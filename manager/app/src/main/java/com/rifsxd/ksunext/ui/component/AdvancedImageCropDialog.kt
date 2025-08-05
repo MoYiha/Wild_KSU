@@ -32,9 +32,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.rifsxd.ksunext.ui.util.ImageCropUtils
 import kotlin.math.cos
 import kotlin.math.sin
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +53,35 @@ fun AdvancedImageCropDialog(
     var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0.0f)) }
     var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0.0f)) }
     
-    val painter = rememberAsyncImagePainter(imageUri)
+    // Debug logging
+    Log.d("AdvancedImageCropDialog", "Image URI: $imageUri")
+    
+    var imageLoaded by remember { mutableStateOf(false) }
+    var imageError by remember { mutableStateOf<String?>(null) }
+    
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .data(imageUri)
+            .crossfade(true)
+            .listener(
+                onStart = { 
+                    Log.d("AdvancedImageCropDialog", "Started loading image")
+                    imageLoaded = false
+                    imageError = null
+                },
+                onSuccess = { _, _ -> 
+                    Log.d("AdvancedImageCropDialog", "Successfully loaded image")
+                    imageLoaded = true
+                    imageError = null
+                },
+                onError = { _, result -> 
+                    Log.e("AdvancedImageCropDialog", "Failed to load image: ${result.throwable}")
+                    imageLoaded = false
+                    imageError = result.throwable.message
+                }
+            )
+            .build()
+    )
     val (minScale, maxScale) = ImageCropUtils.getScaleLimits()
     val (minTranslation, maxTranslation) = ImageCropUtils.getTranslationLimits()
     
@@ -83,19 +113,66 @@ fun AdvancedImageCropDialog(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painter,
-                    contentDescription = "Background Image Preview",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer(
-                            scaleX = scale,
-                            scaleY = scale,
-                            translationX = offsetX,
-                            translationY = offsetY
-                        ),
-                    contentScale = ContentScale.Fit
-                )
+                // Show loading or error state
+                if (!imageLoaded && imageError == null) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator(color = Color.White)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Loading image...",
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                } else if (imageError != null) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Default.Error,
+                                contentDescription = null,
+                                tint = Color.Red,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Failed to load image",
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = imageError ?: "Unknown error",
+                                color = Color.Gray,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                } else {
+                    Image(
+                        painter = painter,
+                        contentDescription = "Background Image Preview",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer(
+                                scaleX = scale,
+                                scaleY = scale,
+                                translationX = offsetX,
+                                translationY = offsetY
+                            ),
+                        contentScale = ContentScale.Fit
+                    )
+                }
                 
                 // Template overlay showing where UI elements will be
                 UITemplateOverlay()
