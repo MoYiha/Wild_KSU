@@ -88,8 +88,6 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")
                 
-                val contentScale = ContentScale.Crop
-                
                 Image(
                     painter = painter,
                     contentDescription = null,

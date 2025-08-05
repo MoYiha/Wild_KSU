@@ -297,23 +297,7 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
             style = Stroke(strokeWidth)
         )
         
-        // Bottom navigation area
-        val bottomY = height - 80.dp.toPx()
-        val navHeight = 60.dp.toPx()
-        
-        drawRoundRect(
-            color = secondaryCardColor,
-            topLeft = androidx.compose.ui.geometry.Offset(0f, bottomY),
-            size = androidx.compose.ui.geometry.Size(width, navHeight),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(0f)
-        )
-        drawRoundRect(
-            color = outlineColor,
-            topLeft = androidx.compose.ui.geometry.Offset(0f, bottomY),
-            size = androidx.compose.ui.geometry.Size(width, navHeight),
-            cornerRadius = androidx.compose.ui.geometry.CornerRadius(0f),
-            style = Stroke(strokeWidth)
-        )
+        // Bottom navigation area removed - no longer needed
         
         // Add text labels
         val textPaint = android.graphics.Paint().apply {
