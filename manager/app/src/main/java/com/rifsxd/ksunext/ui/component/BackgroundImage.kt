@@ -35,29 +35,30 @@ fun BackgroundImageWrapper(
     val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
     
     // Debug logging
-    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode")
+    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency")
     
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image if available
-        backgroundImageUri?.let { uriString ->
-            if (uriString.isNotEmpty()) {
-                Log.d("BackgroundImage", "Loading image from URI: $uriString")
+        if (!backgroundImageUri.isNullOrEmpty()) {
+            Log.d("BackgroundImage", "Loading image from URI: $backgroundImageUri")
+            
+            // Validate URI
+            val uri = try {
+                Uri.parse(backgroundImageUri)
+            } catch (e: Exception) {
+                Log.e("BackgroundImage", "Invalid URI: $backgroundImageUri", e)
+                null
+            }
+            
+            if (uri != null) {
+                Log.d("BackgroundImage", "Parsed URI scheme: ${uri.scheme}, authority: ${uri.authority}")
                 
-                // Validate URI
-                try {
-                    val uri = Uri.parse(uriString)
-                    Log.d("BackgroundImage", "Parsed URI scheme: ${uri.scheme}, authority: ${uri.authority}")
-                } catch (e: Exception) {
-                    Log.e("BackgroundImage", "Invalid URI: $uriString", e)
-                    return@let
-                }
-                
-                var imageLoaded by remember { mutableStateOf(false) }
-                var imageError by remember { mutableStateOf<String?>(null) }
+                var imageLoaded by remember(backgroundImageUri) { mutableStateOf(false) }
+                var imageError by remember(backgroundImageUri) { mutableStateOf<String?>(null) }
                 
                 val painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(context)
-                        .data(Uri.parse(uriString))
+                        .data(uri)
                         .crossfade(true)
                         .listener(
                             onStart = { 
@@ -81,16 +82,25 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Image loaded: $imageLoaded, Error: $imageError")
                 
-                // Apply transformations using enhanced ImageCropUtils
-                val imageModifier = Modifier
-                    .fillMaxSize()
-                    .let { ImageCropUtils.getSimpleCropTransformation(prefs)(it) }
+                // Apply transformations using enhanced ImageCropUtils only for position_adjust mode
+                val imageModifier = if (backgroundFitMode == "position_adjust" || backgroundFitMode == "custom_crop") {
+                    Modifier
+                        .fillMaxSize()
+                        .let { ImageCropUtils.getSimpleCropTransformation(prefs)(it) }
+                        .graphicsLayer(alpha = backgroundTransparency)
+                } else {
+                    Modifier
+                        .fillMaxSize()
+                        .graphicsLayer(alpha = backgroundTransparency)
+                }
                 
                 Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")
                 
                 val contentScale = when (backgroundFitMode) {
                     "zoom_to_fit" -> ContentScale.Crop
                     "edge_to_edge" -> ContentScale.FillBounds
+                    "zoom_fit" -> ContentScale.Fit
+                    "position_adjust" -> ContentScale.Fit
                     "custom_crop" -> ContentScale.Fit
                     else -> ContentScale.FillBounds
                 }
@@ -100,17 +110,6 @@ fun BackgroundImageWrapper(
                     contentDescription = null,
                     modifier = imageModifier,
                     contentScale = contentScale
-                )
-                
-                // Add overlay with transparency control for content readability
-                // Transparency slider controls how dark the overlay is (0 = no overlay, 1 = maximum overlay)
-                val overlayAlpha = (1.0f - backgroundTransparency) * 0.7f // Max overlay alpha of 0.7
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Color.Black.copy(alpha = overlayAlpha)
-                        )
                 )
             }
         }
