@@ -28,7 +28,6 @@ import com.rifsxd.ksunext.ui.util.ImageCropUtils
 fun BackgroundImageWrapper(
     backgroundImageUri: String?,
     backgroundFitMode: String,
-    backgroundTransparency: Float = 1.0f,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -103,17 +102,6 @@ fun BackgroundImageWrapper(
                     contentDescription = null,
                     modifier = imageModifier,
                     contentScale = contentScale
-                )
-                
-                // Add overlay with transparency control for content readability
-                // Transparency slider controls how dark the overlay is (0 = no overlay, 1 = maximum overlay)
-                val overlayAlpha = (1.0f - backgroundTransparency) * 0.7f // Max overlay alpha of 0.7
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Color.Black.copy(alpha = overlayAlpha)
-                        )
                 )
             }
         }
