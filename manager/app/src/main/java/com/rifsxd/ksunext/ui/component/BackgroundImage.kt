@@ -1,0 +1,64 @@
+package com.rifsxd.ksunext.ui.component
+
+import android.content.Context
+import android.net.Uri
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+
+@Composable
+fun BackgroundImageWrapper(
+    backgroundImageUri: String?,
+    backgroundFitMode: String,
+    content: @Composable () -> Unit
+) {
+    val context = LocalContext.current
+    
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Display background image if available
+        backgroundImageUri?.let { uriString ->
+            val painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(context)
+                    .data(Uri.parse(uriString))
+                    .crossfade(true)
+                    .build()
+            )
+            
+            val contentScale = when (backgroundFitMode) {
+                "zoom_to_fit" -> ContentScale.Crop
+                "edge_to_edge" -> ContentScale.FillBounds
+                else -> ContentScale.FillBounds
+            }
+            
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = contentScale
+            )
+            
+            // Add a semi-transparent overlay to ensure content readability
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        MaterialTheme.colorScheme.background.copy(alpha = 0.85f)
+                    )
+            )
+        }
+        
+        // Content on top of background
+        content()
+    }
+}

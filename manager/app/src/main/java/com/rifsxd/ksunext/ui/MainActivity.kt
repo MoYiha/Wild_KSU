@@ -56,6 +56,7 @@ import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.ui.screen.BottomBarDestination
 import com.rifsxd.ksunext.ui.theme.KernelSUTheme
+import com.rifsxd.ksunext.ui.component.BackgroundImageWrapper
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.LocaleHelper
@@ -113,6 +114,10 @@ class MainActivity : ComponentActivity() {
             // Read AMOLED mode preference
             val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
             val amoledMode = prefs.getBoolean("enable_amoled", false)
+            
+            // Read background image preferences
+            val backgroundImageUri = prefs.getString("background_image_uri", null)
+            val backgroundFitMode = prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge"
 
             val moduleViewModel: ModuleViewModel = viewModel()
             val superUserViewModel: SuperUserViewModel = viewModel()
@@ -123,6 +128,10 @@ class MainActivity : ComponentActivity() {
             KernelSUTheme (
                 amoledMode = amoledMode
             ) {
+                BackgroundImageWrapper(
+                    backgroundImageUri = backgroundImageUri,
+                    backgroundFitMode = backgroundFitMode
+                ) {
                 val navController = rememberNavController()
                 val snackBarHostState = remember { SnackbarHostState() }
                 val currentDestination = navController.currentBackStackEntryAsState()?.value?.destination
@@ -183,6 +192,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+                }
                 }
             }
         }
