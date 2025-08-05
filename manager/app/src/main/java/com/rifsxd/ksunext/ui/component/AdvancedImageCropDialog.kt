@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material.icons.filled.FitScreen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -86,17 +85,19 @@ fun AdvancedImageCropDialog(
                 .fillMaxSize()
                 .background(Color.Black)
         ) {
-            // Image preview with simplified transformations (zoom and drag only)
+            // Image preview with full transformations (zoom, drag, and rotation)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .pointerInput(Unit) {
-                        detectTransformGestures { _, pan, zoom, _ ->
+                        detectTransformGestures { _, pan, zoom, rotationDelta ->
                             // Apply zoom
                             scale = (scale * zoom).coerceIn(minScale, maxScale)
                             // Apply pan/drag
                             offsetX = (offsetX + pan.x).coerceIn(minTranslation, maxTranslation)
                             offsetY = (offsetY + pan.y).coerceIn(minTranslation, maxTranslation)
+                            // Apply rotation with finger drag
+                            rotation = (rotation + rotationDelta) % 360f
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -113,7 +114,7 @@ fun AdvancedImageCropDialog(
                             translationY = offsetY,
                             rotationZ = rotation
                         ),
-                    contentScale = ContentScale.Fit
+                    contentScale = ContentScale.Crop
                 )
                 
                 // Template overlay showing where UI elements will be
@@ -131,41 +132,25 @@ fun AdvancedImageCropDialog(
                     )
                     .padding(16.dp)
             ) {
-                // First row - Quick action buttons
+                // Auto-fit button (centered)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    // Rotate button
+                    // Auto-fit button - properly fills screen without black bars
                     OutlinedButton(
                         onClick = {
-                            rotation = (rotation + 90f) % 360f
-                        },
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(Icons.Default.RotateRight, contentDescription = null)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Rotate")
-                    }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    // Auto-fit button
-                    OutlinedButton(
-                        onClick = {
-                            // Auto-fit: reset scale to 1.0, center the image
-                            scale = 1.0f
+                            // Auto-fit: scale to fill screen, center the image, no rotation
+                            scale = 1.2f // Slightly larger to ensure no black bars
                             offsetX = 0.0f
                             offsetY = 0.0f
+                            rotation = 0.0f
                         },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
-                        modifier = Modifier.weight(1f)
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
                     ) {
                         Icon(Icons.Default.FitScreen, contentDescription = null)
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text("Auto Fit")
                     }
                 }
