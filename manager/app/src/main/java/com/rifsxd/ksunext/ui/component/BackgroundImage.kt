@@ -80,12 +80,17 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Image loaded: $imageLoaded, Error: $imageError")
                 
-                // Load crop settings
-                val cropSettings = remember(uriString) {
-                    ImageCropUtils.loadImageCropSettings(prefs)
-                }
+                // Apply transformations using enhanced ImageCropUtils
+                 val imageModifier = Modifier
+                     .fillMaxSize()
+                     .let { modifier ->
+                         val transformation = ImageCropUtils.getImageTransformation(prefs, fitMode)
+                         modifier.transformation()
+                     }
+                 
+                 Log.d(TAG, "Applying transformation for fit mode: $fitMode")
                 
-                val contentScale = when (backgroundFitMode) {
+                val contentScale = when (fitMode) {
                     "zoom_to_fit" -> ContentScale.Crop
                     "edge_to_edge" -> ContentScale.FillBounds
                     "custom_crop" -> ContentScale.Fit
@@ -95,14 +100,7 @@ fun BackgroundImageWrapper(
                 Image(
                     painter = painter,
                     contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer(
-                            scaleX = if (backgroundFitMode == "custom_crop") cropSettings.scale else 1f,
-                            scaleY = if (backgroundFitMode == "custom_crop") cropSettings.scale else 1f,
-                            translationX = if (backgroundFitMode == "custom_crop") cropSettings.offsetX else 0f,
-                            translationY = if (backgroundFitMode == "custom_crop") cropSettings.offsetY else 0f
-                        ),
+                    modifier = imageModifier,
                     contentScale = contentScale
                 )
                 

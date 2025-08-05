@@ -63,7 +63,7 @@ import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.component.SwitchItem
-import com.rifsxd.ksunext.ui.component.ImageCropDialog
+import com.rifsxd.ksunext.ui.component.AdvancedImageCropDialog
 import com.rifsxd.ksunext.ui.util.ImageCropUtils
 import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
@@ -374,26 +374,23 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             }
 
-            // Image crop dialog
+            // Advanced image crop dialog
             if (showCropDialog && selectedImageUri != null) {
-                ImageCropDialog(
+                AdvancedImageCropDialog(
                     imageUri = selectedImageUri!!,
                     onDismiss = {
                         showCropDialog = false
                         selectedImageUri = null
                     },
-                    onConfirm = { cropSettings ->
-                        // Save the image URI and crop settings
+                    onSave = {
+                        // Save the image URI and set to position_adjust mode
                         prefs.edit().apply {
                             putString("background_image_uri", selectedImageUri.toString())
-                            putString("background_fit_mode", "custom_crop")
-                            putFloat("background_crop_scale", cropSettings.scale)
-                            putFloat("background_crop_offset_x", cropSettings.offsetX)
-                            putFloat("background_crop_offset_y", cropSettings.offsetY)
+                            putString("background_fit_mode", "position_adjust")
                             apply()
                         }
                         backgroundImageUri = selectedImageUri.toString()
-                        backgroundFitMode = "custom_crop"
+                        backgroundFitMode = "position_adjust"
                         showCropDialog = false
                         selectedImageUri = null
                     }
@@ -404,6 +401,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 val fitModeOptions = listOf(
                     "edge_to_edge" to stringResource(R.string.background_fit_edge_to_edge),
                     "zoom_to_fit" to stringResource(R.string.background_fit_zoom_to_fit),
+                    "zoom_fit" to "Zoom Fit",
+                    "position_adjust" to "Position Adjust",
                     "custom_crop" to stringResource(R.string.crop_background_image)
                 )
                 
@@ -478,6 +477,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 val currentFitModeDisplay = when (backgroundFitMode) {
                     "edge_to_edge" -> stringResource(R.string.background_fit_edge_to_edge)
                     "zoom_to_fit" -> stringResource(R.string.background_fit_zoom_to_fit)
+                    "zoom_fit" -> "Zoom Fit"
+                    "position_adjust" -> "Position Adjust"
                     "custom_crop" -> stringResource(R.string.crop_background_image)
                     else -> stringResource(R.string.background_fit_edge_to_edge)
                 }
@@ -491,7 +492,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     ) },
                     supportingContent = { Text(currentFitModeDisplay) },
                     trailingContent = {
-                        if (backgroundFitMode == "custom_crop") {
+                        if (backgroundFitMode == "custom_crop" || backgroundFitMode == "position_adjust") {
                             IconButton(onClick = {
                                 // Re-open crop dialog for current image
                                 backgroundImageUri?.let { uriString ->

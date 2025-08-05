@@ -9,14 +9,21 @@ import android.graphics.Paint
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.graphicsLayer
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.rifsxd.ksunext.ui.component.ImageCropSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.math.max
+import kotlin.math.min
 
 object ImageCropUtils {
+    // Constants for transformation limits (inspired by SukiSU Ultra's security limits)
+    private const val MIN_SCALE = 0.5f
+    private const val MAX_SCALE = 3.0f
+    private const val MAX_TRANSLATION = 500f
     private const val TAG = "ImageCropUtils"
     
     fun saveImageCropSettings(prefs: SharedPreferences, uri: String, settings: ImageCropSettings) {
@@ -99,4 +106,75 @@ object ImageCropUtils {
             return bitmap
         }
     }
+    
+    fun getImageTransformation(
+        prefs: SharedPreferences,
+        fitMode: String
+    ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
+        return {
+            when (fitMode) {
+                "custom_crop" -> {
+                    val scaleX = constrainScale(prefs.getFloat("background_scale_x", 1.0f))
+                    val scaleY = constrainScale(prefs.getFloat("background_scale_y", 1.0f))
+                    val offsetX = constrainTranslation(prefs.getFloat("background_offset_x", 0.0f))
+                    val offsetY = constrainTranslation(prefs.getFloat("background_offset_y", 0.0f))
+                    val rotation = constrainRotation(prefs.getFloat("background_rotation", 0.0f))
+                    
+                    graphicsLayer(
+                        scaleX = scaleX,
+                        scaleY = scaleY,
+                        translationX = offsetX,
+                        translationY = offsetY,
+                        rotationZ = rotation
+                    )
+                }
+                "zoom_fit" -> {
+                    val zoom = constrainScale(prefs.getFloat("background_zoom", 1.0f))
+                    graphicsLayer(
+                        scaleX = zoom,
+                        scaleY = zoom
+                    )
+                }
+                "position_adjust" -> {
+                    val offsetX = constrainTranslation(prefs.getFloat("background_pos_x", 0.0f))
+                    val offsetY = constrainTranslation(prefs.getFloat("background_pos_y", 0.0f))
+                    graphicsLayer(
+                        translationX = offsetX,
+                        translationY = offsetY
+                    )
+                }
+                else -> this
+            }
+        }
+    }
+    
+    // Security functions to ensure transformation limits (inspired by SukiSU Ultra)
+    private fun constrainScale(scale: Float): Float {
+        return max(MIN_SCALE, min(MAX_SCALE, scale))
+    }
+    
+    private fun constrainTranslation(translation: Float): Float {
+        return max(-MAX_TRANSLATION, min(MAX_TRANSLATION, translation))
+    }
+    
+    private fun constrainRotation(rotation: Float): Float {
+        return rotation % 360f
+    }
+    
+    // Helper functions for saving constrained values
+    fun saveConstrainedScale(prefs: SharedPreferences, key: String, value: Float) {
+        prefs.edit().putFloat(key, constrainScale(value)).apply()
+    }
+    
+    fun saveConstrainedTranslation(prefs: SharedPreferences, key: String, value: Float) {
+        prefs.edit().putFloat(key, constrainTranslation(value)).apply()
+    }
+    
+    fun saveConstrainedRotation(prefs: SharedPreferences, key: String, value: Float) {
+        prefs.edit().putFloat(key, constrainRotation(value)).apply()
+    }
+    
+    // Get transformation limits for UI
+    fun getScaleLimits(): Pair<Float, Float> = Pair(MIN_SCALE, MAX_SCALE)
+    fun getTranslationLimits(): Pair<Float, Float> = Pair(-MAX_TRANSLATION, MAX_TRANSLATION)
 }
