@@ -39,6 +39,8 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
@@ -465,7 +467,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 // Background Transparency Slider
                 var backgroundTransparency by rememberSaveable {
                     mutableFloatStateOf(
-                        prefs.getFloat("background_transparency", 1.0f)
+                        // Convert stored alpha (0.0-1.0) to transparency percentage (0-100)
+                        // where 0% = solid (alpha 1.0) and 100% = transparent (alpha 0.0)
+                        (1.0f - prefs.getFloat("background_transparency", 1.0f)) * 100f
                     )
                 }
                 
@@ -493,10 +497,19 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     value = backgroundTransparency,
                                     onValueChange = { value ->
                                         backgroundTransparency = value
-                                        prefs.edit().putFloat("background_transparency", value).apply()
+                                        // Convert transparency percentage back to alpha value
+                                        // 0% transparency = 1.0 alpha, 100% transparency = 0.0 alpha
+                                        val alphaValue = 1.0f - (value / 100f)
+                                        prefs.edit().putFloat("background_transparency", alphaValue).apply()
                                     },
-                                    valueRange = 0.0f..1.0f,
-                                    modifier = Modifier.weight(1f)
+                                    valueRange = 0.0f..100.0f,
+                                    modifier = Modifier.weight(1f),
+                                    thumb = {
+                                        // Custom round thumb
+                                        SliderDefaults.Thumb(
+                                            interactionSource = remember { MutableInteractionSource() }
+                                        )
+                                    }
                                 )
                                 Text(
                                     text = "100%",
@@ -506,7 +519,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                 )
                             }
                             Text(
-                                text = "${(backgroundTransparency * 100).toInt()}%",
+                                text = "${backgroundTransparency.toInt()}%",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -527,16 +540,15 @@ private fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
-        title = { Text(
-                text = stringResource(R.string.customization),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Black,
-            ) }, navigationIcon = {
+        title = { Text(stringResource(R.string.customization)) },
+        navigationIcon = {
             IconButton(
                 onClick = onBack
-            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+            ) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null) }
         },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         scrollBehavior = scrollBehavior
     )
 }
