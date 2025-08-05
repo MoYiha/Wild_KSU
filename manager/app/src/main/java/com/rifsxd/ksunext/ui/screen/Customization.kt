@@ -1,7 +1,11 @@
 package com.rifsxd.ksunext.ui.screen
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -326,6 +330,134 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                     )
                 }
+            }
+
+            // Background Image Setting
+            var backgroundImageUri by rememberSaveable {
+                mutableStateOf(
+                    prefs.getString("background_image_uri", null)
+                )
+            }
+            
+            var backgroundFitMode by rememberSaveable {
+                mutableStateOf(
+                    prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge"
+                )
+            }
+
+            val selectImageLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        // Take persistable permission for the selected image
+                        try {
+                            context.contentResolver.takePersistableUriPermission(
+                                uri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
+                            prefs.edit().putString("background_image_uri", uri.toString()).apply()
+                            backgroundImageUri = uri.toString()
+                        } catch (e: Exception) {
+                            // Handle permission error
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+
+            val backgroundFitModeDialog = rememberCustomDialog { dismiss ->
+                val fitModeOptions = listOf(
+                    "edge_to_edge" to stringResource(R.string.background_fit_edge_to_edge),
+                    "zoom_to_fit" to stringResource(R.string.background_fit_zoom_to_fit)
+                )
+                
+                val options = fitModeOptions.map { (mode, displayName) ->
+                    ListOption(
+                        titleText = displayName,
+                        selected = backgroundFitMode == mode
+                    )
+                }
+                
+                var selectedIndex by remember { 
+                    mutableIntStateOf(fitModeOptions.indexOfFirst { (mode, _) -> backgroundFitMode == mode })
+                }
+                
+                ListDialog(
+                    state = rememberUseCaseState(
+                        visible = true,
+                        onFinishedRequest = {
+                            if (selectedIndex >= 0 && selectedIndex < fitModeOptions.size) {
+                                val newMode = fitModeOptions[selectedIndex].first
+                                prefs.edit().putString("background_fit_mode", newMode).apply()
+                                backgroundFitMode = newMode
+                            }
+                            dismiss()
+                        },
+                        onCloseRequest = {
+                            dismiss()
+                        }
+                    ),
+                    header = Header.Default(
+                        title = stringResource(R.string.background_image_fit_mode),
+                    ),
+                    selection = ListSelection.Single(
+                        showRadioButtons = true,
+                        options = options
+                    ) { index, _ ->
+                        selectedIndex = index
+                    }
+                )
+            }
+
+            // Background Image Selection
+            ListItem(
+                leadingContent = { Icon(Icons.Filled.Image, stringResource(R.string.settings_background_image)) },
+                headlineContent = { Text(
+                    text = stringResource(R.string.settings_background_image),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                ) },
+                supportingContent = { Text(stringResource(R.string.settings_background_image_summary)) },
+                trailingContent = {
+                    if (backgroundImageUri != null) {
+                        IconButton(onClick = {
+                            prefs.edit().remove("background_image_uri").apply()
+                            backgroundImageUri = null
+                        }) {
+                            Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
+                        }
+                    }
+                },
+                modifier = Modifier.clickable {
+                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        type = "image/*"
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
+                    selectImageLauncher.launch(intent)
+                }
+            )
+
+            // Background Fit Mode (only show if background image is selected)
+            if (backgroundImageUri != null) {
+                val currentFitModeDisplay = when (backgroundFitMode) {
+                    "edge_to_edge" -> stringResource(R.string.background_fit_edge_to_edge)
+                    "zoom_to_fit" -> stringResource(R.string.background_fit_zoom_to_fit)
+                    else -> stringResource(R.string.background_fit_edge_to_edge)
+                }
+                
+                ListItem(
+                    leadingContent = { Icon(Icons.Filled.AspectRatio, stringResource(R.string.background_image_fit_mode)) },
+                    headlineContent = { Text(
+                        text = stringResource(R.string.background_image_fit_mode),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    ) },
+                    supportingContent = { Text(currentFitModeDisplay) },
+                    modifier = Modifier.clickable {
+                        backgroundFitModeDialog.show()
+                    }
+                )
             }
         }
     }
