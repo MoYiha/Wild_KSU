@@ -131,30 +131,20 @@ class MainActivity : ComponentActivity() {
                     when (key) {
                         "enable_amoled" -> {
                             amoledMode = prefs.getBoolean("enable_amoled", false)
-                            android.util.Log.d("MainActivity", "AMOLED mode updated: $amoledMode")
                         }
                         "background_image_uri" -> {
                             backgroundImageUri = prefs.getString("background_image_uri", null)
-                            android.util.Log.d("MainActivity", "Background URI updated: $backgroundImageUri")
                         }
                         "background_transparency" -> {
                             backgroundTransparency = prefs.getFloat("background_transparency", 1.0f)
-                            android.util.Log.d("MainActivity", "Background transparency updated: $backgroundTransparency")
                         }
                         "ui_transparency" -> {
                             uiTransparency = prefs.getFloat("ui_transparency", 0.0f)
-                            android.util.Log.d("MainActivity", "UI transparency updated: $uiTransparency")
                         }
                     }
                 }
                 prefs.registerOnSharedPreferenceChangeListener(listener)
             }
-            
-            // Debug logging
-            android.util.Log.d("MainActivity", "AMOLED mode: $amoledMode")
-            android.util.Log.d("MainActivity", "Background URI from prefs: $backgroundImageUri")
-            android.util.Log.d("MainActivity", "Background transparency: $backgroundTransparency")
-            android.util.Log.d("MainActivity", "UI transparency: $uiTransparency")
 
             val moduleViewModel: ModuleViewModel = viewModel()
             val superUserViewModel: SuperUserViewModel = viewModel()
