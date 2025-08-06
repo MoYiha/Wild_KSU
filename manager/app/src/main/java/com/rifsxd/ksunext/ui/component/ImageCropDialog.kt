@@ -77,34 +77,6 @@ fun ImageCropDialog(
                     )
                     
                     Row {
-                        // Fit to screen button
-                        IconButton(
-                            onClick = {
-                                scale = 1f
-                                offsetX = 0f
-                                offsetY = 0f
-                            }
-                        ) {
-                            Icon(
-                                Icons.Default.FitScreen,
-                                contentDescription = stringResource(R.string.fit_to_screen)
-                            )
-                        }
-                        
-                        // Zoom to screen button
-                        IconButton(
-                            onClick = {
-                                scale = 1.5f
-                                offsetX = 0f
-                                offsetY = 0f
-                            }
-                        ) {
-                            Icon(
-                                Icons.Default.ZoomOutMap,
-                                contentDescription = stringResource(R.string.zoom_to_screen)
-                            )
-                        }
-                        
                         // Reset button
                         IconButton(
                             onClick = {

@@ -156,4 +156,15 @@ object ImageCropUtils {
     // Get transformation limits for UI
     fun getScaleLimits(): Pair<Float, Float> = Pair(MIN_SCALE, MAX_SCALE)
     fun getTranslationLimits(): Pair<Float, Float> = Pair(-MAX_TRANSLATION, MAX_TRANSLATION)
+    
+    // Get image transformation based on fit mode and crop settings
+    fun getImageTransformation(
+        prefs: SharedPreferences,
+        fitMode: String
+    ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
+        return when (fitMode) {
+            "custom_crop" -> getSimpleCropTransformation(prefs)
+            else -> { { this } } // No transformation for other modes
+        }
+    }
 }

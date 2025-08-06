@@ -547,10 +547,10 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     modifier = Modifier.width(32.dp)
                                 )
                                 Slider(
-                                    value = backgroundTransparency,
+                                    value = 1.0f - backgroundTransparency,
                                     onValueChange = { value ->
-                                        backgroundTransparency = value
-                                        prefs.edit().putFloat("background_transparency", value).apply()
+                                        backgroundTransparency = 1.0f - value
+                                        prefs.edit().putFloat("background_transparency", backgroundTransparency).apply()
                                     },
                                     valueRange = 0.0f..1.0f,
                                     modifier = Modifier.weight(1f)
@@ -563,7 +563,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                 )
                             }
                             Text(
-                                text = "${(backgroundTransparency * 100).toInt()}%",
+                                text = "${((1.0f - backgroundTransparency) * 100).toInt()}%",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
