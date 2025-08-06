@@ -163,7 +163,7 @@ object ImageCropUtils {
         fitMode: String
     ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
         return when (fitMode) {
-            "custom_crop" -> getSimpleCropTransformation(prefs)
+            "custom_crop", "position_adjust" -> getSimpleCropTransformation(prefs)
             else -> { { this } } // No transformation for other modes
         }
     }
