@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.CompositionLocalProvider
 
 private val DarkColorScheme = darkColorScheme(
     primary = PRIMARY,
@@ -32,8 +30,7 @@ private val LightColorScheme = lightColorScheme(
     tertiary = SECONDARY_LIGHT
 )
 
-// CompositionLocal for UI transparency
-val LocalUITransparency = compositionLocalOf { 0.0f }
+
 
 fun Color.blend(other: Color, ratio: Float): Color {
     val inverse = 1f - ratio
@@ -167,12 +164,8 @@ fun KernelSUTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-    ) {
-        CompositionLocalProvider(
-            LocalUITransparency provides uiTransparency,
-            content = content
-        )
-    }
+        content = content
+    )
 }
 
 @Composable
@@ -209,7 +202,7 @@ private fun SystemBarStyle(
  * Always returns 0.dp elevation for a clean, flat appearance
  */
 @Composable
-fun getTransparencyAwareCardElevation(): androidx.compose.material3.CardElevation {
+fun getCardElevation(): androidx.compose.material3.CardElevation {
     return CardDefaults.elevatedCardElevation(
         defaultElevation = 0.dp,
         pressedElevation = 0.dp,

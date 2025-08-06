@@ -135,7 +135,7 @@ import com.rifsxd.ksunext.ui.webui.WebUIActivity
 import com.dergoogler.mmrl.ui.component.LabelItem
 import com.dergoogler.mmrl.ui.component.LabelItemDefaults
 import com.topjohnwu.superuser.io.SuFile
-import com.rifsxd.ksunext.ui.theme.getTransparencyAwareCardElevation
+import com.rifsxd.ksunext.ui.theme.getCardElevation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -848,7 +848,7 @@ fun ModuleItem(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getTransparencyAwareCardElevation(),
+        elevation = getCardElevation(),
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
