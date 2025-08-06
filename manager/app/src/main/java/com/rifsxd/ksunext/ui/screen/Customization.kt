@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
@@ -89,23 +90,17 @@ import java.util.Locale
 @Destination<RootGraph>
 @Composable
 fun CustomizationScreen(navigator: DestinationsNavigator) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackBarHost = LocalSnackbarHost.current
 
     val isManager = Natives.becomeManager(ksuApp.packageName)
     val ksuVersion = if (isManager) Natives.version else null
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHost) },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-    ) { paddingValues ->
-    
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .verticalScroll(rememberScrollState())
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp)
+    ) {
 
             val context = LocalContext.current
             val scope = rememberCoroutineScope()
@@ -519,7 +514,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             }
         }
     }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
