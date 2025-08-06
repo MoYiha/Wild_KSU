@@ -205,19 +205,17 @@ private fun SystemBarStyle(
 }
 
 /**
- * Get dynamic card elevation based on transparency level
- * When transparency is high (> 0.7), elevation becomes 0 to remove borders
+ * Get card elevation with no shadow/border
+ * Always returns 0.dp elevation for a clean, flat appearance
  */
 @Composable
 fun getTransparencyAwareCardElevation(): androidx.compose.material3.CardElevation {
-    val uiTransparency = LocalUITransparency.current
-    val elevation = if (uiTransparency > 0.7f) 0.dp else 6.dp
     return CardDefaults.elevatedCardElevation(
-        defaultElevation = elevation,
-        pressedElevation = elevation,
-        focusedElevation = elevation,
-        hoveredElevation = elevation,
-        draggedElevation = elevation,
+        defaultElevation = 0.dp,
+        pressedElevation = 0.dp,
+        focusedElevation = 0.dp,
+        hoveredElevation = 0.dp,
+        draggedElevation = 0.dp,
         disabledElevation = 0.dp
     )
 }
