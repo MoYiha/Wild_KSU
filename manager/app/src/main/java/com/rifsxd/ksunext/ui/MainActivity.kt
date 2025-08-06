@@ -217,22 +217,21 @@ class MainActivity : ComponentActivity() {
                     else -> true
                 }
 
-                val showTopBar = when (currentDestination?.route) {
-                    FlashScreenDestination.route -> false // Hide for FlashScreenDestination
-                    ExecuteModuleActionScreenDestination.route -> false // Hide for ExecuteModuleActionScreen
-                    ModuleScreenDestination.route -> false // Hide for ModuleScreen (has its own SearchAppBar)
-                    SuperUserScreenDestination.route -> false // Hide for SuperUserScreen (has its own SearchAppBar)
-                    else -> true
-                }
-
                 Scaffold(
                     topBar = {
-                        AnimatedVisibility(
-                            visible = showTopBar,
-                            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
-                        ) {
-                            TopBar(navController, currentDestination)
+                        // Only show TopBar for screens that don't have their own TopBar
+                        val screensWithOwnTopBar = listOf(
+                            ModuleScreenDestination.route,
+                            SuperUserScreenDestination.route,
+                            FlashScreenDestination.route,
+                            ExecuteModuleActionScreenDestination.route
+                        )
+                        
+                        if (currentDestination?.route !in screensWithOwnTopBar) {
+                            TopBar(
+                                currentDestination = currentDestination,
+                                navigator = navigator
+                            )
                         }
                     },
                     bottomBar = {
@@ -328,8 +327,7 @@ private fun BottomBar(navController: NavHostController, moduleUpdateCount: Int) 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(navController: NavHostController, currentDestination: NavDestination?) {
-    val navigator = navController.rememberDestinationsNavigator()
+private fun TopBar(currentDestination: NavDestination?, navigator: DestinationsNavigator) {
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
     val containerColor = remember(surfaceContainer) { surfaceContainer }
     
