@@ -74,16 +74,6 @@ fun HomeScreen(navigator: DestinationsNavigator) {
     val developerOptionsEnabled = prefs.getBoolean("enable_developer_options", false)
 
     Scaffold(
-        topBar = {
-            TopBar(
-                kernelVersion,
-                ksuVersion,
-                onInstallClick = {
-                    navigator.navigate(InstallScreenDestination)
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { innerPadding ->
         Column(

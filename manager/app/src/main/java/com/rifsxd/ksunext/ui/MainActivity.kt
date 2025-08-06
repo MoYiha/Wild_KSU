@@ -24,14 +24,23 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -52,7 +61,15 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import com.ramcosta.composedestinations.generated.destinations.ExecuteModuleActionScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.FlashScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.HomeScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ModuleScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SuperUserScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.CustomizationScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.DeveloperScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.BackupRestoreScreenDestination
 import com.ramcosta.composedestinations.generated.NavGraphs
+import androidx.navigation.NavDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
 import com.rifsxd.ksunext.Natives
@@ -195,7 +212,22 @@ class MainActivity : ComponentActivity() {
                     else -> true
                 }
 
+                val showTopBar = when (currentDestination?.route) {
+                    FlashScreenDestination.route -> false // Hide for FlashScreenDestination
+                    ExecuteModuleActionScreenDestination.route -> false // Hide for ExecuteModuleActionScreen
+                    else -> true
+                }
+
                 Scaffold(
+                    topBar = {
+                        AnimatedVisibility(
+                            visible = showTopBar,
+                            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
+                        ) {
+                            TopBar(navController, currentDestination)
+                        }
+                    },
                     bottomBar = {
                         AnimatedVisibility(
                             visible = showBottomBar,
@@ -285,4 +317,47 @@ private fun BottomBar(navController: NavHostController, moduleUpdateCount: Int) 
                 )
             }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(navController: NavHostController, currentDestination: NavDestination?) {
+    val navigator = navController.rememberDestinationsNavigator()
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = remember(surfaceContainer) { surfaceContainer }
+    
+    // Determine if we need a back button and the title based on current destination
+    val (title, showBackButton) = when (currentDestination?.route) {
+        HomeScreenDestination.route -> stringResource(R.string.home) to false
+        ModuleScreenDestination.route -> stringResource(R.string.module) to false
+        SuperUserScreenDestination.route -> stringResource(R.string.superuser) to false
+        SettingScreenDestination.route -> stringResource(R.string.settings) to false
+        CustomizationScreenDestination.route -> stringResource(R.string.customization) to true
+        DeveloperScreenDestination.route -> stringResource(R.string.developer) to true
+        BackupRestoreScreenDestination.route -> stringResource(R.string.backup_restore) to true
+        else -> "" to false
+    }
+    
+    TopAppBar(
+        title = { 
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black,
+            ) 
+        },
+        navigationIcon = {
+            if (showBackButton) {
+                IconButton(
+                    onClick = { navigator.navigateUp() }
+                ) { 
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) 
+                }
+            }
+        },
+        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor
+        )
+    )
 }

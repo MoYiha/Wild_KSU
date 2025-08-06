@@ -111,11 +111,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
     val ksuVersion = if (isManager) Natives.version else null
 
     Scaffold(
-        topBar = {
-            TopBar(
-                scrollBehavior = scrollBehavior
-            )
-        },
         snackbarHost = { SnackbarHost(snackBarHost) },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { paddingValues ->
