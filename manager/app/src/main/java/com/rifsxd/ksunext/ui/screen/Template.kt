@@ -130,50 +130,6 @@ fun AppProfileTemplateScreen(
     }
 
     Scaffold(
-        topBar = {
-            val clipboardManager = LocalClipboardManager.current
-            val context = LocalContext.current
-            val showToast = fun(msg: String) {
-                scope.launch(Dispatchers.Main) {
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                }
-            }
-            TopBar(
-                onBack = dropUnlessResumed { navigator.popBackStack() },
-                onSync = {
-                    scope.launch { viewModel.fetchTemplates(true) }
-                },
-                onImport = {
-                    clipboardManager.getText()?.text?.let {
-                        if (it.isEmpty()) {
-                            showToast(context.getString(R.string.app_profile_template_import_empty))
-                            return@let
-                        }
-                        scope.launch {
-                            viewModel.importTemplates(
-                                it, {
-                                    showToast(context.getString(R.string.app_profile_template_import_success))
-                                    viewModel.fetchTemplates(false)
-                                },
-                                showToast
-                            )
-                        }
-                    }
-                },
-                onExport = {
-                    scope.launch {
-                        viewModel.exportTemplates(
-                            {
-                                showToast(context.getString(R.string.app_profile_template_export_empty))
-                            }
-                        ) {
-                            clipboardManager.setText(AnnotatedString(it))
-                        }
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
         floatingActionButton = {
             AnimatedVisibility(
                 visible = showFab,

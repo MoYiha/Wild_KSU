@@ -85,44 +85,6 @@ fun TemplateEditorScreen(
     }
 
     Scaffold(
-        topBar = {
-            val author =
-                if (initialTemplate.author.isNotEmpty()) "@${initialTemplate.author}" else ""
-            val readOnlyHint = if (readOnly) {
-                " - ${stringResource(id = R.string.app_profile_template_readonly)}"
-            } else {
-                ""
-            }
-            val titleSummary = "${initialTemplate.id}$author$readOnlyHint"
-            val saveTemplateFailed = stringResource(id = R.string.app_profile_template_save_failed)
-            val context = LocalContext.current
-
-            TopBar(
-                title = if (isCreation) {
-                    stringResource(R.string.app_profile_template_create)
-                } else if (readOnly) {
-                    stringResource(R.string.app_profile_template_view)
-                } else {
-                    stringResource(R.string.app_profile_template_edit)
-                },
-                readOnly = readOnly,
-                summary = titleSummary,
-                onBack = dropUnlessResumed { navigator.navigateBack(result = !readOnly) },
-                onDelete = {
-                    if (deleteAppProfileTemplate(template.id)) {
-                        navigator.navigateBack(result = true)
-                    }
-                },
-                onSave = {
-                    if (saveTemplate(template, isCreation)) {
-                        navigator.navigateBack(result = true)
-                    } else {
-                        Toast.makeText(context, saveTemplateFailed, Toast.LENGTH_SHORT).show()
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { innerPadding ->
         Column(

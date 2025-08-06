@@ -338,6 +338,12 @@ private fun TopBar(navController: NavHostController, currentDestination: NavDest
         CustomizationScreenDestination.route -> stringResource(R.string.customization) to true
         DeveloperScreenDestination.route -> stringResource(R.string.developer) to true
         BackupRestoreScreenDestination.route -> stringResource(R.string.backup_restore) to true
+        AppProfileScreenDestination.route -> stringResource(R.string.app_profile) to true
+        TemplateEditorScreenDestination.route -> stringResource(R.string.app_profile_template_editor) to true
+        AppProfileTemplateScreenDestination.route -> stringResource(R.string.settings_profile_template) to true
+        ExecuteModuleActionScreenDestination.route -> stringResource(R.string.action) to true
+        InstallScreenDestination.route -> stringResource(R.string.install) to true
+        FlashScreenDestination.route -> stringResource(R.string.install) to true
         else -> "" to false
     }
     

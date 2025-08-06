@@ -116,28 +116,6 @@ fun ExecuteModuleActionScreen(navigator: DestinationsNavigator, moduleId: String
     }
 
     Scaffold(
-        topBar = {
-            TopBar(
-                isActionRunning = isActionRunning,
-                onBack = dropUnlessResumed {
-                    navigator.popBackStack()
-                },
-                onSave = {
-                    if (!isActionRunning) {
-                        scope.launch {
-                            val format = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
-                            val date = format.format(Date())
-                            val file = File(
-                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                                "KernelSU_Next_module_action_log_${date}.log"
-                            )
-                            file.writeText(logContent.toString())
-                            snackBarHost.showSnackbar("Log saved to ${file.absolutePath}")
-                        }
-                    }
-                }
-            )
-        },
         floatingActionButton = {
             if (!isActionRunning) {
                 ExtendedFloatingActionButton(

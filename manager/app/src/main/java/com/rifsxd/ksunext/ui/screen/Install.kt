@@ -166,13 +166,6 @@ fun InstallScreen(navigator: DestinationsNavigator) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
-        topBar = {
-            TopBar(
-                onBack = dropUnlessResumed { navigator.popBackStack() },
-                onLkmUpload = onLkmUpload,
-                scrollBehavior = scrollBehavior
-            )
-        },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { innerPadding ->
         Column(

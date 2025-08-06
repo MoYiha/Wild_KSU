@@ -223,28 +223,6 @@ fun FlashScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopBar(
-                flashing,
-                onBack = dropUnlessResumed {
-                    navigator.popBackStack()
-                    if (finishIntent) activity?.finish()
-                },
-                onSave = {
-                    scope.launch {
-                        val format = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
-                        val date = format.format(Date())
-                        val file = File(
-                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                            "KernelSU_Next_install_log_${date}.log"
-                        )
-                        file.writeText(logContent.toString())
-                        snackBarHost.showSnackbar("Log saved to ${file.absolutePath}")
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        },
         floatingActionButton = {
             if (flashIt is FlashIt.FlashModules && (flashing == FlashingStatus.SUCCESS)) {
                 // Reboot button for modules flashing

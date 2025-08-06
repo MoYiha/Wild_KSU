@@ -112,12 +112,6 @@ fun AppProfileScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopBar(
-                onBack = dropUnlessResumed { navigator.popBackStack() },
-                scrollBehavior = scrollBehavior
-            )
-        },
         snackbarHost = { SnackbarHost(hostState = snackBarHost) },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { paddingValues ->
