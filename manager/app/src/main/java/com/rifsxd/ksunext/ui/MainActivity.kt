@@ -216,6 +216,8 @@ class MainActivity : ComponentActivity() {
                 val showTopBar = when (currentDestination?.route) {
                     FlashScreenDestination.route -> false // Hide for FlashScreenDestination
                     ExecuteModuleActionScreenDestination.route -> false // Hide for ExecuteModuleActionScreen
+                    ModuleScreenDestination.route -> false // Hide for ModuleScreen (has its own SearchAppBar)
+                    SuperUserScreenDestination.route -> false // Hide for SuperUserScreen (has its own SearchAppBar)
                     else -> true
                 }
 
@@ -329,7 +331,7 @@ private fun TopBar(navController: NavHostController, currentDestination: NavDest
     
     // Determine if we need a back button and the title based on current destination
     val (title, showBackButton) = when (currentDestination?.route) {
-        HomeScreenDestination.route -> stringResource(R.string.home) to false
+        HomeScreenDestination.route -> stringResource(R.string.app_name) to false
         ModuleScreenDestination.route -> stringResource(R.string.module) to false
         SuperUserScreenDestination.route -> stringResource(R.string.superuser) to false
         SettingScreenDestination.route -> stringResource(R.string.settings) to false
