@@ -27,6 +27,9 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
@@ -40,6 +43,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -76,12 +80,17 @@ import com.ramcosta.composedestinations.generated.NavGraphs
 import androidx.navigation.NavDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.screen.BottomBarDestination
 import com.rifsxd.ksunext.ui.theme.KernelSUTheme
 import com.rifsxd.ksunext.ui.component.BackgroundImageWrapper
+import com.rifsxd.ksunext.ui.component.SearchAppBar
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.LocaleHelper
@@ -219,18 +228,18 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     topBar = {
-                        // Only show TopBar for screens that don't have their own TopBar
-                        val screensWithOwnTopBar = listOf(
-                            ModuleScreenDestination.route,
-                            SuperUserScreenDestination.route,
+                        // Show unified TopBar for all screens except those that should be hidden
+                        val screensWithoutTopBar = listOf(
                             FlashScreenDestination.route,
                             ExecuteModuleActionScreenDestination.route
                         )
                         
-                        if (currentDestination?.route !in screensWithOwnTopBar) {
-                            TopBar(
+                        if (currentDestination?.route !in screensWithoutTopBar) {
+                            UnifiedTopBar(
                                 currentDestination = currentDestination,
-                                navigator = navigator
+                                navigator = navigator,
+                                moduleViewModel = moduleViewModel,
+                                superUserViewModel = superUserViewModel
                             )
                         }
                     },
@@ -327,15 +336,154 @@ private fun BottomBar(navController: NavHostController, moduleUpdateCount: Int) 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TopBar(currentDestination: NavDestination?, navigator: DestinationsNavigator) {
+private fun UnifiedTopBar(
+    currentDestination: NavDestination?, 
+    navigator: DestinationsNavigator,
+    moduleViewModel: ModuleViewModel,
+    superUserViewModel: SuperUserViewModel
+) {
+    when (currentDestination?.route) {
+        ModuleScreenDestination.route -> {
+            ModuleTopBar(moduleViewModel = moduleViewModel)
+        }
+        SuperUserScreenDestination.route -> {
+            SuperUserTopBar(superUserViewModel = superUserViewModel, navigator = navigator)
+        }
+        else -> {
+            RegularTopBar(currentDestination = currentDestination, navigator = navigator)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    
+    SearchAppBar(
+        title = { 
+            Text(
+                text = stringResource(R.string.module),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black,
+            ) 
+        },
+        searchText = moduleViewModel.search,
+        onSearchTextChange = { moduleViewModel.search = it },
+        onClearClick = { moduleViewModel.search = "" },
+        dropdownContent = {
+            var showDropdown by remember { mutableStateOf(false) }
+            IconButton(
+                onClick = { showDropdown = true },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(id = R.string.settings)
+                )
+                DropdownMenu(
+                    expanded = showDropdown,
+                    onDismissRequest = { showDropdown = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.module_sort_a_to_z)) },
+                        trailingIcon = {
+                            Checkbox(checked = moduleViewModel.sortAToZ, onCheckedChange = null)
+                        },
+                        onClick = {
+                            moduleViewModel.sortAToZ = !moduleViewModel.sortAToZ
+                            moduleViewModel.sortZToA = false
+                            moduleViewModel.sortSizeLowToHigh = false
+                            moduleViewModel.sortSizeHighToLow = false
+                            moduleViewModel.sortEnabledFirst = false
+                            moduleViewModel.sortActionFirst = false
+                            moduleViewModel.sortWebUiFirst = false
+                            prefs.edit()
+                                .putBoolean("module_sort_a_to_z", moduleViewModel.sortAToZ)
+                                .putBoolean("module_sort_z_to_a", false)
+                                .putBoolean("module_sort_size_low_to_high", false)
+                                .putBoolean("module_sort_size_high_to_low", false)
+                                .putBoolean("module_sort_enabled_first", false)
+                                .putBoolean("module_sort_action_first", false)
+                                .putBoolean("module_sort_webui_first", false)
+                                .apply()
+                            showDropdown = false
+                        }
+                    )
+                    // Add other sorting options here...
+                }
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: DestinationsNavigator) {
+    val scope = rememberCoroutineScope()
+    
+    SearchAppBar(
+        title = { 
+            Text(
+                text = stringResource(R.string.superuser),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black,
+            ) 
+        },
+        searchText = superUserViewModel.search,
+        onSearchTextChange = { superUserViewModel.search = it },
+        onClearClick = { superUserViewModel.search = "" },
+        dropdownContent = {
+            var showDropdown by remember { mutableStateOf(false) }
+            IconButton(
+                onClick = { showDropdown = true },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(id = R.string.settings)
+                )
+                DropdownMenu(
+                    expanded = showDropdown, 
+                    onDismissRequest = { showDropdown = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.refresh)) }, 
+                        onClick = {
+                            scope.launch { superUserViewModel.fetchAppList() }
+                            showDropdown = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                if (superUserViewModel.showSystemApps) {
+                                    stringResource(R.string.hide_system_apps)
+                                } else {
+                                    stringResource(R.string.show_system_apps)
+                                }
+                            )
+                        }, 
+                        onClick = {
+                            superUserViewModel.updateShowSystemApps(!superUserViewModel.showSystemApps)
+                            showDropdown = false
+                        }
+                    )
+                }
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RegularTopBar(currentDestination: NavDestination?, navigator: DestinationsNavigator) {
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
     val containerColor = remember(surfaceContainer) { surfaceContainer }
     
     // Determine if we need a back button and the title based on current destination
     val (title, showBackButton) = when (currentDestination?.route) {
         HomeScreenDestination.route -> stringResource(R.string.app_name) to false
-        ModuleScreenDestination.route -> stringResource(R.string.module) to false
-        SuperUserScreenDestination.route -> stringResource(R.string.superuser) to false
         SettingScreenDestination.route -> stringResource(R.string.settings) to false
         CustomizationScreenDestination.route -> stringResource(R.string.customization) to true
         DeveloperScreenDestination.route -> stringResource(R.string.developer) to true
@@ -343,9 +491,7 @@ private fun TopBar(currentDestination: NavDestination?, navigator: DestinationsN
         AppProfileScreenDestination.route -> stringResource(R.string.profile) to true
         TemplateEditorScreenDestination.route -> stringResource(R.string.app_profile_template_edit) to true
         AppProfileTemplateScreenDestination.route -> stringResource(R.string.settings_profile_template) to true
-        ExecuteModuleActionScreenDestination.route -> stringResource(R.string.action) to true
         InstallScreenDestination.route -> stringResource(R.string.install) to true
-        FlashScreenDestination.route -> stringResource(R.string.install) to true
         else -> "" to false
     }
     

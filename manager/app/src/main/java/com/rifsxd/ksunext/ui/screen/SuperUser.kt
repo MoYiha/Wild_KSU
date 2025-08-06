@@ -8,15 +8,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -35,7 +32,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.R
-import com.rifsxd.ksunext.ui.component.SearchAppBar
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -44,7 +40,6 @@ import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 fun SuperUserScreen(navigator: DestinationsNavigator) {
     val viewModel = viewModel<SuperUserViewModel>()
     val scope = rememberCoroutineScope()
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
 
     LaunchedEffect(navigator) {
@@ -54,76 +49,19 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
         }
     }
 
-    Scaffold(
-        topBar = {
-            SearchAppBar(
-                title = { Text(
-                    text = stringResource(R.string.superuser),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Black,
-                ) },
-                searchText = viewModel.search,
-                onSearchTextChange = { viewModel.search = it },
-                onClearClick = { viewModel.search = "" },
-                dropdownContent = {
-                    var showDropdown by remember { mutableStateOf(false) }
-
-                    IconButton(
-                        onClick = { showDropdown = true },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.MoreVert,
-                            contentDescription = stringResource(id = R.string.settings)
-                        )
-
-                        DropdownMenu(expanded = showDropdown, onDismissRequest = {
-                            showDropdown = false
-                        }) {
-                            DropdownMenuItem(text = {
-                                Text(stringResource(R.string.refresh))
-                            }, onClick = {
-                                scope.launch {
-                                    viewModel.fetchAppList()
-                                }
-                                showDropdown = false
-                            })
-                            DropdownMenuItem(text = {
-                                Text(
-                                    if (viewModel.showSystemApps) {
-                                        stringResource(R.string.hide_system_apps)
-                                    } else {
-                                        stringResource(R.string.show_system_apps)
-                                    }
-                                )
-                            }, onClick = {
-                                viewModel.updateShowSystemApps(!viewModel.showSystemApps)
-                                showDropdown = false
-                            })
-                        }
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
+    PullToRefreshBox(
+        onRefresh = {
+            scope.launch { viewModel.fetchAppList() }
         },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-    ) { innerPadding ->
-        PullToRefreshBox(
-            modifier = Modifier.padding(innerPadding),
-            onRefresh = {
-                scope.launch { viewModel.fetchAppList() }
-            },
-            isRefreshing = viewModel.isRefreshing
+        isRefreshing = viewModel.isRefreshing
+    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
         ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-            ) {
-                items(viewModel.appList, key = { it.packageName + it.uid }) { app ->
-                    AppItem(app) {
-                        navigator.navigate(AppProfileScreenDestination(app))
-                    }
+            items(viewModel.appList, key = { it.packageName + it.uid }) { app ->
+                AppItem(app) {
+                    navigator.navigate(AppProfileScreenDestination(app))
                 }
             }
         }
