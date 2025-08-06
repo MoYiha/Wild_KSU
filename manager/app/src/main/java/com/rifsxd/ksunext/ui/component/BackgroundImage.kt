@@ -89,18 +89,18 @@ fun BackgroundImageWrapper(
                     .let { modifier ->
                         if (backgroundFitMode == "custom_crop") {
                             val transformation = ImageCropUtils.getImageTransformation(prefs, backgroundFitMode)
-                            transformation(modifier)
+                            modifier.transformation()
                         } else {
                             modifier
                         }
                     }
                 
                 val contentScale = when (backgroundFitMode) {
-                    "zoom_to_fit" -> ContentScale.Crop
-                    "edge_to_edge" -> ContentScale.Crop  // Changed from FillBounds to prevent morphing
-                    "custom_crop" -> ContentScale.Fit
-                    "position_adjust" -> ContentScale.Fit
-                    else -> ContentScale.Crop  // Default to Crop to prevent morphing
+                    "zoom_to_fit" -> ContentScale.Crop  // Crop to maintain aspect ratio
+                    "edge_to_edge" -> ContentScale.FillBounds  // Fill entire screen for edge-to-edge
+                    "custom_crop" -> ContentScale.Fit  // Fit for custom crop with transformations
+                    "position_adjust" -> ContentScale.Inside  // Inside to maintain aspect ratio
+                    else -> ContentScale.Fit  // Default to Fit to prevent morphing
                 }
                 
                 Image(

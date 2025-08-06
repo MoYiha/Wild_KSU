@@ -37,6 +37,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import android.content.SharedPreferences
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -115,11 +118,36 @@ class MainActivity : ComponentActivity() {
             val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
             val amoledMode = prefs.getBoolean("enable_amoled", false)
             
-            // Read background image preferences
-            val backgroundImageUri = prefs.getString("background_image_uri", null)
-            val backgroundFitMode = prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge"
-            val backgroundTransparency = prefs.getFloat("background_transparency", 0.0f)
-            val uiTransparency = prefs.getFloat("ui_transparency", 1.0f)
+            // Use remember and mutableStateOf for reactive background preferences
+            var backgroundImageUri by remember { mutableStateOf(prefs.getString("background_image_uri", null)) }
+            var backgroundFitMode by remember { mutableStateOf(prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge") }
+            var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 0.0f)) }
+            var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 1.0f)) }
+            
+            // Listen for preference changes
+            LaunchedEffect(Unit) {
+                val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                    when (key) {
+                        "background_image_uri" -> {
+                            backgroundImageUri = prefs.getString("background_image_uri", null)
+                            android.util.Log.d("MainActivity", "Background URI updated: $backgroundImageUri")
+                        }
+                        "background_fit_mode" -> {
+                            backgroundFitMode = prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge"
+                            android.util.Log.d("MainActivity", "Background fit mode updated: $backgroundFitMode")
+                        }
+                        "background_transparency" -> {
+                            backgroundTransparency = prefs.getFloat("background_transparency", 0.0f)
+                            android.util.Log.d("MainActivity", "Background transparency updated: $backgroundTransparency")
+                        }
+                        "ui_transparency" -> {
+                            uiTransparency = prefs.getFloat("ui_transparency", 1.0f)
+                            android.util.Log.d("MainActivity", "UI transparency updated: $uiTransparency")
+                        }
+                    }
+                }
+                prefs.registerOnSharedPreferenceChangeListener(listener)
+            }
             
             // Debug logging
             android.util.Log.d("MainActivity", "Background URI from prefs: $backgroundImageUri")
