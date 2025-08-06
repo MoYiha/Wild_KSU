@@ -282,9 +282,7 @@ private fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     // Use derivedStateOf to create a stable container color that reduces flickering
-    val containerColor by remember {
-        derivedStateOf { MaterialTheme.colorScheme.surfaceContainer }
-    }
+    val containerColor by remember { derivedStateOf { MaterialTheme.colorScheme.surfaceContainer } }
     
     TopAppBar(
         title = { Text(
