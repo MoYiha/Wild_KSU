@@ -81,21 +81,26 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Image loaded: $imageLoaded, Error: $imageError")
                 
+                Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")
+                
                 // Apply transformations using enhanced ImageCropUtils
                 val imageModifier = Modifier
                     .fillMaxSize()
                     .let { modifier ->
-                        val transformation = ImageCropUtils.getImageTransformation(prefs, backgroundFitMode)
-                        modifier.transformation()
+                        if (backgroundFitMode == "custom_crop") {
+                            val transformation = ImageCropUtils.getImageTransformation(prefs, backgroundFitMode)
+                            modifier.transformation()
+                        } else {
+                            modifier
+                        }
                     }
-                
-                Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")
                 
                 val contentScale = when (backgroundFitMode) {
                     "zoom_to_fit" -> ContentScale.Crop
-                    "edge_to_edge" -> ContentScale.FillBounds
+                    "edge_to_edge" -> ContentScale.Crop  // Changed from FillBounds to prevent morphing
                     "custom_crop" -> ContentScale.Fit
-                    else -> ContentScale.FillBounds
+                    "position_adjust" -> ContentScale.Fit
+                    else -> ContentScale.Crop  // Default to Crop to prevent morphing
                 }
                 
                 Image(
@@ -106,15 +111,19 @@ fun BackgroundImageWrapper(
                 )
                 
                 // Add overlay with transparency control for content readability
-                // Transparency slider controls how dark the overlay is (0 = no overlay, 1 = maximum overlay)
-                val overlayAlpha = (1.0f - backgroundTransparency) * 0.7f // Max overlay alpha of 0.7
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Color.Black.copy(alpha = overlayAlpha)
-                        )
-                )
+                // Background darkness slider controls how dark the overlay is (0 = no overlay, 1 = maximum overlay)
+                val overlayAlpha = backgroundTransparency * 0.8f // Max overlay alpha of 0.8
+                Log.d("BackgroundImage", "Background transparency: $backgroundTransparency, Overlay alpha: $overlayAlpha")
+                
+                if (overlayAlpha > 0.0f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Color.Black.copy(alpha = overlayAlpha)
+                            )
+                    )
+                }
             }
         }
         

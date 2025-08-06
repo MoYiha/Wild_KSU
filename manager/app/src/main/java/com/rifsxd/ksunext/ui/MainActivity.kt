@@ -119,10 +119,13 @@ class MainActivity : ComponentActivity() {
             val backgroundImageUri = prefs.getString("background_image_uri", null)
             val backgroundFitMode = prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge"
             val backgroundTransparency = prefs.getFloat("background_transparency", 1.0f)
+            val uiTransparency = prefs.getFloat("ui_transparency", 0.9f)
             
             // Debug logging
             android.util.Log.d("MainActivity", "Background URI from prefs: $backgroundImageUri")
             android.util.Log.d("MainActivity", "Background fit mode from prefs: $backgroundFitMode")
+            android.util.Log.d("MainActivity", "Background transparency: $backgroundTransparency")
+            android.util.Log.d("MainActivity", "UI transparency: $uiTransparency")
 
             val moduleViewModel: ModuleViewModel = viewModel()
             val superUserViewModel: SuperUserViewModel = viewModel()
@@ -132,7 +135,9 @@ class MainActivity : ComponentActivity() {
 
             KernelSUTheme (
                 amoledMode = amoledMode,
-                isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty()
+                isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty(),
+                backgroundTransparency = backgroundTransparency,
+                uiTransparency = uiTransparency
             ) {
                 BackgroundImageWrapper(
                     backgroundImageUri = backgroundImageUri,
