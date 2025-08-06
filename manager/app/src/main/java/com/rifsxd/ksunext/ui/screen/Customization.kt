@@ -519,23 +519,23 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     }
                 )
                 
-                // Background Darkness Slider
+                // Background Transparency Slider
                 var backgroundTransparency by rememberSaveable {
                     mutableFloatStateOf(
-                        prefs.getFloat("background_transparency", 0.0f)
+                        prefs.getFloat("background_transparency", 1.0f)
                     )
                 }
                 
                 ListItem(
-                    leadingContent = { Icon(Icons.Filled.Opacity, "Background Darkness") },
+                    leadingContent = { Icon(Icons.Filled.Opacity, stringResource(R.string.background_transparency)) },
                     headlineContent = { Text(
-                        text = "Background Darkness",
+                        text = stringResource(R.string.background_transparency),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                     ) },
                     supportingContent = { 
                         Column {
-                            Text("Adjust how dark the background appears behind the UI")
+                            Text(stringResource(R.string.background_transparency_summary))
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -571,16 +571,16 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 )
-
+                
                 // UI Transparency Slider
                 var uiTransparency by rememberSaveable {
                     mutableFloatStateOf(
-                        prefs.getFloat("ui_transparency", 1.0f)
+                        prefs.getFloat("ui_transparency", 0.0f)
                     )
                 }
                 
                 ListItem(
-                    leadingContent = { Icon(Icons.Filled.Layers, "UI Transparency") },
+                    leadingContent = { Icon(Icons.Filled.Tune, "UI Transparency") },
                     headlineContent = { Text(
                         text = "UI Transparency",
                         style = MaterialTheme.typography.titleMedium,
@@ -588,7 +588,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     ) },
                     supportingContent = { 
                         Column {
-                            Text("Adjust how transparent the UI elements appear over the background")
+                            Text("Adjust the transparency of UI elements over the background")
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,

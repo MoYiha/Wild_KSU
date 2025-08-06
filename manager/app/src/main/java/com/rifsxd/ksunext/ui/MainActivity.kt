@@ -36,8 +36,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import android.content.SharedPreferences
 import androidx.compose.ui.Modifier
@@ -119,10 +119,12 @@ class MainActivity : ComponentActivity() {
             val amoledMode = prefs.getBoolean("enable_amoled", false)
             
             // Use remember and mutableStateOf for reactive background preferences
+            // Darkness slider: 1.0f = 100% (full black overlay), 0.0f = 0% (no overlay)
+            // UI transparency: 0.0f = 0% (fully transparent), 1.0f = 100% (fully opaque)
             var backgroundImageUri by remember { mutableStateOf(prefs.getString("background_image_uri", null)) }
             var backgroundFitMode by remember { mutableStateOf(prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge") }
-            var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 0.0f)) }
-            var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 1.0f)) }
+            var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 1.0f)) } // Default 100% darkness
+            var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 0.0f)) } // Default 0% UI transparency
             
             // Listen for preference changes
             LaunchedEffect(Unit) {
@@ -137,11 +139,11 @@ class MainActivity : ComponentActivity() {
                             android.util.Log.d("MainActivity", "Background fit mode updated: $backgroundFitMode")
                         }
                         "background_transparency" -> {
-                            backgroundTransparency = prefs.getFloat("background_transparency", 0.0f)
+                            backgroundTransparency = prefs.getFloat("background_transparency", 1.0f)
                             android.util.Log.d("MainActivity", "Background transparency updated: $backgroundTransparency")
                         }
                         "ui_transparency" -> {
-                            uiTransparency = prefs.getFloat("ui_transparency", 1.0f)
+                            uiTransparency = prefs.getFloat("ui_transparency", 0.0f)
                             android.util.Log.d("MainActivity", "UI transparency updated: $uiTransparency")
                         }
                     }
@@ -164,7 +166,6 @@ class MainActivity : ComponentActivity() {
             KernelSUTheme (
                 amoledMode = amoledMode,
                 isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty(),
-                backgroundTransparency = backgroundTransparency,
                 uiTransparency = uiTransparency
             ) {
                 BackgroundImageWrapper(

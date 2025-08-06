@@ -81,26 +81,21 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Image loaded: $imageLoaded, Error: $imageError")
                 
-                Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")
-                
                 // Apply transformations using enhanced ImageCropUtils
                 val imageModifier = Modifier
                     .fillMaxSize()
                     .let { modifier ->
-                        if (backgroundFitMode == "custom_crop") {
-                            val transformation = ImageCropUtils.getImageTransformation(prefs, backgroundFitMode)
-                            modifier.transformation()
-                        } else {
-                            modifier
-                        }
+                        val transformation = ImageCropUtils.getImageTransformation(prefs, backgroundFitMode)
+                        modifier.transformation()
                     }
                 
+                Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")
+                
                 val contentScale = when (backgroundFitMode) {
-                    "zoom_to_fit" -> ContentScale.Crop  // Crop to maintain aspect ratio
-                    "edge_to_edge" -> ContentScale.FillBounds  // Fill entire screen for edge-to-edge
-                    "custom_crop" -> ContentScale.Fit  // Fit for custom crop with transformations
-                    "position_adjust" -> ContentScale.Inside  // Inside to maintain aspect ratio
-                    else -> ContentScale.Fit  // Default to Fit to prevent morphing
+                    "zoom_to_fit" -> ContentScale.Crop
+                    "edge_to_edge" -> ContentScale.FillBounds
+                    "custom_crop" -> ContentScale.Fit
+                    else -> ContentScale.FillBounds
                 }
                 
                 Image(
@@ -110,20 +105,17 @@ fun BackgroundImageWrapper(
                     contentScale = contentScale
                 )
                 
-                // Add overlay with transparency control for content readability
-                // Background darkness slider controls how dark the overlay is (0 = no overlay, 1 = maximum overlay)
-                val overlayAlpha = backgroundTransparency * 0.7f // Max overlay alpha of 0.7
-                Log.d("BackgroundImage", "Background transparency: $backgroundTransparency, Overlay alpha: $overlayAlpha")
-                
-                if (overlayAlpha > 0.0f) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Color.Black.copy(alpha = overlayAlpha)
-                            )
-                    )
-                }
+                // Add overlay with darkness control for content readability
+                // Darkness slider: 1.0f = 100% (full black overlay), 0.0f = 0% (no overlay)
+                val overlayAlpha = backgroundTransparency // Direct mapping: 1.0f = full black, 0.0f = transparent
+                Log.d("BackgroundImage", "Overlay alpha: $overlayAlpha (from transparency: $backgroundTransparency)")
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Color.Black.copy(alpha = overlayAlpha)
+                        )
+                )
             }
         }
         
