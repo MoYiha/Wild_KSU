@@ -81,26 +81,25 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Image loaded: $imageLoaded, Error: $imageError")
                 
+                // Use custom_crop as default fit mode for advanced editor
+                val effectiveFitMode = if (backgroundFitMode.isEmpty()) "custom_crop" else backgroundFitMode
+                
                 // Apply transformations using enhanced ImageCropUtils
                 val imageModifier = Modifier
                     .fillMaxSize()
                     .let { modifier ->
-                        val transformation = ImageCropUtils.getImageTransformation(prefs, backgroundFitMode)
+                        val transformation = ImageCropUtils.getImageTransformation(prefs, effectiveFitMode)
                         modifier.transformation()
                     }
                 
-                Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")
+                Log.d("BackgroundImage", "Applying transformation for fit mode: $effectiveFitMode")
                 
                 // Load saved crop settings for debugging
                 val cropSettings = ImageCropUtils.loadImageCropSettings(prefs)
                 Log.d("BackgroundImage", "Loaded crop settings: scale=${cropSettings.scale}, offsetX=${cropSettings.offsetX}, offsetY=${cropSettings.offsetY}, rotation=${cropSettings.rotation}")
                 
-                val contentScale = when (backgroundFitMode) {
-                    "zoom_to_fit" -> ContentScale.Crop
-                    "edge_to_edge" -> ContentScale.Crop // Changed from FillBounds to prevent image morphing
-                    "custom_crop", "position_adjust" -> ContentScale.Fit // Preserve aspect ratio for custom crop and position adjust
-                    else -> ContentScale.Fit // Default to preserving aspect ratio
-                }
+                // Always use ContentScale.Fit to preserve aspect ratio for custom crop
+                val contentScale = ContentScale.Fit
                 
                 Image(
                     painter = painter,

@@ -122,7 +122,6 @@ class MainActivity : ComponentActivity() {
             // Darkness slider: 1.0f = 100% (full black overlay), 0.0f = 0% (no overlay)
             // UI transparency: 0.0f = 0% (fully transparent), 1.0f = 100% (fully opaque)
             var backgroundImageUri by remember { mutableStateOf(prefs.getString("background_image_uri", null)) }
-            var backgroundFitMode by remember { mutableStateOf(prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge") }
             var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 1.0f)) } // Default 100% darkness
             var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 0.0f)) } // Default 0% UI transparency
             
@@ -133,10 +132,6 @@ class MainActivity : ComponentActivity() {
                         "background_image_uri" -> {
                             backgroundImageUri = prefs.getString("background_image_uri", null)
                             android.util.Log.d("MainActivity", "Background URI updated: $backgroundImageUri")
-                        }
-                        "background_fit_mode" -> {
-                            backgroundFitMode = prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge"
-                            android.util.Log.d("MainActivity", "Background fit mode updated: $backgroundFitMode")
                         }
                         "background_transparency" -> {
                             backgroundTransparency = prefs.getFloat("background_transparency", 1.0f)
@@ -153,7 +148,6 @@ class MainActivity : ComponentActivity() {
             
             // Debug logging
             android.util.Log.d("MainActivity", "Background URI from prefs: $backgroundImageUri")
-            android.util.Log.d("MainActivity", "Background fit mode from prefs: $backgroundFitMode")
             android.util.Log.d("MainActivity", "Background transparency: $backgroundTransparency")
             android.util.Log.d("MainActivity", "UI transparency: $uiTransparency")
 
@@ -170,7 +164,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 BackgroundImageWrapper(
                     backgroundImageUri = backgroundImageUri,
-                    backgroundFitMode = backgroundFitMode,
+                    backgroundFitMode = "custom_crop", // Default to advanced crop editor
                     backgroundTransparency = backgroundTransparency
                 ) {
                 val navController = rememberNavController()
