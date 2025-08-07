@@ -413,7 +413,7 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
                                 .putBoolean("module_sort_action_first", false)
                                 .putBoolean("module_sort_webui_first", false)
                                 .apply()
-                            moduleViewModel.triggerSortingRefresh()
+                            scope.launch { moduleViewModel.fetchModuleList() }
                             showDropdown = false
                         }
                     )
@@ -439,7 +439,7 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
                                 .putBoolean("module_sort_action_first", false)
                                 .putBoolean("module_sort_webui_first", false)
                                 .apply()
-                            moduleViewModel.triggerSortingRefresh()
+                            scope.launch { moduleViewModel.fetchModuleList() }
                             showDropdown = false
                         }
                     )
@@ -465,7 +465,7 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
                                 .putBoolean("module_sort_action_first", false)
                                 .putBoolean("module_sort_webui_first", false)
                                 .apply()
-                            moduleViewModel.triggerSortingRefresh()
+                            scope.launch { moduleViewModel.fetchModuleList() }
                             showDropdown = false
                         }
                     )
@@ -491,7 +491,7 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
                                 .putBoolean("module_sort_action_first", moduleViewModel.sortActionFirst)
                                 .putBoolean("module_sort_webui_first", false)
                                 .apply()
-                            moduleViewModel.triggerSortingRefresh()
+                            scope.launch { moduleViewModel.fetchModuleList() }
                             showDropdown = false
                         }
                     )
@@ -517,7 +517,7 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
                                 .putBoolean("module_sort_action_first", false)
                                 .putBoolean("module_sort_webui_first", moduleViewModel.sortWebUiFirst)
                                 .apply()
-                            moduleViewModel.triggerSortingRefresh()
+                            scope.launch { moduleViewModel.fetchModuleList() }
                             showDropdown = false
                         }
                     )
