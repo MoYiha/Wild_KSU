@@ -87,8 +87,10 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             StatusCard(kernelVersion, ksuVersion, lkmMode) {
                 navigator.navigate(InstallScreenDestination)
             }
+        }
 
-            if (ksuVersion != null && rootAvailable()) {
+        if (ksuVersion != null && rootAvailable()) {
+            item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -99,30 +101,41 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                     Box(modifier = Modifier.weight(1f)) { ModuleCard() }
                 }
             }
+        }
 
-            if (isManager && Natives.requireNewKernel()) {
+        if (isManager && Natives.requireNewKernel()) {
+            item {
                 WarningCard(
                     stringResource(id = R.string.require_kernel_version).format(
                         ksuVersion, Natives.MINIMAL_SUPPORTED_KERNEL
                     )
                 )
             }
-            if (ksuVersion != null && !rootAvailable()) {
+        }
+
+        if (ksuVersion != null && !rootAvailable()) {
+            item {
                 WarningCard(
                     stringResource(id = R.string.grant_root_failed)
                 )
             }
+        }
+
+        item {
             val checkUpdate =
                 LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
                     .getBoolean("check_update", false)
             if (checkUpdate) {
                 UpdateCard()
             }
-            //NextCard()
+        }
+
+        item {
             InfoCard(autoExpand = developerOptionsEnabled)
+        }
+
+        item {
             IssueReportCard()
-            //EXperimentalCard()
-            Spacer(Modifier)
         }
     }
 }
