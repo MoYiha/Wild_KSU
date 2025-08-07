@@ -2,6 +2,7 @@ package com.rifsxd.ksunext.ui.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -46,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -129,37 +131,8 @@ fun AppProfileTemplateScreen(
             }
     }
 
-    Scaffold(
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = showFab,
-                enter = scaleIn(
-                    animationSpec = tween(200),
-                    initialScale = 0.8f
-                ) + fadeIn(animationSpec = tween(400)),
-                exit = scaleOut(
-                    animationSpec = tween(200),
-                    targetScale = 0.8f
-                ) + fadeOut(animationSpec = tween(400))
-            ) {
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        navigator.navigate(
-                            TemplateEditorScreenDestination(
-                                TemplateViewModel.TemplateInfo(),
-                                false
-                            )
-                        )
-                    },
-                    icon = { Icon(Icons.Filled.Add, null) },
-                    text = { Text(stringResource(id = R.string.app_profile_template_create)) },
-                )
-            }
-        },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-    ) { innerPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         PullToRefreshBox(
-            modifier = Modifier.padding(innerPadding),
             isRefreshing = viewModel.isRefreshing,
             onRefresh = {
                 scope.launch { viewModel.fetchTemplates() }
@@ -170,14 +143,42 @@ fun AppProfileTemplateScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
-                contentPadding = remember {
-                    PaddingValues(bottom = 16.dp /* Scaffold Fab Spacing + Fab container height */)
-                }
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
                 items(viewModel.templateList, key = { it.id }) { app ->
                     TemplateItem(navigator, app)
                 }
             }
+        }
+
+        // Floating Action Button positioned over the content
+        AnimatedVisibility(
+            visible = showFab,
+            enter = scaleIn(
+                animationSpec = tween(200),
+                initialScale = 0.8f
+            ) + fadeIn(animationSpec = tween(400)),
+            exit = scaleOut(
+                animationSpec = tween(200),
+                targetScale = 0.8f
+            ) + fadeOut(animationSpec = tween(400)),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            ExtendedFloatingActionButton(
+                onClick = {
+                    navigator.navigate(
+                        TemplateEditorScreenDestination(
+                            TemplateViewModel.TemplateInfo(),
+                            false
+                        )
+                    )
+                },
+                icon = { Icon(Icons.Filled.Add, null) },
+                text = { Text(stringResource(id = R.string.app_profile_template_create)) },
+            )
         }
     }
 }
