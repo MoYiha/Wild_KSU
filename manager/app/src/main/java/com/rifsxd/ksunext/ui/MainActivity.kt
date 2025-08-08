@@ -60,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -401,7 +402,8 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
                     modifier = Modifier.clip(MaterialTheme.shapes.medium),
                     shape = MaterialTheme.shapes.medium,
                     tonalElevation = 0.dp,
-                    shadowElevation = 0.dp
+                    shadowElevation = 0.dp,
+                    offset = DpOffset(0.dp, 8.dp)
                 ) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.module_sort_a_to_z)) },
@@ -547,7 +549,8 @@ private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: D
                     modifier = Modifier.clip(MaterialTheme.shapes.medium),
                     shape = MaterialTheme.shapes.medium,
                     tonalElevation = 0.dp,
-                    shadowElevation = 0.dp
+                    shadowElevation = 0.dp,
+                    offset = DpOffset(0.dp, 8.dp)
                 ) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.refresh)) }, 
