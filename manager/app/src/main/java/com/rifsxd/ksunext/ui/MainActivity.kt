@@ -219,7 +219,13 @@ class MainActivity : ComponentActivity() {
             }
             
             val isAmoledMode = themeMode == "amoled"
-            val isDynamicColor = themeMode == "dynamic"
+            // Dynamic colors should be default when available (Android 12+), except when explicitly disabled
+            val isDynamicColor = when (themeMode) {
+                "light", "dark" -> false // Explicitly disabled dynamic colors
+                "dynamic" -> true // Explicitly enabled dynamic colors
+                "amoled" -> true // AMOLED mode with dynamic colors when available
+                else -> true // system_default: prefer dynamic colors when available, fallback to system theme
+            }
             
             KernelSUTheme (
                 darkTheme = isDarkTheme,
