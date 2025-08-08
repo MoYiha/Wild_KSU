@@ -55,7 +55,8 @@ fun SearchAppBar(
     onBackClick: (() -> Unit)? = null,
     onConfirm: (() -> Unit)? = null,
     dropdownContent: @Composable (() -> Unit)? = null,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    modifier: Modifier = Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
@@ -71,6 +72,7 @@ fun SearchAppBar(
     }
 
     TopAppBar(
+        modifier = modifier,
         title = {
             Box {
                 AnimatedVisibility(
