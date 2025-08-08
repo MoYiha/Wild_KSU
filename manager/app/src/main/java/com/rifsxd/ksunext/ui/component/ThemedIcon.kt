@@ -24,27 +24,31 @@ fun ThemedIcon(
 ) {
     val context = LocalContext.current
     val prefs = remember { ksuApp.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE) }
-    val selectedIconPack = remember { prefs.getString("icon_theme", "default") ?: "default" }
     
-    var themedIcon by remember(packageName, selectedIconPack) { mutableStateOf<BitmapPainter?>(null) }
-    var useSystemIcon by remember(packageName, selectedIconPack) { mutableStateOf(selectedIconPack == "default") }
+    var themedIcon by remember(packageName) { mutableStateOf<BitmapPainter?>(null) }
+    var useSystemIcon by remember(packageName) { mutableStateOf(true) }
+    var enabledThemes by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var themePriorities by remember { mutableStateOf<List<String>>(emptyList()) }
     
-    // Load themed icon if an icon pack is selected
-    LaunchedEffect(packageName, selectedIconPack) {
-        if (selectedIconPack != "default") {
-            withContext(Dispatchers.IO) {
-                val drawable = IconPackHelper.getThemedIcon(context, selectedIconPack, packageName)
-                if (drawable != null) {
-                    val bitmap = drawable.toBitmap()
-                    themedIcon = BitmapPainter(bitmap.asImageBitmap())
-                    useSystemIcon = false
-                } else {
-                    useSystemIcon = true
+    // Load themed icon based on priority system
+    LaunchedEffect(packageName) {
+        enabledThemes = prefs.getStringSet("enabled_icon_themes", setOf("default")) ?: setOf("default")
+        val priorityString = prefs.getString("icon_theme_priorities", "default") ?: "default"
+        themePriorities = priorityString.split(",").filter { it.isNotEmpty() }
+        
+        withContext(Dispatchers.IO) {
+            // Try to get themed icon from enabled themes in priority order
+            for (themeId in themePriorities) {
+                if (enabledThemes.contains(themeId) && themeId != "default") {
+                    val drawable = IconPackHelper.getThemedIcon(context, themeId, packageName)
+                    if (drawable != null) {
+                        val bitmap = drawable.toBitmap()
+                        themedIcon = BitmapPainter(bitmap.asImageBitmap())
+                        useSystemIcon = false
+                        break
+                    }
                 }
             }
-        } else {
-            useSystemIcon = true
-            themedIcon = null
         }
     }
     

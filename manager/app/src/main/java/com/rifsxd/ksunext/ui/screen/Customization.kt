@@ -78,6 +78,7 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.component.SwitchItem
 import com.rifsxd.ksunext.ui.component.AdvancedImageCropDialog
+import com.rifsxd.ksunext.ui.component.IconThemeManagerDialog
 import com.rifsxd.ksunext.ui.util.ImageCropUtils
 import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
@@ -655,79 +656,27 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             )
 
             // Icon Theme Selection
-             var iconTheme by rememberSaveable {
-                 mutableStateOf(
-                     prefs.getString("icon_theme", "default") ?: "default"
-                 )
-             }
-             
-             var availableIconPacks by remember { mutableStateOf<List<IconPack>>(emptyList()) }
-             
-             // Load available icon packs
-             LaunchedEffect(Unit) {
-                 availableIconPacks = IconPackHelper.getInstalledIconPacks(context)
-             }
-             
-             val iconThemeOptions = buildList {
-                 add("default" to stringResource(R.string.icon_theme_default))
-                 availableIconPacks.forEach { iconPack ->
-                     add(iconPack.packageName to iconPack.name)
-                 }
-             }
-             
-             val currentIconThemeDisplay = iconThemeOptions.find { it.first == iconTheme }?.second 
-                 ?: stringResource(R.string.icon_theme_default)
-             
-             val iconThemeDialog = rememberCustomDialog { dismiss ->
-                 if (iconThemeOptions.isEmpty() || iconThemeOptions.size == 1) {
-                     // Show message that no icon packs are found
-                     AlertDialog(
-                         onDismissRequest = { dismiss() },
-                         title = { Text(stringResource(R.string.icon_theme)) },
-                         text = { Text(stringResource(R.string.icon_theme_none_found)) },
-                         confirmButton = {
-                             TextButton(onClick = { dismiss() }) {
-                                 Text("OK")
-                             }
-                         }
-                     )
-                 } else {
-                     val options = iconThemeOptions.map { (value, display) ->
-                         ListOption(
-                             titleText = display,
-                             selected = value == iconTheme
-                         )
-                     }
-                     
-                     ListDialog(
-                         state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
-                         header = Header.Default(title = stringResource(R.string.icon_theme)),
-                         selection = ListSelection.Single(
-                             showRadioButtons = true,
-                             options = options
-                         ) { index, _ ->
-                             val selectedIconTheme = iconThemeOptions[index].first
-                             prefs.edit().putString("icon_theme", selectedIconTheme).commit()
-                             iconTheme = selectedIconTheme
-                             dismiss()
-                         }
-                     )
-                 }
-             }
-             
-             ListItem(
-                 leadingContent = { Icon(Icons.Filled.Style, stringResource(R.string.icon_theme)) },
-                 headlineContent = { Text(
-                     text = stringResource(R.string.icon_theme),
-                     style = MaterialTheme.typography.titleMedium,
-                     fontWeight = FontWeight.SemiBold,
-                 ) },
-                 supportingContent = { Text(stringResource(R.string.icon_theme_summary, currentIconThemeDisplay)) },
-                 modifier = Modifier
-                     .clickable {
-                         iconThemeDialog.show()
-                     }
-             )
+            var showIconThemeManager by remember { mutableStateOf(false) }
+            
+            ListItem(
+                leadingContent = { Icon(Icons.Filled.Style, stringResource(R.string.icon_theme)) },
+                headlineContent = { Text(
+                    text = stringResource(R.string.icon_theme),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                ) },
+                supportingContent = { Text(stringResource(R.string.icon_theme_summary)) },
+                modifier = Modifier
+                    .clickable {
+                        showIconThemeManager = true
+                    }
+            )
+            
+            if (showIconThemeManager) {
+                IconThemeManagerDialog(
+                    onDismiss = { showIconThemeManager = false }
+                )
+            }
         }
     }
 }

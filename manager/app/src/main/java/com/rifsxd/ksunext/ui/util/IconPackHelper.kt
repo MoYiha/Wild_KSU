@@ -43,7 +43,7 @@ object IconPackHelper {
      * Get all installed icon packs on the system
      */
     fun getInstalledIconPacks(context: Context): List<IconPack> {
-        val iconPacks = mutableSetOf<IconPack>()
+        val iconPacksMap = mutableMapOf<String, IconPack>()
         val packageManager = context.packageManager
         
         // Search by intents
@@ -54,6 +54,10 @@ object IconPackHelper {
                 
                 for (resolveInfo in resolveInfos) {
                     val packageName = resolveInfo.activityInfo.packageName
+                    
+                    // Skip if already found
+                    if (iconPacksMap.containsKey(packageName)) continue
+                    
                     val appInfo = try {
                         packageManager.getApplicationInfo(packageName, 0)
                     } catch (e: PackageManager.NameNotFoundException) {
@@ -67,7 +71,7 @@ object IconPackHelper {
                         null
                     }
                     
-                    iconPacks.add(IconPack(packageName, name, icon))
+                    iconPacksMap[packageName] = IconPack(packageName, name, icon)
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Error querying intent $intentAction", e)
@@ -84,6 +88,10 @@ object IconPackHelper {
                 
                 for (resolveInfo in resolveInfos) {
                     val packageName = resolveInfo.activityInfo.packageName
+                    
+                    // Skip if already found
+                    if (iconPacksMap.containsKey(packageName)) continue
+                    
                     val appInfo = try {
                         packageManager.getApplicationInfo(packageName, 0)
                     } catch (e: PackageManager.NameNotFoundException) {
@@ -97,14 +105,14 @@ object IconPackHelper {
                         null
                     }
                     
-                    iconPacks.add(IconPack(packageName, name, icon))
+                    iconPacksMap[packageName] = IconPack(packageName, name, icon)
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Error querying category $category", e)
             }
         }
         
-        return iconPacks.toList().sortedBy { it.name }
+        return iconPacksMap.values.toList().sortedBy { it.name }
     }
     
     /**
