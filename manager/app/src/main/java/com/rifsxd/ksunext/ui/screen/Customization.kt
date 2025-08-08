@@ -401,7 +401,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             // Background Section Header
             Text(
                 text = "Background",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
@@ -565,7 +565,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             // UI Section Header
             Text(
                 text = "UI",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
@@ -643,7 +643,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 ) },
                 supportingContent = { 
                     Column {
-                        Text("Add blur effect to UI elements")
+                        Text("Add blur effect to the UI layer (same layer as UI transparency)")
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
