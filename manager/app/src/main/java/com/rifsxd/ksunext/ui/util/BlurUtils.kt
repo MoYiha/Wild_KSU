@@ -8,16 +8,16 @@ import com.rifsxd.ksunext.ui.theme.LocalUIBlur
 
 /**
  * UI blur effect that works on the same layer as UI transparency.
- * This applies blur to UI components when the UI blur setting is enabled,
- * creating a frosted glass effect that complements the transparency system.
+ * This applies a very subtle blur to card backgrounds and UI elements,
+ * creating a light frosted glass effect that complements transparency.
  */
 @Composable
 fun Modifier.applyUIBlur(): Modifier {
     val uiBlur = LocalUIBlur.current
     return if (uiBlur > 0f) {
-        // Apply blur with intensity matching the UI blur setting
-        // This creates a frosted glass effect on UI components
-        this.blur(radius = (uiBlur * 0.5f).dp)
+        // Apply very subtle blur - much lower intensity to avoid over-blurring
+        // This creates a light frosted glass effect on card backgrounds only
+        this.blur(radius = (uiBlur * 0.05f).dp)
     } else {
         this
     }
