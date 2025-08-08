@@ -83,6 +83,7 @@ import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.IconPackHelper
+import com.rifsxd.ksunext.ui.util.IconPack
 
 import java.util.Locale
 
@@ -660,7 +661,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                  )
              }
              
-             var availableIconPacks by remember { mutableStateOf<List<IconPackHelper.IconPack>>(emptyList()) }
+             var availableIconPacks by remember { mutableStateOf<List<IconPack>>(emptyList()) }
              
              // Load available icon packs
              LaunchedEffect(Unit) {
