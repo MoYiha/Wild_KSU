@@ -458,7 +458,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 )
 
             }
-            
+
             // UI Transparency Slider - Always available
             var uiTransparency by rememberSaveable {
                 mutableFloatStateOf(

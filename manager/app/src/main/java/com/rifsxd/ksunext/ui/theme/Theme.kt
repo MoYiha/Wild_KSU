@@ -53,7 +53,7 @@ fun KernelSUTheme(
     uiTransparency: Float = 1.0f,
     content: @Composable () -> Unit
 ) {
-    // Convert transparency percentage to alpha value (invert so 0% = solid, 100% = transparent)
+    // Always apply UI transparency, regardless of background settings
     val alphaValue = 1.0f - uiTransparency
     val colorScheme = when {
         amoledMode && darkTheme && dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -72,88 +72,76 @@ fun KernelSUTheme(
             dynamicScheme.copy(
                 background = if (isCustomBackgroundEnabled) Color.Transparent else AMOLED_BLACK,
                 surface = if (isCustomBackgroundEnabled) Color.Transparent else AMOLED_BLACK,
-                surfaceVariant = if (isCustomBackgroundEnabled) baseSurfaceVariant.copy(alpha = alphaValue) else baseSurfaceVariant,
-                surfaceContainer = if (isCustomBackgroundEnabled) baseSurfaceContainer.copy(alpha = alphaValue) else baseSurfaceContainer,
-                surfaceContainerLow = if (isCustomBackgroundEnabled) baseSurfaceContainerLow.copy(alpha = alphaValue) else baseSurfaceContainerLow,
-                surfaceContainerLowest = if (isCustomBackgroundEnabled) baseSurfaceContainerLowest.copy(alpha = alphaValue) else baseSurfaceContainerLowest,
-                surfaceContainerHigh = if (isCustomBackgroundEnabled) baseSurfaceContainerHigh.copy(alpha = alphaValue) else baseSurfaceContainerHigh,
-                surfaceContainerHighest = if (isCustomBackgroundEnabled) baseSurfaceContainerHighest.copy(alpha = alphaValue) else baseSurfaceContainerHighest,
-                primaryContainer = if (isCustomBackgroundEnabled) basePrimaryContainer.copy(alpha = alphaValue) else basePrimaryContainer,
-                secondaryContainer = if (isCustomBackgroundEnabled) baseSecondaryContainer.copy(alpha = alphaValue) else baseSecondaryContainer,
-                tertiaryContainer = if (isCustomBackgroundEnabled) baseTertiaryContainer.copy(alpha = alphaValue) else baseTertiaryContainer
+                surfaceVariant = baseSurfaceVariant.copy(alpha = alphaValue),
+                surfaceContainer = baseSurfaceContainer.copy(alpha = alphaValue),
+                surfaceContainerLow = baseSurfaceContainerLow.copy(alpha = alphaValue),
+                surfaceContainerLowest = baseSurfaceContainerLowest.copy(alpha = alphaValue),
+                surfaceContainerHigh = baseSurfaceContainerHigh.copy(alpha = alphaValue),
+                surfaceContainerHighest = baseSurfaceContainerHighest.copy(alpha = alphaValue),
+                primaryContainer = basePrimaryContainer.copy(alpha = alphaValue),
+                secondaryContainer = baseSecondaryContainer.copy(alpha = alphaValue),
+                tertiaryContainer = baseTertiaryContainer.copy(alpha = alphaValue)
             )
         }
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             val baseScheme = if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-            if (isCustomBackgroundEnabled) {
-                baseScheme.copy(
-                    background = Color.Transparent,
-                    surface = Color.Transparent,
-                    surfaceVariant = baseScheme.surfaceVariant.copy(alpha = alphaValue),
-                    surfaceContainer = baseScheme.surfaceContainer.copy(alpha = alphaValue),
-                    surfaceContainerLow = baseScheme.surfaceContainerLow.copy(alpha = alphaValue),
-                    surfaceContainerLowest = baseScheme.surfaceContainerLowest.copy(alpha = alphaValue),
-                    surfaceContainerHigh = baseScheme.surfaceContainerHigh.copy(alpha = alphaValue),
-                    surfaceContainerHighest = baseScheme.surfaceContainerHighest.copy(alpha = alphaValue),
-                    primaryContainer = baseScheme.primaryContainer.copy(alpha = alphaValue),
-                    secondaryContainer = baseScheme.secondaryContainer.copy(alpha = alphaValue),
-                    tertiaryContainer = baseScheme.tertiaryContainer.copy(alpha = alphaValue)
-                )
-            } else {
-                baseScheme
-            }
+            baseScheme.copy(
+                background = if (isCustomBackgroundEnabled) Color.Transparent else baseScheme.background,
+                surface = if (isCustomBackgroundEnabled) Color.Transparent else baseScheme.surface,
+                surfaceVariant = baseScheme.surfaceVariant.copy(alpha = alphaValue),
+                surfaceContainer = baseScheme.surfaceContainer.copy(alpha = alphaValue),
+                surfaceContainerLow = baseScheme.surfaceContainerLow.copy(alpha = alphaValue),
+                surfaceContainerLowest = baseScheme.surfaceContainerLowest.copy(alpha = alphaValue),
+                surfaceContainerHigh = baseScheme.surfaceContainerHigh.copy(alpha = alphaValue),
+                surfaceContainerHighest = baseScheme.surfaceContainerHighest.copy(alpha = alphaValue),
+                primaryContainer = baseScheme.primaryContainer.copy(alpha = alphaValue),
+                secondaryContainer = baseScheme.secondaryContainer.copy(alpha = alphaValue),
+                tertiaryContainer = baseScheme.tertiaryContainer.copy(alpha = alphaValue)
+            )
         }
         amoledMode && darkTheme -> {
             val baseSurfaceVariant = DARK_GREY.blend(AMOLED_BLACK, 0.8f)
             DarkColorScheme.copy(
                 background = if (isCustomBackgroundEnabled) Color.Transparent else AMOLED_BLACK,
                 surface = if (isCustomBackgroundEnabled) Color.Transparent else AMOLED_BLACK,
-                surfaceVariant = if (isCustomBackgroundEnabled) baseSurfaceVariant.copy(alpha = alphaValue) else baseSurfaceVariant,
-                surfaceContainer = if (isCustomBackgroundEnabled) baseSurfaceVariant.copy(alpha = alphaValue) else baseSurfaceVariant,
-                surfaceContainerLow = if (isCustomBackgroundEnabled) baseSurfaceVariant.copy(alpha = alphaValue) else baseSurfaceVariant,
-                surfaceContainerLowest = if (isCustomBackgroundEnabled) baseSurfaceVariant.copy(alpha = alphaValue) else baseSurfaceVariant,
-                surfaceContainerHigh = if (isCustomBackgroundEnabled) baseSurfaceVariant.copy(alpha = alphaValue) else baseSurfaceVariant,
-                surfaceContainerHighest = if (isCustomBackgroundEnabled) baseSurfaceVariant.copy(alpha = alphaValue) else baseSurfaceVariant,
+                surfaceVariant = baseSurfaceVariant.copy(alpha = alphaValue),
+                surfaceContainer = baseSurfaceVariant.copy(alpha = alphaValue),
+                surfaceContainerLow = baseSurfaceVariant.copy(alpha = alphaValue),
+                surfaceContainerLowest = baseSurfaceVariant.copy(alpha = alphaValue),
+                surfaceContainerHigh = baseSurfaceVariant.copy(alpha = alphaValue),
+                surfaceContainerHighest = baseSurfaceVariant.copy(alpha = alphaValue),
             )
         }
         darkTheme -> {
-            if (isCustomBackgroundEnabled) {
-                DarkColorScheme.copy(
-                    background = Color.Transparent,
-                    surface = Color.Transparent,
-                    surfaceVariant = DarkColorScheme.surfaceVariant.copy(alpha = alphaValue),
-                    surfaceContainer = DarkColorScheme.surfaceContainer.copy(alpha = alphaValue),
-                    surfaceContainerLow = DarkColorScheme.surfaceContainerLow.copy(alpha = alphaValue),
-                    surfaceContainerLowest = DarkColorScheme.surfaceContainerLowest.copy(alpha = alphaValue),
-                    surfaceContainerHigh = DarkColorScheme.surfaceContainerHigh.copy(alpha = alphaValue),
-                    surfaceContainerHighest = DarkColorScheme.surfaceContainerHighest.copy(alpha = alphaValue),
-                    primaryContainer = DarkColorScheme.primaryContainer.copy(alpha = alphaValue),
-                    secondaryContainer = DarkColorScheme.secondaryContainer.copy(alpha = alphaValue),
-                    tertiaryContainer = DarkColorScheme.tertiaryContainer.copy(alpha = alphaValue)
-                )
-            } else {
-                DarkColorScheme
-            }
+            DarkColorScheme.copy(
+                background = if (isCustomBackgroundEnabled) Color.Transparent else DarkColorScheme.background,
+                surface = if (isCustomBackgroundEnabled) Color.Transparent else DarkColorScheme.surface,
+                surfaceVariant = DarkColorScheme.surfaceVariant.copy(alpha = alphaValue),
+                surfaceContainer = DarkColorScheme.surfaceContainer.copy(alpha = alphaValue),
+                surfaceContainerLow = DarkColorScheme.surfaceContainerLow.copy(alpha = alphaValue),
+                surfaceContainerLowest = DarkColorScheme.surfaceContainerLowest.copy(alpha = alphaValue),
+                surfaceContainerHigh = DarkColorScheme.surfaceContainerHigh.copy(alpha = alphaValue),
+                surfaceContainerHighest = DarkColorScheme.surfaceContainerHighest.copy(alpha = alphaValue),
+                primaryContainer = DarkColorScheme.primaryContainer.copy(alpha = alphaValue),
+                secondaryContainer = DarkColorScheme.secondaryContainer.copy(alpha = alphaValue),
+                tertiaryContainer = DarkColorScheme.tertiaryContainer.copy(alpha = alphaValue)
+            )
         }
         else -> {
-            if (isCustomBackgroundEnabled) {
-                LightColorScheme.copy(
-                    background = Color.Transparent,
-                    surface = Color.Transparent,
-                    surfaceVariant = LightColorScheme.surfaceVariant.copy(alpha = alphaValue),
-                    surfaceContainer = LightColorScheme.surfaceContainer.copy(alpha = alphaValue),
-                    surfaceContainerLow = LightColorScheme.surfaceContainerLow.copy(alpha = alphaValue),
-                    surfaceContainerLowest = LightColorScheme.surfaceContainerLowest.copy(alpha = alphaValue),
-                    surfaceContainerHigh = LightColorScheme.surfaceContainerHigh.copy(alpha = alphaValue),
-                    surfaceContainerHighest = LightColorScheme.surfaceContainerHighest.copy(alpha = alphaValue),
-                    primaryContainer = LightColorScheme.primaryContainer.copy(alpha = alphaValue),
-                    secondaryContainer = LightColorScheme.secondaryContainer.copy(alpha = alphaValue),
-                    tertiaryContainer = LightColorScheme.tertiaryContainer.copy(alpha = alphaValue)
-                )
-            } else {
-                LightColorScheme
-            }
+            LightColorScheme.copy(
+                background = if (isCustomBackgroundEnabled) Color.Transparent else LightColorScheme.background,
+                surface = if (isCustomBackgroundEnabled) Color.Transparent else LightColorScheme.surface,
+                surfaceVariant = LightColorScheme.surfaceVariant.copy(alpha = alphaValue),
+                surfaceContainer = LightColorScheme.surfaceContainer.copy(alpha = alphaValue),
+                surfaceContainerLow = LightColorScheme.surfaceContainerLow.copy(alpha = alphaValue),
+                surfaceContainerLowest = LightColorScheme.surfaceContainerLowest.copy(alpha = alphaValue),
+                surfaceContainerHigh = LightColorScheme.surfaceContainerHigh.copy(alpha = alphaValue),
+                surfaceContainerHighest = LightColorScheme.surfaceContainerHighest.copy(alpha = alphaValue),
+                primaryContainer = LightColorScheme.primaryContainer.copy(alpha = alphaValue),
+                secondaryContainer = LightColorScheme.secondaryContainer.copy(alpha = alphaValue),
+                tertiaryContainer = LightColorScheme.tertiaryContainer.copy(alpha = alphaValue)
+            )
         }
     }
 
