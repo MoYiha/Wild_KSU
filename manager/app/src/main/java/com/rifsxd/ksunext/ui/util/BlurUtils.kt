@@ -73,36 +73,43 @@ fun BackdropBlurBox(
 }
 
 /**
- * A Card composable that applies backdrop blur to its background while keeping content sharp.
- * This should be used instead of applying applyUIBlur() to cards with text content.
+ * A Card composable that applies blur to the background layer while keeping content sharp.
+ * This mimics the transparency approach but for blur effects.
+ * Use this instead of ElevatedCard with applyUIBlur() to prevent text blurring.
  */
 @Composable
-fun BackdropBlurCard(
+fun BlurredCard(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     shape: Shape = RoundedCornerShape(12.dp),
+    elevation: androidx.compose.material3.CardElevation = androidx.compose.material3.CardDefaults.elevatedCardElevation(),
     content: @Composable () -> Unit
 ) {
     val uiBlur = LocalUIBlur.current
     
     Box(modifier = modifier) {
-        // Blurred background layer
+        // Background blur layer - only visible when blur is enabled
         if (uiBlur > 0f) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(shape)
-                    .background(backgroundColor.copy(alpha = 0.9f))
-                    .blur(radius = (uiBlur * 25f).dp)
+                    .background(backgroundColor.copy(alpha = 0.8f)) // Slightly transparent for better blur effect
+                    .blur(radius = (uiBlur * 25f).dp) // Full blur intensity like background blur
+                    .zIndex(0f)
             )
         }
         
-        // Sharp content layer with subtle background
-        Box(
+        // Card content layer - always sharp
+        androidx.compose.material3.ElevatedCard(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(shape)
-                .background(backgroundColor.copy(alpha = if (uiBlur > 0f) 0.1f else 1f))
+                .zIndex(1f),
+            colors = androidx.compose.material3.CardDefaults.elevatedCardColors(
+                containerColor = if (uiBlur > 0f) backgroundColor.copy(alpha = 0.3f) else backgroundColor
+            ),
+            shape = shape,
+            elevation = elevation
         ) {
             content()
         }
