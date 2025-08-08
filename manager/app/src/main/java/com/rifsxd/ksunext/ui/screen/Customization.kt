@@ -296,8 +296,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 "system_default" to "System Default",
                 "light" to "Light Mode",
                 "dark" to "Dark Mode",
-                "amoled" to "AMOLED Dark",
-                "dynamic" to "Dynamic Color"
+                "amoled" to "AMOLED Dark"
             )
             
             val currentThemeDisplay = themeOptions.find { it.first == themeMode }?.second ?: "System Default"
