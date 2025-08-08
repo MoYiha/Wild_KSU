@@ -59,8 +59,6 @@ import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.theme.getCardElevation
-import com.rifsxd.ksunext.ui.util.applyUIBlur
-import com.rifsxd.ksunext.ui.util.LayeredBlurCard
 
 import java.util.*
 
@@ -145,8 +143,10 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun SuperuserCard() {
     val count = getSuperuserCount()
-    LayeredBlurCard(
-        backgroundColor = MaterialTheme.colorScheme.secondaryContainer
+    ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
     ) {
         Box(
             modifier = Modifier
@@ -179,8 +179,10 @@ private fun SuperuserCard() {
 @Composable
 private fun ModuleCard() {
     val count = getModuleCount()
-    LayeredBlurCard(
-        backgroundColor = MaterialTheme.colorScheme.secondaryContainer
+    ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
     ) {
         Box(
             modifier = Modifier
@@ -385,7 +387,6 @@ private fun StatusCard(
     var tapCount by remember { mutableStateOf(0) }
 
     ElevatedCard(
-        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(containerColor = run {
             if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.errorContainer
@@ -536,7 +537,6 @@ fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
     ElevatedCard(
-        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = color
         ),
@@ -575,7 +575,6 @@ private fun InfoCard(autoExpand: Boolean = false) {
     }   
 
     ElevatedCard(
-        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
@@ -748,7 +747,6 @@ fun NextCard() {
     val url = stringResource(R.string.home_next_kernelsu_repo)
 
     ElevatedCard(
-        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
