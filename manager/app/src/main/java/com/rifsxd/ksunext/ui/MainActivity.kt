@@ -237,7 +237,7 @@ class MainActivity : ComponentActivity() {
                     backgroundImageUri = backgroundImageUri,
                     backgroundFitMode = "custom_crop", // Default to advanced crop editor
                     backgroundTransparency = backgroundTransparency,
-                    backgroundBlur = B
+                    backgroundBlur = backgroundBlur
                 ) {
                 val navController = rememberNavController()
                 val snackBarHostState = remember { SnackbarHostState() }
