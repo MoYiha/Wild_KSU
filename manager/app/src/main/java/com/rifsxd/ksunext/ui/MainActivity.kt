@@ -65,6 +65,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.runtime.compositionLocalOf
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -102,6 +103,10 @@ import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 import kotlinx.coroutines.launch
+
+// CompositionLocal providers for ViewModels
+val LocalModuleViewModel = compositionLocalOf<ModuleViewModel> { error("ModuleViewModel not provided") }
+val LocalSuperUserViewModel = compositionLocalOf<SuperUserViewModel> { error("SuperUserViewModel not provided") }
 
 class MainActivity : ComponentActivity() {
 
@@ -262,6 +267,8 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     CompositionLocalProvider(
                         LocalSnackbarHost provides snackBarHostState,
+                        LocalModuleViewModel provides moduleViewModel,
+                        LocalSuperUserViewModel provides superUserViewModel,
                     ) {
                         DestinationsNavHost(
                             modifier = Modifier.padding(innerPadding),

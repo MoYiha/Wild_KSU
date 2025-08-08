@@ -33,12 +33,13 @@ import kotlinx.coroutines.launch
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
+import com.rifsxd.ksunext.ui.LocalSuperUserViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
 @Composable
 fun SuperUserScreen(navigator: DestinationsNavigator) {
-    val viewModel = viewModel<SuperUserViewModel>()
+    val viewModel = LocalSuperUserViewModel.current
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 

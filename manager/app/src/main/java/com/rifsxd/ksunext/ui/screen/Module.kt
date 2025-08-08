@@ -133,12 +133,13 @@ import com.dergoogler.mmrl.ui.component.LabelItem
 import com.dergoogler.mmrl.ui.component.LabelItemDefaults
 import com.topjohnwu.superuser.io.SuFile
 import com.rifsxd.ksunext.ui.theme.getCardElevation
+import com.rifsxd.ksunext.ui.LocalModuleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
 @Composable
 fun ModuleScreen(navigator: DestinationsNavigator) {
-    val viewModel = viewModel<ModuleViewModel>()
+    val viewModel = LocalModuleViewModel.current
     val context = LocalContext.current
     val snackBarHost = LocalSnackbarHost.current
     val scope = rememberCoroutineScope()
@@ -580,7 +581,7 @@ fun ModuleItem(
     expanded: Boolean,
     onExpandToggle: () -> Unit,
 ) {
-    val viewModel = viewModel<ModuleViewModel>()
+    val viewModel = LocalModuleViewModel.current
 
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(

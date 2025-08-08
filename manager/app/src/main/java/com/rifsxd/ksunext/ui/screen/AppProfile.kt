@@ -81,6 +81,7 @@ import com.rifsxd.ksunext.ui.util.restartApp
 import com.rifsxd.ksunext.ui.util.setSepolicy
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 import com.rifsxd.ksunext.ui.viewmodel.getTemplateInfoById
+import com.rifsxd.ksunext.ui.LocalSuperUserViewModel
 
 /**
  * @author weishu
@@ -97,7 +98,7 @@ fun AppProfileScreen(
     val snackBarHost = LocalSnackbarHost.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
-    val viewModel: SuperUserViewModel = viewModel()
+    val viewModel = LocalSuperUserViewModel.current
     val failToUpdateAppProfile = stringResource(R.string.failed_to_update_app_profile).format(appInfo.label)
     val failToUpdateSepolicy = stringResource(R.string.failed_to_update_sepolicy).format(appInfo.label)
     val suNotAllowed = stringResource(R.string.su_not_allowed).format(appInfo.label)
