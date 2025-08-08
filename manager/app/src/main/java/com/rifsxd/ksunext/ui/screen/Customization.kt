@@ -398,6 +398,17 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
 
 
+            // Background Section Header
+            Text(
+                text = "Background",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
             // Background Image Selection
             ListItem(
                 leadingContent = { Icon(Icons.Filled.Image, stringResource(R.string.settings_background_image)) },
@@ -443,7 +454,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     .applyUIBlur()
             )
 
-            // Background Transparency Slider - Always available
+            // Background Transparency Slider (Darkness) - Always available
             var backgroundTransparency by rememberSaveable {
                 mutableFloatStateOf(
                     prefs.getFloat("background_transparency", 1.0f)
@@ -495,6 +506,71 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     }
                 },
                 modifier = Modifier.applyUIBlur()
+            )
+
+            // Background Blur Slider
+            var backgroundBlur by rememberSaveable {
+                mutableFloatStateOf(
+                    prefs.getFloat("background_blur", 0.0f)
+                )
+            }
+            
+            ListItem(
+                leadingContent = { Icon(Icons.Filled.BlurCircular, "Background Blur") },
+                headlineContent = { Text(
+                    text = "Background Blur",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                ) },
+                supportingContent = { 
+                    Column {
+                        Text("Add blur effect to background image")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "0px",
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.width(32.dp)
+                            )
+                            Slider(
+                                value = backgroundBlur,
+                                onValueChange = { value ->
+                                    backgroundBlur = value
+                                    prefs.edit().putFloat("background_blur", value).commit()
+                                },
+                                valueRange = 0.0f..25.0f,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                text = "25px",
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.width(32.dp),
+                                textAlign = TextAlign.End
+                            )
+                        }
+                        Text(
+                            text = "${backgroundBlur.toInt()}px",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                },
+                modifier = Modifier.applyUIBlur()
+            )
+
+            // UI Section Header
+            Text(
+                text = "UI",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
             // UI Transparency Slider - Always available
@@ -596,60 +672,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                         Text(
                             text = "${uiBlur.toInt()}px",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                },
-                modifier = Modifier.applyUIBlur()
-            )
-
-            // Background Blur Slider
-            var backgroundBlur by rememberSaveable {
-                mutableFloatStateOf(
-                    prefs.getFloat("background_blur", 0.0f)
-                )
-            }
-            
-            ListItem(
-                leadingContent = { Icon(Icons.Filled.BlurCircular, "Background Blur") },
-                headlineContent = { Text(
-                    text = "Background Blur",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
-                supportingContent = { 
-                    Column {
-                        Text("Add blur effect to background image")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "0px",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp)
-                            )
-                            Slider(
-                                value = backgroundBlur,
-                                onValueChange = { value ->
-                                    backgroundBlur = value
-                                    prefs.edit().putFloat("background_blur", value).commit()
-                                },
-                                valueRange = 0.0f..25.0f,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Text(
-                                text = "25px",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp),
-                                textAlign = TextAlign.End
-                            )
-                        }
-                        Text(
-                            text = "${backgroundBlur.toInt()}px",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
