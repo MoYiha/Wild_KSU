@@ -8,18 +8,19 @@ import com.rifsxd.ksunext.ui.theme.LocalUIBlur
 
 /**
  * UI blur effect that works on the same layer as UI transparency.
- * Currently disabled to prevent whole-app blurring. The blur effect
- * is now handled through the transparency system in the theme.
- * 
- * This function is kept for compatibility but returns the modifier unchanged.
- * The UI blur effect is achieved through the combination of transparency
- * and background effects in the theme system.
+ * This applies blur to UI components when the UI blur setting is enabled,
+ * creating a frosted glass effect that complements the transparency system.
  */
 @Composable
 fun Modifier.applyUIBlur(): Modifier {
-    // Disabled to prevent component-level blurring that affects the entire UI
-    // UI blur now works through the transparency system for better integration
-    return this
+    val uiBlur = LocalUIBlur.current
+    return if (uiBlur > 0f) {
+        // Apply blur with intensity matching the UI blur setting
+        // This creates a frosted glass effect on UI components
+        this.blur(radius = (uiBlur * 0.5f).dp)
+    } else {
+        this
+    }
 }
 
 /**
