@@ -2,26 +2,22 @@ package com.rifsxd.ksunext.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.unit.dp
 import com.rifsxd.ksunext.ui.theme.LocalUIBlur
 
 /**
- * Applies UI blur effect that works harmoniously with UI transparency.
- * The blur is applied more subtly to complement the transparency effect
- * rather than overwhelming it. This creates a glass-like effect when
- * combined with UI transparency.
+ * UI blur effect that works on the same layer as UI transparency.
+ * Currently disabled to prevent whole-app blurring. The blur effect
+ * is now handled through the transparency system in the theme.
+ * 
+ * This function is kept for compatibility but returns the modifier unchanged.
+ * The UI blur effect is achieved through the combination of transparency
+ * and background effects in the theme system.
  */
 @Composable
 fun Modifier.applyUIBlur(): Modifier {
-    val uiBlur = LocalUIBlur.current
-    return if (uiBlur > 0f) {
-        // Apply blur with reduced intensity for better integration with transparency
-        // The blur radius is scaled down to create a more subtle effect
-        this.blur(radius = (uiBlur * 0.3f).dp)
-    } else {
-        this
-    }
+    // Disabled to prevent component-level blurring that affects the entire UI
+    // UI blur now works through the transparency system for better integration
+    return this
 }
 
 /**

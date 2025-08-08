@@ -396,8 +396,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 )
             }
 
-
-
             // Background Section Header
             Text(
                 text = "Background",

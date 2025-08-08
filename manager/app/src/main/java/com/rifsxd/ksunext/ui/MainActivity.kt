@@ -286,7 +286,7 @@ class MainActivity : ComponentActivity() {
                                 navigator = navigator,
                                 moduleViewModel = moduleViewModel,
                                 superUserViewModel = superUserViewModel,
-                                modifier = Modifier.applyUIBlur()
+                                modifier = Modifier
                             )
                         }
                     },
@@ -296,7 +296,7 @@ class MainActivity : ComponentActivity() {
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
                         ) {
-                            BottomBar(navController, moduleUpdateCount, Modifier.applyUIBlur())
+                            BottomBar(navController, moduleUpdateCount, Modifier)
                         }
                     },
                     contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -308,8 +308,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         DestinationsNavHost(
                             modifier = Modifier
-                                .padding(innerPadding)
-                                .applyUIBlur(),
+                                .padding(innerPadding),
                             navGraph = NavGraphs.root,
                             navController = navController,
                             defaultTransitions = object : NavHostAnimatedDestinationStyle() {
