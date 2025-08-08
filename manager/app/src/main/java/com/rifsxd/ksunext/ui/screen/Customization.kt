@@ -283,22 +283,58 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             }
 
-            var enableAmoled by rememberSaveable {
+            // Theme Mode Selection
+            var themeMode by rememberSaveable {
                 mutableStateOf(
-                    prefs.getBoolean("enable_amoled", false)
+                    prefs.getString("theme_mode", "system_default") ?: "system_default"
                 )
             }
-            if (isSystemInDarkTheme()) {
-                SwitchItem(
-                    icon = Icons.Filled.Contrast,
-                    title = stringResource(id = R.string.settings_amoled_mode),
-                    summary = stringResource(id = R.string.settings_amoled_mode_summary),
-                    checked = enableAmoled
-                ) { checked ->
-                    prefs.edit().putBoolean("enable_amoled", checked).commit()
-                    enableAmoled = checked
+            
+            val themeOptions = listOf(
+                "system_default" to "System Default",
+                "light" to "Light Mode",
+                "dark" to "Dark Mode",
+                "amoled" to "AMOLED Dark",
+                "dynamic" to "Dynamic Color"
+            )
+            
+            val currentThemeDisplay = themeOptions.find { it.first == themeMode }?.second ?: "System Default"
+            
+            val themeDialog = rememberCustomDialog { dismiss ->
+                val options = themeOptions.map { (value, display) ->
+                    ListOption(
+                        titleText = display,
+                        selected = value == themeMode
+                    )
                 }
+                
+                ListDialog(
+                    state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
+                    header = Header.Default(title = "Theme Mode"),
+                    selection = ListSelection.Single(
+                        showRadioButtons = true,
+                        options = options
+                    ) { index, _ ->
+                        val selectedTheme = themeOptions[index].first
+                        prefs.edit().putString("theme_mode", selectedTheme).commit()
+                        themeMode = selectedTheme
+                        dismiss()
+                    }
+                )
             }
+            
+            ListItem(
+                leadingContent = { Icon(Icons.Filled.Palette, "Theme Mode") },
+                headlineContent = { Text(
+                    text = "Theme Mode",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                ) },
+                supportingContent = { Text("Current: $currentThemeDisplay") },
+                modifier = Modifier.clickable {
+                    themeDialog.show()
+                }
+            )
 
             // Background Image Setting
             var backgroundImageUri by rememberSaveable {
