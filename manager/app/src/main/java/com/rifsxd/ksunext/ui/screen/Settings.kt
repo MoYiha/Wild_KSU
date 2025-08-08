@@ -95,6 +95,7 @@ import com.rifsxd.ksunext.ui.util.getBugreportFile
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.isGlobalNamespaceEnabled
 import com.rifsxd.ksunext.ui.util.setGlobalNamespaceEnabled
+import com.rifsxd.ksunext.ui.util.applyUIBlur
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -158,9 +159,11 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         fontWeight = FontWeight.SemiBold
                     ) },
                     supportingContent = { Text(stringResource(id = R.string.settings_profile_template_summary)) },
-                    modifier = Modifier.clickable {
-                        navigator.navigate(AppProfileTemplateScreenDestination)
-                    }
+                    modifier = Modifier
+                        .clickable {
+                            navigator.navigate(AppProfileTemplateScreenDestination)
+                        }
+                        .applyUIBlur()
                 )
             }
 

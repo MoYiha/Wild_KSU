@@ -81,6 +81,7 @@ import com.rifsxd.ksunext.ui.util.ImageCropUtils
 import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.*
+import com.rifsxd.ksunext.ui.util.applyUIBlur
 import java.util.Locale
 
 /**
@@ -261,9 +262,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     fontWeight = FontWeight.SemiBold,
                 ) },
                 supportingContent = { Text(currentLanguageDisplay) },
-                modifier = Modifier.clickable {
-                    languageDialog.show()
-                }
+                modifier = Modifier
+                    .clickable {
+                        languageDialog.show()
+                    }
+                    .applyUIBlur()
             )
 
             var useBanner by rememberSaveable {
@@ -331,9 +334,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     fontWeight = FontWeight.SemiBold,
                 ) },
                 supportingContent = { Text("Current: $currentThemeDisplay") },
-                modifier = Modifier.clickable {
-                    themeDialog.show()
-                }
+                modifier = Modifier
+                    .clickable {
+                        themeDialog.show()
+                    }
+                    .applyUIBlur()
             )
 
             // Background Image Setting
@@ -427,13 +432,15 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 },
-                modifier = Modifier.clickable {
-                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                        type = "image/*"
-                        addCategory(Intent.CATEGORY_OPENABLE)
+                modifier = Modifier
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                            type = "image/*"
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                        }
+                        selectImageLauncher.launch(intent)
                     }
-                    selectImageLauncher.launch(intent)
-                }
+                    .applyUIBlur()
             )
 
             // Background Transparency Slider - Always available
@@ -486,7 +493,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                }
+                },
+                modifier = Modifier.applyUIBlur()
             )
 
             // UI Transparency Slider - Always available
@@ -539,7 +547,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                }
+                },
+                modifier = Modifier.applyUIBlur()
             )
 
             // UI Blur Slider
@@ -592,7 +601,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                }
+                },
+                modifier = Modifier.applyUIBlur()
             )
 
             // Background Blur Slider
@@ -645,7 +655,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                }
+                },
+                modifier = Modifier.applyUIBlur()
             )
         }
     }

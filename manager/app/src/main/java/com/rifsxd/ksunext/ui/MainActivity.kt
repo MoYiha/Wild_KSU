@@ -101,6 +101,7 @@ import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.rootAvailable
 import com.rifsxd.ksunext.ui.util.install
 import com.rifsxd.ksunext.ui.util.isSuCompatDisabled
+import com.rifsxd.ksunext.ui.util.applyUIBlur
 import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
@@ -284,7 +285,8 @@ class MainActivity : ComponentActivity() {
                                 currentDestination = currentDestination,
                                 navigator = navigator,
                                 moduleViewModel = moduleViewModel,
-                                superUserViewModel = superUserViewModel
+                                superUserViewModel = superUserViewModel,
+                                modifier = Modifier.applyUIBlur()
                             )
                         }
                     },
@@ -294,7 +296,7 @@ class MainActivity : ComponentActivity() {
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
                         ) {
-                            BottomBar(navController, moduleUpdateCount)
+                            BottomBar(navController, moduleUpdateCount, Modifier.applyUIBlur())
                         }
                     },
                     contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -305,7 +307,9 @@ class MainActivity : ComponentActivity() {
                         LocalSuperUserViewModel provides superUserViewModel,
                     ) {
                         DestinationsNavHost(
-                            modifier = Modifier.padding(innerPadding),
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .applyUIBlur(),
                             navGraph = NavGraphs.root,
                             navController = navController,
                             defaultTransitions = object : NavHostAnimatedDestinationStyle() {
@@ -324,7 +328,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun BottomBar(navController: NavHostController, moduleUpdateCount: Int) {
+private fun BottomBar(navController: NavHostController, moduleUpdateCount: Int, modifier: Modifier = Modifier) {
     val navigator = navController.rememberDestinationsNavigator()
     val isManager = Natives.becomeManager(ksuApp.packageName)
     val fullFeatured = isManager && !Natives.requireNewKernel() && rootAvailable()
@@ -333,6 +337,7 @@ private fun BottomBar(navController: NavHostController, moduleUpdateCount: Int) 
     val susSUMode = susfsSUS_SU_Mode()
 
     NavigationBar(
+        modifier = modifier,
         tonalElevation = 8.dp,
         windowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout).only(
             WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
@@ -387,29 +392,31 @@ private fun UnifiedTopBar(
     currentDestination: NavDestination?, 
     navigator: DestinationsNavigator,
     moduleViewModel: ModuleViewModel,
-    superUserViewModel: SuperUserViewModel
+    superUserViewModel: SuperUserViewModel,
+    modifier: Modifier = Modifier
 ) {
     when (currentDestination?.route) {
         ModuleScreenDestination.route -> {
-            ModuleTopBar(moduleViewModel = moduleViewModel)
+            ModuleTopBar(moduleViewModel = moduleViewModel, modifier = modifier)
         }
         SuperUserScreenDestination.route -> {
-            SuperUserTopBar(superUserViewModel = superUserViewModel, navigator = navigator)
+            SuperUserTopBar(superUserViewModel = superUserViewModel, navigator = navigator, modifier = modifier)
         }
         else -> {
-            RegularTopBar(currentDestination = currentDestination, navigator = navigator)
+            RegularTopBar(currentDestination = currentDestination, navigator = navigator, modifier = modifier)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
+private fun ModuleTopBar(moduleViewModel: ModuleViewModel, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     
     SearchAppBar(
+        modifier = modifier,
         title = { 
             Text(
                 text = stringResource(R.string.module),
@@ -551,12 +558,13 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: DestinationsNavigator) {
+private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: DestinationsNavigator, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val scope = rememberCoroutineScope()
     
     SearchAppBar(
+        modifier = modifier,
         title = { 
             Text(
                 text = stringResource(R.string.superuser),
@@ -566,7 +574,7 @@ private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: D
         },
         searchText = superUserViewModel.search,
         onSearchTextChange = { superUserViewModel.search = it },
-        onClearClick = { superUserViewModel.search = "" },
+                        onClearClick = { superUserViewModel.search = "" },
         dropdownContent = {
             var showDropdown by remember { mutableStateOf(false) }
             IconButton(
@@ -616,7 +624,7 @@ private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: D
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RegularTopBar(currentDestination: NavDestination?, navigator: DestinationsNavigator) {
+private fun RegularTopBar(currentDestination: NavDestination?, navigator: DestinationsNavigator, modifier: Modifier = Modifier) {
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
     val containerColor = remember(surfaceContainer) { surfaceContainer }
     
@@ -635,6 +643,7 @@ private fun RegularTopBar(currentDestination: NavDestination?, navigator: Destin
     }
     
     TopAppBar(
+        modifier = modifier,
         title = { 
             Text(
                 text = title,

@@ -58,6 +58,7 @@ import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.theme.getCardElevation
+import com.rifsxd.ksunext.ui.util.applyUIBlur
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -142,6 +143,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 private fun SuperuserCard() {
     val count = getSuperuserCount()
     ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
@@ -179,6 +181,7 @@ private fun SuperuserCard() {
 private fun ModuleCard() {
     val count = getModuleCount()
     ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
@@ -387,6 +390,7 @@ private fun StatusCard(
     var tapCount by remember { mutableStateOf(0) }
 
     ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(containerColor = run {
             if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.errorContainer
@@ -537,6 +541,7 @@ fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
     ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = color
         ),
@@ -575,6 +580,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
     }   
 
     ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
@@ -747,6 +753,7 @@ fun NextCard() {
     val url = stringResource(R.string.home_next_kernelsu_repo)
 
     ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
