@@ -36,15 +36,14 @@ import com.rifsxd.ksunext.BuildConfig
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.theme.getCardElevation
 import com.rifsxd.ksunext.ui.theme.uiBlur
+import com.rifsxd.ksunext.ui.theme.BlurredCard
 
 @Preview
 @Composable
 fun AboutCard() {
-    ElevatedCard(
+    BlurredCard(
         modifier = Modifier
-            .fillMaxWidth()
-            .uiBlur(),
-        shape = RoundedCornerShape(8.dp),
+            .fillMaxWidth(),
         elevation = getCardElevation()
     ) {
         Row(

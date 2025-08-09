@@ -60,6 +60,7 @@ import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.theme.getCardElevation
 import com.rifsxd.ksunext.ui.theme.uiBlur
+import com.rifsxd.ksunext.ui.theme.BlurredCard
 
 import java.util.*
 
@@ -144,12 +145,11 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun SuperuserCard() {
     val count = getSuperuserCount()
-    ElevatedCard(
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
-        elevation = getCardElevation(),
-        modifier = Modifier.uiBlur()
+        elevation = getCardElevation()
     ) {
         Box(
             modifier = Modifier
@@ -182,12 +182,11 @@ private fun SuperuserCard() {
 @Composable
 private fun ModuleCard() {
     val count = getModuleCount()
-    ElevatedCard(
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
-        elevation = getCardElevation(),
-        modifier = Modifier.uiBlur()
+        elevation = getCardElevation()
     ) {
         Box(
             modifier = Modifier
@@ -391,8 +390,7 @@ private fun StatusCard(
     val context = LocalContext.current
     var tapCount by remember { mutableStateOf(0) }
 
-    ElevatedCard(
-        modifier = Modifier.uiBlur(),
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(containerColor = run {
             if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.errorContainer
@@ -542,8 +540,7 @@ private fun StatusCard(
 fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
-    ElevatedCard(
-        modifier = Modifier.uiBlur(),
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = color
         ),
@@ -581,8 +578,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
         }
     }   
 
-    ElevatedCard(
-        modifier = Modifier.uiBlur(),
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
@@ -754,12 +750,11 @@ fun NextCard() {
     val uriHandler = LocalUriHandler.current
     val url = stringResource(R.string.home_next_kernelsu_repo)
 
-    ElevatedCard(
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getCardElevation(),
-        modifier = Modifier.uiBlur()
+        elevation = getCardElevation()
     ) {
         Row(
             modifier = Modifier
@@ -789,12 +784,11 @@ fun EXperimentalCard() {
     val url = stringResource(R.string.home_experimental_kernelsu_repo)
     */
 
-    ElevatedCard(
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getCardElevation(),
-        modifier = Modifier.uiBlur()
+        elevation = getCardElevation()
     ) {
         Row(
             modifier = Modifier
@@ -841,12 +835,11 @@ fun IssueReportCard() {
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
 
-    ElevatedCard(
+    BlurredCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getCardElevation(),
-        modifier = Modifier.uiBlur()
+        elevation = getCardElevation()
     ) {
         Row(
             modifier = Modifier

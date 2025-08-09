@@ -30,13 +30,56 @@ val LocalUIBlur = compositionLocalOf { 0.dp }
  */
 @Composable
 fun Modifier.uiBlur(): Modifier {
+    // This modifier is now a placeholder - blur is handled by BlurredCard composable
+    return this
+}
+
+/**
+ * Card composable with background-only blur effect
+ * The background is blurred while content remains sharp and readable
+ */
+@Composable
+fun BlurredCard(
+    modifier: Modifier = Modifier,
+    colors: androidx.compose.material3.CardColors = CardDefaults.elevatedCardColors(),
+    elevation: androidx.compose.material3.CardElevation = getCardElevation(),
+    content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit
+) {
     val blurRadius = LocalUIBlur.current
-    return if (blurRadius > 0.dp) {
-        // Apply blur with reduced intensity to maintain text readability
-        // Use a lighter blur that creates a frosted glass effect
-        this.blur(blurRadius * 0.3f)
+    
+    if (blurRadius > 0.dp) {
+        Box(modifier = modifier) {
+            // Blurred background card
+            ElevatedCard(
+                modifier = Modifier
+                    .matchParentSize()
+                    .blur(blurRadius),
+                colors = colors,
+                elevation = elevation
+            ) {
+                // Empty content for background only
+            }
+            
+            // Sharp content card on top
+            ElevatedCard(
+                modifier = Modifier.matchParentSize(),
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = androidx.compose.ui.graphics.Color.Transparent
+                ),
+                elevation = CardDefaults.elevatedCardElevation(
+                    defaultElevation = 0.dp
+                )
+            ) {
+                content()
+            }
+        }
     } else {
-        this
+        ElevatedCard(
+            modifier = modifier,
+            colors = colors,
+            elevation = elevation,
+            content = content
+        )
     }
 }
 
