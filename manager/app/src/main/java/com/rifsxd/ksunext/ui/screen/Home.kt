@@ -105,8 +105,12 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                             .height(IntrinsicSize.Min),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Box(modifier = Modifier.weight(1f)) { SuperuserCard() }
-                        Box(modifier = Modifier.weight(1f)) { ModuleCard() }
+                        Box(modifier = Modifier.weight(1f)) { 
+                            SuperuserCard(onClick = { navigator.navigate(SuperUserScreenDestination) }) 
+                        }
+                        Box(modifier = Modifier.weight(1f)) { 
+                            ModuleCard(onClick = { navigator.navigate(ModuleScreenDestination) }) 
+                        }
                     }
                 }
 
@@ -146,13 +150,14 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 }
 
 @Composable
-private fun SuperuserCard() {
+private fun SuperuserCard(onClick: () -> Unit = {}) {
     val count = getSuperuserCount()
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
-        elevation = getCardElevation()
+        elevation = getCardElevation(),
+        onClick = onClick
     ) {
         Box(
             modifier = Modifier
@@ -183,13 +188,14 @@ private fun SuperuserCard() {
 }
 
 @Composable
-private fun ModuleCard() {
+private fun ModuleCard(onClick: () -> Unit = {}) {
     val count = getModuleCount()
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
-        elevation = getCardElevation()
+        elevation = getCardElevation(),
+        onClick = onClick
     ) {
         Box(
             modifier = Modifier

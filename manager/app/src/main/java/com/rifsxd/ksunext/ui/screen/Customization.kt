@@ -962,7 +962,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 mutableStateOf(prefs.getBoolean("info_card_show_selinux_status", true))
             }
             var showHelpCard by rememberSaveable {
-                mutableStateOf(prefs.getBoolean("help_card_show", true))
+                mutableStateOf(prefs.getBoolean("show_help_card", true))
             }
 
             // InfoCard items order management
@@ -1249,7 +1249,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         summary = null,
                         checked = showHelpCard
                     ) {
-                        prefs.edit().putBoolean("help_card_show", it).apply()
+                        prefs.edit().putBoolean("show_help_card", it).apply()
                         showHelpCard = it
                     }
                 }
