@@ -1159,8 +1159,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                         draggedIndex = null
                                         dragOffset = Offset.Zero
                                     },
-                                    onDrag = { change ->
-                                        dragOffset += change
+                                    onDrag = { change, dragAmount ->
+                                        dragOffset += dragAmount
                                     }
                                 )
                             },
