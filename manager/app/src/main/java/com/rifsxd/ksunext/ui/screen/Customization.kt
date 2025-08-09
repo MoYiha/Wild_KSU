@@ -605,59 +605,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             )
 
-            // UI Blur Slider - Now functional
-            var uiBlur by rememberSaveable {
-                mutableFloatStateOf(
-                    prefs.getFloat("ui_blur", 0.0f)
-                )
-            }
-            
-            ListItem(
-                leadingContent = { Icon(Icons.Filled.BlurOn, "UI Blur") },
-                headlineContent = { Text(
-                    text = "UI Blur",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
-                supportingContent = { 
-                    Column {
-                        Text("Apply blur effect to UI elements")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "0%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp)
-                            )
-                            Slider(
-                                value = uiBlur,
-                                onValueChange = { value ->
-                                    uiBlur = value
-                                    prefs.edit().putFloat("ui_blur", value).commit()
-                                },
-                                valueRange = 0.0f..1.0f,
-                                modifier = Modifier.weight(1f),
-                                colors = SliderDefaults.colors()
-                            )
-                            Text(
-                                text = "100%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp),
-                                textAlign = TextAlign.End
-                            )
-                        }
-                        Text(
-                            text = "${(uiBlur * 100).toInt()}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-            )
+
 
             // Icon Theme Selection
             var showIconThemeManager by remember { mutableStateOf(false) }

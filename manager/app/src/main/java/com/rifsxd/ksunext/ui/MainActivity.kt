@@ -165,7 +165,7 @@ class MainActivity : ComponentActivity() {
             var backgroundImageUri by remember { mutableStateOf(prefs.getString("background_image_uri", null)) }
             var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 1.0f)) } // Default 100% darkness
             var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 0.0f)) } // Default 0% UI transparency
-            var uiBlur by remember { mutableStateOf(prefs.getFloat("ui_blur", 0.0f)) } // Default 0% UI blur
+
             var backgroundBlur by remember { mutableStateOf(prefs.getFloat("background_blur", 0.0f)) } // Default 0px blur
             
             // Listen for preference changes
@@ -193,9 +193,7 @@ class MainActivity : ComponentActivity() {
                         "ui_transparency" -> {
                             uiTransparency = prefs.getFloat("ui_transparency", 0.0f)
                         }
-                        "ui_blur" -> {
-                            uiBlur = prefs.getFloat("ui_blur", 0.0f)
-                        }
+
                         "background_blur" -> {
                             backgroundBlur = prefs.getFloat("background_blur", 0.0f)
                         }
@@ -234,8 +232,7 @@ class MainActivity : ComponentActivity() {
                 dynamicColor = isDynamicColor,
                 amoledMode = isAmoledMode,
                 isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty(),
-                uiTransparency = uiTransparency,
-                uiBlur = uiBlur
+                uiTransparency = uiTransparency
             ) {
                 BackgroundImageWrapper(
                     backgroundImageUri = backgroundImageUri,

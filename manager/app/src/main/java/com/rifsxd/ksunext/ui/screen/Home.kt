@@ -59,8 +59,8 @@ import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.theme.getCardElevation
-import com.rifsxd.ksunext.ui.theme.uiBlur
-import com.rifsxd.ksunext.ui.theme.BlurredCard
+
+import androidx.compose.material3.ElevatedCard
 
 import java.util.*
 
@@ -145,7 +145,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun SuperuserCard() {
     val count = getSuperuserCount()
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
@@ -182,7 +182,7 @@ private fun SuperuserCard() {
 @Composable
 private fun ModuleCard() {
     val count = getModuleCount()
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
@@ -390,7 +390,7 @@ private fun StatusCard(
     val context = LocalContext.current
     var tapCount by remember { mutableStateOf(0) }
 
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(containerColor = run {
             if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.errorContainer
@@ -540,7 +540,7 @@ private fun StatusCard(
 fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = color
         ),
@@ -578,7 +578,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
         }
     }   
 
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
@@ -750,7 +750,7 @@ fun NextCard() {
     val uriHandler = LocalUriHandler.current
     val url = stringResource(R.string.home_next_kernelsu_repo)
 
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
@@ -784,7 +784,7 @@ fun EXperimentalCard() {
     val url = stringResource(R.string.home_experimental_kernelsu_repo)
     */
 
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
@@ -835,7 +835,7 @@ fun IssueReportCard() {
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
 
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),

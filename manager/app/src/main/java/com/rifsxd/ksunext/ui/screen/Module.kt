@@ -134,8 +134,8 @@ import com.dergoogler.mmrl.ui.component.LabelItem
 import com.dergoogler.mmrl.ui.component.LabelItemDefaults
 import com.topjohnwu.superuser.io.SuFile
 import com.rifsxd.ksunext.ui.theme.getCardElevation
-import com.rifsxd.ksunext.ui.theme.uiBlur
-import com.rifsxd.ksunext.ui.theme.BlurredCard
+
+import androidx.compose.material3.ElevatedCard
 import com.rifsxd.ksunext.ui.LocalModuleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -586,7 +586,7 @@ fun ModuleItem(
 ) {
     val viewModel = LocalModuleViewModel.current
 
-    BlurredCard(
+    ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),

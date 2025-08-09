@@ -35,13 +35,13 @@ import androidx.compose.ui.text.font.FontWeight
 import com.rifsxd.ksunext.BuildConfig
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.theme.getCardElevation
-import com.rifsxd.ksunext.ui.theme.uiBlur
-import com.rifsxd.ksunext.ui.theme.BlurredCard
+
+import androidx.compose.material3.ElevatedCard
 
 @Preview
 @Composable
 fun AboutCard() {
-    BlurredCard(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth(),
         elevation = getCardElevation()

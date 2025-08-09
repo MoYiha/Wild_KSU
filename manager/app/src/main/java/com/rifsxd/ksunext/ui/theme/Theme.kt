@@ -5,74 +5,17 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layout
-
-// CompositionLocal for UI blur
-val LocalUIBlur = compositionLocalOf { 0.dp }
-
-/**
- * Apply UI blur effect to a composable if blur is enabled
- */
-@Composable
-fun Modifier.uiBlur(): Modifier {
-    // This modifier is now a placeholder - blur is handled by BlurredCard composable
-    return this
-}
-
-/**
- * Card composable with background-only blur effect
- * The background is blurred while content remains sharp and readable
- */
-@Composable
-fun BlurredCard(
-    modifier: Modifier = Modifier,
-    elevation: androidx.compose.material3.CardElevation = CardDefaults.elevatedCardElevation(),
-    colors: androidx.compose.material3.CardColors = CardDefaults.elevatedCardColors(),
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val blurRadius = LocalUIBlur.current
-    
-    Box(modifier = modifier) {
-        // Background blurred card
-        ElevatedCard(
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(blurRadius),
-            elevation = elevation,
-            colors = colors
-        ) {}
-        
-        // Foreground card with content (no blur)
-        ElevatedCard(
-            modifier = Modifier.fillMaxSize(),
-            elevation = CardDefaults.elevatedCardElevation(0.dp),
-            colors = CardDefaults.elevatedCardColors(
-                containerColor = Color.Transparent
-            ),
-            content = content
-        )
-    }
-}
 
 private val DarkColorScheme = darkColorScheme(
     primary = PRIMARY,
@@ -109,7 +52,6 @@ fun KernelSUTheme(
     isCustomBackgroundEnabled: Boolean = false,
     backgroundTransparency: Float = 1.0f,
     uiTransparency: Float = 1.0f,
-    uiBlur: Float = 0.0f,
     content: @Composable () -> Unit
 ) {
     // Always apply UI transparency, regardless of background settings
@@ -208,16 +150,11 @@ fun KernelSUTheme(
         darkMode = darkTheme
     )
 
-    // Convert 0-1.0f range to 0-25dp to match background blur intensity
-    val blurRadius = (uiBlur * 25f).dp
-
-    CompositionLocalProvider(LocalUIBlur provides blurRadius) {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = Typography,
-            content = content
-        )
-    }
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content
+    )
 }
 
 @Composable
