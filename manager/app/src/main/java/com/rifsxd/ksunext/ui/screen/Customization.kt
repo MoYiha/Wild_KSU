@@ -575,11 +575,35 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 
                 ListItem(
                 leadingContent = { Icon(Icons.Filled.BlurCircular, "Background Blur") },
-                headlineContent = { Text(
-                    text = "Background Blur",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
+                headlineContent = { 
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Background Blur",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        // Reset button
+                        TextButton(
+                            onClick = { 
+                                backgroundBlur = 0.0f
+                                prefs.edit().putFloat("background_blur", 0.0f).commit()
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text(
+                                "Reset", 
+                                style = MaterialTheme.typography.labelLarge,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                },
                 supportingContent = { 
                     Column {
                         Text("Add blur effect to background image")
@@ -617,12 +641,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                         
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         
                         // Min/Low/Med/High/Max preset buttons
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             val presets = listOf(
                                 0.0f to "Min",
@@ -639,6 +663,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                         prefs.edit().putFloat("background_blur", value).commit()
                                     },
                                     modifier = Modifier.weight(1f),
+                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (backgroundBlur == value) 
                                             MaterialTheme.colorScheme.primary 
@@ -672,11 +697,35 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             
             ListItem(
                 leadingContent = { Icon(Icons.Filled.Tune, "UI Transparency") },
-                headlineContent = { Text(
-                    text = "UI Transparency",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
+                headlineContent = { 
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "UI Transparency",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        // Reset button
+                        TextButton(
+                            onClick = { 
+                                uiTransparency = 0.0f
+                                prefs.edit().putFloat("ui_transparency", 0.0f).commit()
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text(
+                                "Reset", 
+                                style = MaterialTheme.typography.labelLarge,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                },
                 supportingContent = { 
                     Column {
                         Text("Adjust the transparency of UI elements")
@@ -714,12 +763,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                         
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         
                         // Min/Low/Med/High/Max preset buttons
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             val presets = listOf(
                                 0.0f to "Min",
@@ -736,6 +785,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                         prefs.edit().putFloat("ui_transparency", value).commit()
                                     },
                                     modifier = Modifier.weight(1f),
+                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (uiTransparency == value) 
                                             MaterialTheme.colorScheme.primary 
@@ -750,9 +800,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     Text(
                                         text = label,
                                         style = MaterialTheme.typography.labelSmall,
-                                        fontSize = 10.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
+                                        fontSize = 10.sp
                                     )
                                 }
                             }
@@ -844,8 +892,10 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         // Reset button
                         TextButton(
                             onClick = { 
-                                // Reset to system DPI - this will trigger the apply button to show
+                                // Reset to system DPI and save immediately
                                 currentDpi = systemDpi
+                                prefs.edit().putInt("dpi", systemDpi).commit()
+                                savedDpi = systemDpi
                             },
                             colors = ButtonDefaults.textButtonColors(
                                 contentColor = MaterialTheme.colorScheme.primary
@@ -935,9 +985,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     Text(
                                         text = label,
                                         style = MaterialTheme.typography.labelSmall,
-                                        fontSize = 10.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
+                                        fontSize = 10.sp
                                     )
                                 }
                             }
@@ -1141,6 +1189,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun TopBar(
     onBack: () -> Unit = {},
+    onResetAll: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
@@ -1151,10 +1200,25 @@ private fun TopBar(
                 text = stringResource(R.string.customization),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Black,
-            ) }, navigationIcon = {
+            ) }, 
+        navigationIcon = {
             IconButton(
                 onClick = onBack
             ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+        },
+        actions = {
+            TextButton(
+                onClick = onResetAll,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    "Reset All",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontSize = 14.sp
+                )
+            }
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         scrollBehavior = scrollBehavior,

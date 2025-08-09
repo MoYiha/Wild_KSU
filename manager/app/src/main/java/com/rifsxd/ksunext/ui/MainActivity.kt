@@ -851,6 +851,31 @@ private fun RegularTopBar(
                 }
             }
             
+            // Show reset button for Customization screen
+            if (currentDestination?.route == CustomizationScreenDestination.route) {
+                IconButton(
+                    onClick = {
+                        // Reset all customization settings to default
+                        val editor = prefs.edit()
+                        editor.putString("app_locale", "system")
+                        editor.putBoolean("use_banner", true)
+                        editor.putFloat("background_blur", 0.0f)
+                        editor.putFloat("ui_transparency", 0.0f)
+                        editor.putInt("dpi", 320) // Default DPI
+                        editor.apply()
+                        
+                        // Navigate back and forward to refresh the screen
+                        navigator.navigateUp()
+                        navigator.navigate(CustomizationScreenDestination)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.RestartAlt,
+                        contentDescription = "Reset to default"
+                    )
+                }
+            }
+            
             // Show LKM and restart icons only on home screen
             if (isHomeScreen) {
                 // Bake LKM icon
