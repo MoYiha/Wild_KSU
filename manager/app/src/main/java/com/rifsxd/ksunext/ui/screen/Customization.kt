@@ -51,6 +51,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 
 import androidx.compose.runtime.getValue
@@ -826,17 +829,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         // Reset button
                         TextButton(
                             onClick = { 
-                                // Reset to system DPI and apply immediately
+                                // Reset to system DPI - this will trigger the apply button to show
                                 currentDpi = systemDpi
-                                
-                                // Remove custom DPI setting to use system default
-                                prefs.edit().remove("app_dpi").apply()
-                                
-                                // Reset scale factor to 1.0 (no scaling)
-                                prefs.edit().putFloat("dpi_scale", 1.0f).apply()
-                                
-                                // Restart activity to apply changes
-                                (context as? Activity)?.recreate()
                             },
                             colors = ButtonDefaults.textButtonColors(
                                 contentColor = MaterialTheme.colorScheme.primary
@@ -893,7 +887,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         // Min/Low/Med/High/Max preset buttons
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
                             val presets = listOf(
                                 160 to "Min",
@@ -907,6 +901,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                 Button(
                                     onClick = { currentDpi = dpi },
                                     modifier = Modifier.weight(1f),
+                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (currentDpi == dpi) 
                                             MaterialTheme.colorScheme.primary 
@@ -920,7 +915,10 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                 ) {
                                     Text(
                                         text = label,
-                                        style = MaterialTheme.typography.labelSmall
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontSize = 10.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
                             }
@@ -1303,100 +1301,79 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 )
             }
 
-            OutlinedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = CardDefaults.outlinedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+            // System Info Card Settings
+            ListItem(
+                leadingContent = { 
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "System Info Card Settings"
+                    ) 
+                },
+                headlineContent = {
                     Text(
                         text = stringResource(R.string.info_card_customization),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 8.dp)
                     )
+                },
+                supportingContent = {
                     Text(
                         text = stringResource(R.string.info_card_customization_summary),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
-
-
-                    // Settings button
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = "System Info Card Settings",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        },
-                        supportingContent = {
-                            Text(
-                                text = "Configure toggles, order, and expansion settings",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        trailingContent = {
-                            IconButton(
-                                onClick = { reorderDialog.show() }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Settings,
-                                    contentDescription = "Configure settings",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        },
-                        modifier = Modifier.clickable { reorderDialog.show() }
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
+                },
+                trailingContent = {
+                    IconButton(
+                        onClick = { reorderDialog.show() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Configure settings",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                modifier = Modifier.clickable { reorderDialog.show() }
+            )
 
             // Help Card Customization
-            OutlinedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = CardDefaults.outlinedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+            ListItem(
+                leadingContent = { 
+                    Icon(
+                        imageVector = Icons.Filled.Help,
+                        contentDescription = "Help Card Settings"
+                    ) 
+                },
+                headlineContent = {
                     Text(
                         text = stringResource(R.string.help_card_customization),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 8.dp)
                     )
+                },
+                supportingContent = {
                     Text(
                         text = stringResource(R.string.help_card_customization_summary),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
-                    SwitchItem(
-                        title = stringResource(R.string.help_card_show),
-                        summary = null,
-                        checked = showHelpCard
-                    ) {
-                        prefs.edit().putBoolean("show_help_card", it).apply()
-                        showHelpCard = it
-                    }
+                },
+                trailingContent = {
+                    Switch(
+                        checked = showHelpCard,
+                        onCheckedChange = {
+                            prefs.edit().putBoolean("show_help_card", it).apply()
+                            showHelpCard = it
+                        }
+                    )
+                },
+                modifier = Modifier.clickable { 
+                    val newValue = !showHelpCard
+                    prefs.edit().putBoolean("show_help_card", newValue).apply()
+                    showHelpCard = newValue
                 }
-            }
+            )
 
             // Home Icon Customization
             var selectedIconType by rememberSaveable {
