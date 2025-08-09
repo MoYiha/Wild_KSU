@@ -57,6 +57,8 @@ import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -131,6 +133,10 @@ val LocalFlashViewModel = compositionLocalOf<FlashViewModel> { error("FlashViewM
 // Icon type enum
 enum class IconType(val displayName: String, val icon: ImageVector) {
     SEASONAL("Seasonal", Icons.Filled.Whatshot), // Placeholder, actual icon determined by season
+    WINTER("Winter", Icons.Filled.AcUnit),
+    SPRING("Spring", Icons.Filled.Spa),
+    SUMMER("Summer", Icons.Filled.WbSunny),
+    FALL("Fall", Icons.Filled.Forest),
     CANNABIS("Cannabis", Icons.Filled.LocalFlorist), // Using LocalFlorist as cannabis alternative
     YIN_YANG("Yin Yang", Icons.Filled.Adjust), // Using Adjust as yin-yang alternative
     ECO("Eco", Icons.Filled.Eco),
@@ -141,6 +147,10 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
 private fun getIcon(iconType: IconType): ImageVector {
     return when (iconType) {
         IconType.SEASONAL -> getSeasonalIcon()
+        IconType.WINTER -> Icons.Filled.AcUnit
+        IconType.SPRING -> Icons.Filled.Spa
+        IconType.SUMMER -> Icons.Filled.WbSunny
+        IconType.FALL -> Icons.Filled.Forest
         else -> iconType.icon
     }
 }
@@ -790,7 +800,7 @@ private fun RegularTopBar(
             }
         },
         actions = {
-            // Show icon settings menu only on home screen
+            // Show LKM and restart menus only on home screen
             if (isHomeScreen) {
                 var showDropdown by remember { mutableStateOf(false) }
                 IconButton(
@@ -798,7 +808,7 @@ private fun RegularTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Icon Settings"
+                        contentDescription = "Menu"
                     )
                 }
                 DropdownMenu(
@@ -810,45 +820,29 @@ private fun RegularTopBar(
                     shadowElevation = 0.dp,
                     offset = DpOffset(0.dp, 16.dp)
                 ) {
-                    // Toggle to enable/disable icons
+                    // Bake LKM menu
                     DropdownMenuItem(
-                        text = { Text("Enable Icons") },
-                        trailingIcon = {
-                            Checkbox(checked = iconsEnabled, onCheckedChange = null)
+                        text = { Text("Bake LKM") },
+                        leadingIcon = {
+                            Icon(Icons.Filled.Build, "Bake LKM")
                         },
                         onClick = {
-                            prefs.edit().putBoolean("icons_enabled", !iconsEnabled).apply()
+                            // TODO: Implement LKM baking functionality
                             showDropdown = false
                         }
                     )
                     
-                    // Icon selection menu items
-                    if (iconsEnabled) {
-                        IconType.values().forEach { iconType ->
-                            DropdownMenuItem(
-                                text = { Text(iconType.displayName) },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = if (iconType == IconType.SEASONAL) getSeasonalIcon() else iconType.icon,
-                                        contentDescription = iconType.displayName
-                                    )
-                                },
-                                trailingIcon = {
-                                    if (selectedIconType == iconType) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Circle,
-                                            contentDescription = "Selected",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                },
-                                onClick = {
-                                    prefs.edit().putString("selected_icon_type", iconType.name).apply()
-                                    showDropdown = false
-                                }
-                            )
+                    // Restart menu
+                    DropdownMenuItem(
+                        text = { Text("Restart") },
+                        leadingIcon = {
+                            Icon(Icons.Filled.RestartAlt, "Restart")
+                        },
+                        onClick = {
+                            // TODO: Implement restart functionality
+                            showDropdown = false
                         }
-                    }
+                    )
                 }
             }
         },
