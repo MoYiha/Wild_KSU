@@ -498,6 +498,9 @@ private fun UnifiedTopBar(
         SuperUserScreenDestination.route -> {
             SuperUserTopBar(superUserViewModel = superUserViewModel, navigator = navigator, modifier = modifier)
         }
+        TemplateEditorScreenDestination.route -> {
+            // TemplateEditor handles its own top bar, so we don't show one here
+        }
         else -> {
             RegularTopBar(
                 currentDestination = currentDestination, 

@@ -85,7 +85,34 @@ fun TemplateEditorScreen(
     }
 
     Scaffold(
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+        topBar = {
+            TopBar(
+                title = if (isCreation) stringResource(R.string.app_profile_template_create) else template.name,
+                readOnly = readOnly,
+                summary = if (readOnly) stringResource(R.string.app_profile_template_readonly) else "",
+                onBack = dropUnlessResumed { navigator.navigateBack(result = !readOnly) },
+                onDelete = {
+                    if (!isCreation) {
+                        deleteAppProfileTemplate(template.id)
+                        navigator.navigateBack(result = true)
+                    }
+                },
+                onSave = {
+                    if (isCreation) {
+                        if (saveTemplate(template, isCreation = true)) {
+                            val context = LocalContext.current
+                            Toast.makeText(context, R.string.app_profile_template_import_success, Toast.LENGTH_SHORT).show()
+                            navigator.navigateBack(result = true)
+                        } else {
+                            val context = LocalContext.current
+                            Toast.makeText(context, R.string.app_profile_template_save_failed, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
+        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
     ) { innerPadding ->
         Column(
             modifier = Modifier
