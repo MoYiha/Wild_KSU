@@ -56,9 +56,6 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.Adjust
-import androidx.compose.material.icons.filled.Eco
-import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.ui.text.font.FontWeight
@@ -139,10 +136,7 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
     WINTER("Winter", Icons.Filled.AcUnit),
     SPRING("Spring", Icons.Filled.Spa),
     SUMMER("Summer", Icons.Filled.WbSunny),
-    FALL("Fall", Icons.Filled.Forest),
-    YIN_YANG("Yin Yang", Icons.Filled.Adjust), // Using Adjust as yin-yang alternative
-    ECO("Eco", Icons.Filled.Eco),
-    CIRCLE("Circle", Icons.Filled.Circle)
+    FALL("Fall", Icons.Filled.Forest)
 }
 
 // Get icon based on type and season
