@@ -605,21 +605,23 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             )
 
-            // UI Blur Slider (Non-functional - kept for future implementation)
+            // UI Blur Slider - Now functional
             var uiBlur by rememberSaveable {
-                mutableFloatStateOf(0.0f) // Always 0, no longer reads from preferences
+                mutableFloatStateOf(
+                    prefs.getFloat("ui_blur", 0.0f)
+                )
             }
             
             ListItem(
                 leadingContent = { Icon(Icons.Filled.BlurOn, "UI Blur") },
                 headlineContent = { Text(
-                    text = "UI Blur (Coming Soon)",
+                    text = "UI Blur",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 ) },
                 supportingContent = { 
                     Column {
-                        Text("UI blur functionality is currently disabled")
+                        Text("Apply blur effect to UI elements")
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -632,10 +634,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             )
                             Slider(
                                 value = uiBlur,
-                                onValueChange = { /* No functionality */ },
+                                onValueChange = { value ->
+                                    uiBlur = value
+                                    prefs.edit().putFloat("ui_blur", value).commit()
+                                },
                                 valueRange = 0.0f..1.0f,
                                 modifier = Modifier.weight(1f),
-                                enabled = false, // Disable the slider
                                 colors = SliderDefaults.colors()
                             )
                             Text(
@@ -646,9 +650,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             )
                         }
                         Text(
-                            text = "0%",
+                            text = "${(uiBlur * 100).toInt()}%",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }

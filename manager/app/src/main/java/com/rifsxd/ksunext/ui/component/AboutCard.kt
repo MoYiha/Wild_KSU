@@ -35,12 +35,15 @@ import androidx.compose.ui.text.font.FontWeight
 import com.rifsxd.ksunext.BuildConfig
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.theme.getCardElevation
+import com.rifsxd.ksunext.ui.theme.uiBlur
 
 @Preview
 @Composable
 fun AboutCard() {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .uiBlur(),
         shape = RoundedCornerShape(8.dp),
         elevation = getCardElevation()
     ) {

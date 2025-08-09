@@ -59,6 +59,7 @@ import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.theme.getCardElevation
+import com.rifsxd.ksunext.ui.theme.uiBlur
 
 import java.util.*
 
@@ -146,7 +147,8 @@ private fun SuperuserCard() {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+        ),
+        modifier = Modifier.uiBlur()
     ) {
         Box(
             modifier = Modifier
@@ -182,7 +184,8 @@ private fun ModuleCard() {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+        ),
+        modifier = Modifier.uiBlur()
     ) {
         Box(
             modifier = Modifier
@@ -387,6 +390,7 @@ private fun StatusCard(
     var tapCount by remember { mutableStateOf(0) }
 
     ElevatedCard(
+        modifier = Modifier.uiBlur(),
         colors = CardDefaults.elevatedCardColors(containerColor = run {
             if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.errorContainer
@@ -537,6 +541,7 @@ fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
     ElevatedCard(
+        modifier = Modifier.uiBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = color
         ),
@@ -575,6 +580,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
     }   
 
     ElevatedCard(
+        modifier = Modifier.uiBlur(),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
@@ -750,7 +756,8 @@ fun NextCard() {
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getCardElevation()
+        elevation = getCardElevation(),
+        modifier = Modifier.uiBlur()
     ) {
         Row(
             modifier = Modifier
@@ -784,7 +791,8 @@ fun EXperimentalCard() {
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getCardElevation()
+        elevation = getCardElevation(),
+        modifier = Modifier.uiBlur()
     ) {
         Row(
             modifier = Modifier
@@ -835,7 +843,8 @@ fun IssueReportCard() {
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getCardElevation()
+        elevation = getCardElevation(),
+        modifier = Modifier.uiBlur()
     ) {
         Row(
             modifier = Modifier

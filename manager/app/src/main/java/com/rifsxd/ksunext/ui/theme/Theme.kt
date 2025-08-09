@@ -19,6 +19,24 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.Modifier
+
+// CompositionLocal for UI blur
+val LocalUIBlur = compositionLocalOf { 0.dp }
+
+/**
+ * Apply UI blur effect to a composable if blur is enabled
+ */
+@Composable
+fun Modifier.uiBlur(): Modifier {
+    val blurRadius = LocalUIBlur.current
+    return if (blurRadius > 0.dp) {
+        this.blur(blurRadius)
+    } else {
+        this
+    }
+}
 
 private val DarkColorScheme = darkColorScheme(
     primary = PRIMARY,
@@ -55,6 +73,7 @@ fun KernelSUTheme(
     isCustomBackgroundEnabled: Boolean = false,
     backgroundTransparency: Float = 1.0f,
     uiTransparency: Float = 1.0f,
+    uiBlur: Float = 0.0f,
     content: @Composable () -> Unit
 ) {
     // Always apply UI transparency, regardless of background settings
@@ -153,11 +172,16 @@ fun KernelSUTheme(
         darkMode = darkTheme
     )
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    // Convert 0-1.0f range to 0-25dp to match background blur intensity
+    val blurRadius = (uiBlur * 25f).dp
+
+    CompositionLocalProvider(LocalUIBlur provides blurRadius) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
 }
 
 @Composable

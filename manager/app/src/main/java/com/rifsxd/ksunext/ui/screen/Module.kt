@@ -134,6 +134,7 @@ import com.dergoogler.mmrl.ui.component.LabelItem
 import com.dergoogler.mmrl.ui.component.LabelItemDefaults
 import com.topjohnwu.superuser.io.SuFile
 import com.rifsxd.ksunext.ui.theme.getCardElevation
+import com.rifsxd.ksunext.ui.theme.uiBlur
 import com.rifsxd.ksunext.ui.LocalModuleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -595,6 +596,7 @@ fun ModuleItem(
             .clickable(
                 onClick = onExpandToggle
             )
+            .uiBlur()
     ) {
         Box(
             modifier = Modifier

@@ -55,6 +55,7 @@ import com.rifsxd.ksunext.profile.Capabilities
 import com.rifsxd.ksunext.profile.Groups
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.util.isSepolicyValid
+import com.rifsxd.ksunext.ui.theme.uiBlur
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -241,6 +242,7 @@ fun GroupsPanel(selected: List<Groups>, closeSelection: (selection: Set<Groups>)
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .uiBlur()
     ) {
 
         Column(
@@ -312,6 +314,7 @@ fun CapsPanel(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .uiBlur()
     ) {
 
         Column(
