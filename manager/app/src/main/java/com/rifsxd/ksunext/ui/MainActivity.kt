@@ -56,6 +56,8 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.Grass
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Circle
@@ -140,7 +142,7 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
     SPRING("Spring", Icons.Filled.Spa),
     SUMMER("Summer", Icons.Filled.WbSunny),
     FALL("Fall", Icons.Filled.Forest),
-    CANNABIS("Cannabis", Icons.Filled.LocalFlorist), // Using LocalFlorist as cannabis alternative
+    CANNABIS("Cannabis", Icons.Filled.Grass), // Using Grass as cannabis symbol
     YIN_YANG("Yin Yang", Icons.Filled.Adjust), // Using Adjust as yin-yang alternative
     ECO("Eco", Icons.Filled.Eco),
     CIRCLE("Circle", Icons.Filled.Circle)
@@ -813,7 +815,7 @@ private fun RegularTopBar(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Memory,
+                        imageVector = Icons.Filled.Download,
                         contentDescription = "Bake LKM"
                     )
                 }
