@@ -11,13 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.preference.PreferenceManager
+import android.content.Context
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -31,38 +32,38 @@ fun InfoCardSettingsScreen(
     navigator: DestinationsNavigator
 ) {
     val context = LocalContext.current
-    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     
     // State variables for all info card settings
     var infoCardAlwaysExpanded by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_always_expanded", false))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_always_expanded", false))
     }
     var showManagerVersion by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_manager_version", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_manager_version", true))
     }
     var showHookMode by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_hook_mode", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_hook_mode", true))
     }
     var showMountSystem by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_mount_system", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_mount_system", true))
     }
     var showSusfsStatus by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_susfs_status", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_susfs_status", true))
     }
     var showZygiskStatus by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_zygisk_status", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_zygisk_status", true))
     }
     var showKernelVersion by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_kernel_version", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_kernel_version", true))
     }
     var showAndroidVersion by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_android_version", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_android_version", true))
     }
     var showAbi by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_abi", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_abi", true))
     }
     var showSelinuxStatus by rememberSaveable {
-        mutableStateOf(prefs.getBoolean("info_card_show_selinux_status", true))
+        mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_selinux_status", true))
     }
 
     // InfoCard items data class
@@ -133,7 +134,7 @@ fun InfoCardSettingsScreen(
             }
             result
         }
-        mutableStateOf(currentOrder)
+        mutableStateOf<List<String>>(currentOrder)
     }
 
     // Save order when it changes
