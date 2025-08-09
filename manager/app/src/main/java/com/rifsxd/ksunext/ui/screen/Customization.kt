@@ -609,85 +609,60 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
 
             // Home Icon Customization
-            var iconsEnabled by rememberSaveable {
-                mutableStateOf(prefs.getBoolean("icons_enabled", true))
-            }
-            
             var selectedIconType by rememberSaveable {
                 mutableStateOf(
                     prefs.getString("selected_icon_type", "SEASONAL") ?: "SEASONAL"
                 )
             }
             
-            // Enable/Disable Icons Toggle
+            // Icon Selection with OFF option
+            val iconOptions = listOf(
+                "OFF" to "Off",
+                "SEASONAL" to "Seasonal (Auto)",
+                "WINTER" to "Winter",
+                "SPRING" to "Spring", 
+                "SUMMER" to "Summer",
+                "FALL" to "Fall"
+            )
+            
+            val currentIconDisplay = iconOptions.find { it.first == selectedIconType }?.second ?: "Seasonal (Auto)"
+            
+            val iconDialog = rememberCustomDialog { dismiss ->
+                val options = iconOptions.map { (value, display) ->
+                    ListOption(
+                        titleText = display,
+                        selected = value == selectedIconType
+                    )
+                }
+                
+                ListDialog(
+                    state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
+                    header = Header.Default(title = "Select Icon Style"),
+                    selection = ListSelection.Single(
+                        showRadioButtons = true,
+                        options = options
+                    ) { index, _ ->
+                        val selectedIcon = iconOptions[index].first
+                        prefs.edit().putString("selected_icon_type", selectedIcon).apply()
+                        selectedIconType = selectedIcon
+                        dismiss()
+                    }
+                )
+            }
+            
             ListItem(
-                leadingContent = { Icon(Icons.Filled.Star, "Home Icon") },
+                leadingContent = { Icon(Icons.Filled.Palette, "Icon Style") },
                 headlineContent = { Text(
-                    text = "Home Icon",
+                    text = "Icon Style",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 ) },
-                supportingContent = { Text("Enable or disable the home screen icon") },
-                trailingContent = {
-                    Switch(
-                        checked = iconsEnabled,
-                        onCheckedChange = { enabled ->
-                            iconsEnabled = enabled
-                            prefs.edit().putBoolean("icons_enabled", enabled).apply()
-                        }
-                    )
-                }
-            )
-            
-            // Icon Selection (only show when icons are enabled)
-            if (iconsEnabled) {
-                val iconOptions = listOf(
-                    "SEASONAL" to "Seasonal (Auto)",
-                    "WINTER" to "Winter",
-                    "SPRING" to "Spring", 
-                    "SUMMER" to "Summer",
-                    "FALL" to "Fall"
-                )
-                
-                val currentIconDisplay = iconOptions.find { it.first == selectedIconType }?.second ?: "Seasonal (Auto)"
-                
-                val iconDialog = rememberCustomDialog { dismiss ->
-                    val options = iconOptions.map { (value, display) ->
-                        ListOption(
-                            titleText = display,
-                            selected = value == selectedIconType
-                        )
+                supportingContent = { Text("Current: $currentIconDisplay") },
+                modifier = Modifier
+                    .clickable {
+                        iconDialog.show()
                     }
-                    
-                    ListDialog(
-                        state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
-                        header = Header.Default(title = "Select Icon"),
-                        selection = ListSelection.Single(
-                            showRadioButtons = true,
-                            options = options
-                        ) { index, _ ->
-                            val selectedIcon = iconOptions[index].first
-                            prefs.edit().putString("selected_icon_type", selectedIcon).apply()
-                            selectedIconType = selectedIcon
-                            dismiss()
-                        }
-                    )
-                }
-                
-                ListItem(
-                    leadingContent = { Icon(Icons.Filled.Palette, "Icon Style") },
-                    headlineContent = { Text(
-                        text = "Icon Style",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    ) },
-                    supportingContent = { Text("Current: $currentIconDisplay") },
-                    modifier = Modifier
-                        .clickable {
-                            iconDialog.show()
-                        }
-                )
-            }
+            )
 
             // Icon Theme Selection
             var showIconThemeManager by remember { mutableStateOf(false) }

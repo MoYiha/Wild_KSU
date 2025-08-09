@@ -58,6 +58,7 @@ import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -132,6 +133,7 @@ val LocalFlashViewModel = compositionLocalOf<FlashViewModel> { error("FlashViewM
 
 // Icon type enum
 enum class IconType(val displayName: String, val icon: ImageVector) {
+    OFF("Off", Icons.Filled.VisibilityOff), // Icons disabled
     SEASONAL("Seasonal", Icons.Filled.Whatshot), // Placeholder, actual icon determined by season
     WINTER("Winter", Icons.Filled.AcUnit),
     SPRING("Spring", Icons.Filled.Spa),
@@ -142,6 +144,7 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
 // Get icon based on type and season
 private fun getIcon(iconType: IconType): ImageVector {
     return when (iconType) {
+        IconType.OFF -> Icons.Filled.VisibilityOff
         IconType.SEASONAL -> getSeasonalIcon()
         IconType.WINTER -> Icons.Filled.AcUnit
         IconType.SPRING -> Icons.Filled.Spa
@@ -223,7 +226,6 @@ class MainActivity : ComponentActivity() {
             var backgroundBlur by remember { mutableStateOf(prefs.getFloat("background_blur", 0.0f)) } // Default 0px blur
             
             // Icon settings
-            var iconsEnabled by remember { mutableStateOf(prefs.getBoolean("icons_enabled", true)) } // Default enabled
             var selectedIconType by remember { 
                 mutableStateOf(
                     IconType.values().find { it.name == prefs.getString("selected_icon_type", "SEASONAL") } ?: IconType.SEASONAL
@@ -258,9 +260,6 @@ class MainActivity : ComponentActivity() {
 
                         "background_blur" -> {
                             backgroundBlur = prefs.getFloat("background_blur", 0.0f)
-                        }
-                        "icons_enabled" -> {
-                            iconsEnabled = prefs.getBoolean("icons_enabled", true)
                         }
                         "selected_icon_type" -> {
                             selectedIconType = IconType.values().find { it.name == prefs.getString("selected_icon_type", "SEASONAL") } ?: IconType.SEASONAL
@@ -356,7 +355,6 @@ class MainActivity : ComponentActivity() {
                                 moduleViewModel = moduleViewModel,
                                 superUserViewModel = superUserViewModel,
                                 flashViewModel = flashViewModel,
-                                iconsEnabled = iconsEnabled,
                                 selectedIconType = selectedIconType,
                                 modifier = Modifier
                             )
@@ -466,7 +464,6 @@ private fun UnifiedTopBar(
     moduleViewModel: ModuleViewModel,
     superUserViewModel: SuperUserViewModel,
     flashViewModel: FlashViewModel,
-    iconsEnabled: Boolean,
     selectedIconType: IconType,
     modifier: Modifier = Modifier
 ) {
@@ -482,7 +479,6 @@ private fun UnifiedTopBar(
                 currentDestination = currentDestination, 
                 navigator = navigator, 
                 flashViewModel = flashViewModel, 
-                iconsEnabled = iconsEnabled,
                 selectedIconType = selectedIconType,
                 modifier = modifier
             )
@@ -710,7 +706,6 @@ private fun RegularTopBar(
     currentDestination: NavDestination?, 
     navigator: DestinationsNavigator, 
     flashViewModel: FlashViewModel, 
-    iconsEnabled: Boolean,
     selectedIconType: IconType,
     modifier: Modifier = Modifier
 ) {
@@ -765,8 +760,8 @@ private fun RegularTopBar(
             Row(
                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
             ) {
-                // Show icon to the left of title only on home screen and if enabled
-                if (isHomeScreen && iconsEnabled) {
+                // Show icon to the left of title only on home screen and if not OFF
+                if (isHomeScreen && selectedIconType != IconType.OFF) {
                     IconButton(
                         onClick = { 
                             rotationState += 360f
