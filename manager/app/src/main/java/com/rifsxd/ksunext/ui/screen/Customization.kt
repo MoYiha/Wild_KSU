@@ -737,25 +737,55 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
             // DPI Scale Settings
             val systemDpi = remember { context.resources.displayMetrics.densityDpi }
+            val savedDpi = remember { prefs.getInt("app_dpi", systemDpi) }
             var currentDpi by rememberSaveable { 
-                mutableIntStateOf(
-                    prefs.getInt("app_dpi", systemDpi)
-                )
+                mutableIntStateOf(savedDpi)
             }
+            var showDpiConfirmDialog by remember { mutableStateOf(false) }
             
-            // Auto-apply DPI changes
-            LaunchedEffect(currentDpi) {
-                val savedDpi = prefs.getInt("app_dpi", systemDpi)
-                if (currentDpi != savedDpi) {
-                    prefs.edit().putInt("app_dpi", currentDpi).apply()
-                    
-                    // Calculate scale factor for MainActivity
-                    val scale = currentDpi.toFloat() / systemDpi.toFloat()
-                    prefs.edit().putFloat("dpi_scale", scale).apply()
-                    
-                    // Restart activity to apply changes
-                    (context as? Activity)?.recreate()
-                }
+            // DPI confirmation dialog
+            if (showDpiConfirmDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDpiConfirmDialog = false },
+                    title = { Text(stringResource(R.string.dpi_confirm_title)) },
+                    text = { 
+                        Column {
+                            Text(stringResource(R.string.dpi_confirm_message))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.dpi_confirm_summary, currentDpi, savedDpi),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                // Apply DPI changes
+                                prefs.edit().putInt("app_dpi", currentDpi).apply()
+                                
+                                // Calculate scale factor for MainActivity
+                                val scale = currentDpi.toFloat() / systemDpi.toFloat()
+                                prefs.edit().putFloat("dpi_scale", scale).apply()
+                                
+                                showDpiConfirmDialog = false
+                                
+                                // Restart activity to apply changes
+                                (context as? Activity)?.recreate()
+                            }
+                        ) {
+                            Text(stringResource(R.string.dpi_apply_settings))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { showDpiConfirmDialog = false }
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
             }
             
             ListItem(
@@ -859,6 +889,23 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                         style = MaterialTheme.typography.labelSmall
                                     )
                                 }
+                            }
+                        }
+                        
+                        // Apply button (only show when changes are made)
+                        if (currentDpi != savedDpi) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(
+                                onClick = { showDpiConfirmDialog = true },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.dpi_apply_settings),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
                             }
                         }
                     }
