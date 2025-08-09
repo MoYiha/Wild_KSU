@@ -737,7 +737,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
             // DPI Scale Settings
             val systemDpi = remember { context.resources.displayMetrics.densityDpi }
-            val savedDpi = remember { prefs.getInt("app_dpi", systemDpi) }
+            val savedDpi = remember { 
+                if (prefs.contains("app_dpi")) {
+                    prefs.getInt("app_dpi", systemDpi)
+                } else {
+                    systemDpi // Use system DPI when no custom setting exists
+                }
+            }
             var currentDpi by rememberSaveable { 
                 mutableIntStateOf(savedDpi)
             }
@@ -806,11 +812,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             onClick = { 
                                 // Reset to system DPI and apply immediately
                                 currentDpi = systemDpi
-                                prefs.edit().putInt("app_dpi", systemDpi).apply()
                                 
-                                // Calculate scale factor for MainActivity (should be 1.0 for system DPI)
-                                val scale = systemDpi.toFloat() / systemDpi.toFloat()
-                                prefs.edit().putFloat("dpi_scale", scale).apply()
+                                // Remove custom DPI setting to use system default
+                                prefs.edit().remove("app_dpi").apply()
+                                
+                                // Reset scale factor to 1.0 (no scaling)
+                                prefs.edit().putFloat("dpi_scale", 1.0f).apply()
                                 
                                 // Restart activity to apply changes
                                 (context as? Activity)?.recreate()
