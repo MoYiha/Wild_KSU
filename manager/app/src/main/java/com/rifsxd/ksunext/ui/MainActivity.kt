@@ -59,7 +59,7 @@ import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
@@ -813,7 +813,7 @@ private fun RegularTopBar(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Build,
+                        imageVector = Icons.Filled.Memory,
                         contentDescription = "Bake LKM"
                     )
                 }
