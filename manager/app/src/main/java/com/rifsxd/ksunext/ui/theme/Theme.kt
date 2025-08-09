@@ -5,11 +5,15 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -21,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 
 // CompositionLocal for UI blur
 val LocalUIBlur = compositionLocalOf { 0.dp }
@@ -41,43 +46,29 @@ fun Modifier.uiBlur(): Modifier {
 @Composable
 fun BlurredCard(
     modifier: Modifier = Modifier,
+    elevation: androidx.compose.material3.CardElevation = CardDefaults.elevatedCardElevation(),
     colors: androidx.compose.material3.CardColors = CardDefaults.elevatedCardColors(),
-    elevation: androidx.compose.material3.CardElevation = getCardElevation(),
-    content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     val blurRadius = LocalUIBlur.current
     
-    if (blurRadius > 0.dp) {
-        Box(modifier = modifier) {
-            // Blurred background card
-            ElevatedCard(
-                modifier = Modifier
-                    .matchParentSize()
-                    .blur(blurRadius),
-                colors = colors,
-                elevation = elevation
-            ) {
-                // Empty content for background only
-            }
-            
-            // Sharp content card on top
-            ElevatedCard(
-                modifier = Modifier.matchParentSize(),
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = androidx.compose.ui.graphics.Color.Transparent
-                ),
-                elevation = CardDefaults.elevatedCardElevation(
-                    defaultElevation = 0.dp
-                )
-            ) {
-                content()
-            }
-        }
-    } else {
+    Box(modifier = modifier) {
+        // Background blurred card
         ElevatedCard(
-            modifier = modifier,
-            colors = colors,
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(blurRadius),
             elevation = elevation,
+            colors = colors
+        ) {}
+        
+        // Foreground card with content (no blur)
+        ElevatedCard(
+            modifier = Modifier.fillMaxSize(),
+            elevation = CardDefaults.elevatedCardElevation(0.dp),
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = Color.Transparent
+            ),
             content = content
         )
     }
