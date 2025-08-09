@@ -18,19 +18,15 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
@@ -42,7 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.font.FontWeight
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -68,9 +64,7 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.component.ConfirmResult
 import com.rifsxd.ksunext.ui.component.KeyEventBlocker
-import com.rifsxd.ksunext.ui.theme.ORANGE
-import com.rifsxd.ksunext.ui.theme.GREEN
-import com.rifsxd.ksunext.ui.theme.RED
+
 import com.rifsxd.ksunext.ui.util.FlashResult
 import com.rifsxd.ksunext.ui.util.LkmSelection
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
@@ -367,54 +361,7 @@ fun flashIt(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(
-    status: FlashingStatus,
-    onBack: () -> Unit = {},
-    onSave: () -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null
-) {
-    TopAppBar(
-        title = {
-            Text(
-                stringResource(
-                    when (status) {
-                        FlashingStatus.FLASHING -> R.string.flashing
-                        FlashingStatus.SUCCESS -> R.string.flash_success
-                        FlashingStatus.FAILED -> R.string.flash_failed
-                    }
-                ),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Black,
-                color = when (status) {
-                    FlashingStatus.FLASHING -> ORANGE
-                    FlashingStatus.SUCCESS -> GREEN
-                    FlashingStatus.FAILED -> RED
-                }
-            )
-        },
-        navigationIcon = {
-            IconButton(
-                onClick = { if (status != FlashingStatus.FLASHING) onBack() },
-                enabled = status != FlashingStatus.FLASHING
-            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
-        },
-        actions = {
-            IconButton(
-                onClick = { if (status != FlashingStatus.FLASHING) onSave() },
-                enabled = status != FlashingStatus.FLASHING
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Save,
-                    contentDescription = "Localized description"
-                )
-            }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior
-    )
-}
+
 
 @Preview
 @Composable

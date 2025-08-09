@@ -48,10 +48,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.AcUnit
-import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material.icons.filled.Eco
-import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Forest
+import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -92,6 +92,7 @@ import com.ramcosta.composedestinations.generated.destinations.AppProfileScreenD
 import com.ramcosta.composedestinations.generated.destinations.TemplateEditorScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppProfileTemplateScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.InstallScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.FlashScreenDestination
 import com.ramcosta.composedestinations.generated.NavGraphs
 import androidx.navigation.NavDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
@@ -126,11 +127,11 @@ private fun getSeasonalIcon(): ImageVector {
     val month = calendar.get(Calendar.MONTH)
     
     return when (month) {
-        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> Icons.Filled.AcUnit // Winter (snowflake)
-        Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> Icons.Filled.LocalFlorist // Spring
+        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> Icons.Filled.AcUnit // Winter
+        Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> Icons.Filled.Spa // Spring
         Calendar.JUNE, Calendar.JULY, Calendar.AUGUST -> Icons.Filled.WbSunny // Summer
-        Calendar.SEPTEMBER, Calendar.OCTOBER, Calendar.NOVEMBER -> Icons.Filled.Eco // Fall
-        else -> Icons.Filled.Android // Fallback
+        Calendar.SEPTEMBER, Calendar.OCTOBER, Calendar.NOVEMBER -> Icons.Filled.Forest // Fall
+        else -> Icons.Filled.Whatshot // Fallback icon
     }
 }
 
@@ -300,7 +301,6 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         // Show unified TopBar for all screens except those that should be hidden
                         val screensWithoutTopBar = listOf(
-                            FlashScreenDestination.route,
                             ExecuteModuleActionScreenDestination.route
                         )
                         
@@ -662,6 +662,7 @@ private fun RegularTopBar(currentDestination: NavDestination?, navigator: Destin
         TemplateEditorScreenDestination.route -> stringResource(R.string.app_profile_template_edit) to true
         AppProfileTemplateScreenDestination.route -> stringResource(R.string.settings_profile_template) to true
         InstallScreenDestination.route -> stringResource(R.string.install) to true
+        FlashScreenDestination.route -> stringResource(R.string.flashing) to true
         else -> "" to false
     }
     
