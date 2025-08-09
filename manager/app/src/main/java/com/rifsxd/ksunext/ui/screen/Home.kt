@@ -148,6 +148,7 @@ private fun SuperuserCard() {
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
+        elevation = getCardElevation(),
         modifier = Modifier.uiBlur()
     ) {
         Box(
@@ -185,6 +186,7 @@ private fun ModuleCard() {
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer
         ),
+        elevation = getCardElevation(),
         modifier = Modifier.uiBlur()
     ) {
         Box(

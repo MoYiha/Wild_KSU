@@ -32,7 +32,9 @@ val LocalUIBlur = compositionLocalOf { 0.dp }
 fun Modifier.uiBlur(): Modifier {
     val blurRadius = LocalUIBlur.current
     return if (blurRadius > 0.dp) {
-        this.blur(blurRadius)
+        // Apply blur with reduced intensity to maintain text readability
+        // Use a lighter blur that creates a frosted glass effect
+        this.blur(blurRadius * 0.3f)
     } else {
         this
     }
