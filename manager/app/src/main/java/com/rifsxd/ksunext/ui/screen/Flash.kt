@@ -76,17 +76,12 @@ import com.rifsxd.ksunext.ui.util.reboot
 import com.rifsxd.ksunext.ui.util.restoreBoot
 import com.rifsxd.ksunext.ui.util.uninstallPermanently
 import com.rifsxd.ksunext.ui.viewmodel.FlashViewModel
+import com.rifsxd.ksunext.ui.viewmodel.FlashingStatus
 import com.rifsxd.ksunext.ui.LocalFlashViewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-enum class FlashingStatus {
-    FLASHING,
-    SUCCESS,
-    FAILED
-}
 
 fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
