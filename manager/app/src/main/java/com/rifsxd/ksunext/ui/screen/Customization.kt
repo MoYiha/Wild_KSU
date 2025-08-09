@@ -958,6 +958,178 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 mutableStateOf(prefs.getBoolean("help_card_show", true))
             }
 
+            // InfoCard items order management
+            data class InfoCardItem(
+                val key: String,
+                val titleRes: Int,
+                val enabled: Boolean,
+                val onToggle: (Boolean) -> Unit
+            )
+
+            val infoCardItems = remember(
+                showManagerVersion, showHookMode, showMountSystem, showSusfsStatus,
+                showZygiskStatus, showKernelVersion, showAndroidVersion, showAbi, showSelinuxStatus
+            ) {
+                listOf(
+                    InfoCardItem("manager_version", R.string.info_card_show_manager_version, showManagerVersion) {
+                        prefs.edit().putBoolean("info_card_show_manager_version", it).apply()
+                        showManagerVersion = it
+                    },
+                    InfoCardItem("hook_mode", R.string.info_card_show_hook_mode, showHookMode) {
+                        prefs.edit().putBoolean("info_card_show_hook_mode", it).apply()
+                        showHookMode = it
+                    },
+                    InfoCardItem("mount_system", R.string.info_card_show_mount_system, showMountSystem) {
+                        prefs.edit().putBoolean("info_card_show_mount_system", it).apply()
+                        showMountSystem = it
+                    },
+                    InfoCardItem("susfs_status", R.string.info_card_show_susfs_status, showSusfsStatus) {
+                        prefs.edit().putBoolean("info_card_show_susfs_status", it).apply()
+                        showSusfsStatus = it
+                    },
+                    InfoCardItem("zygisk_status", R.string.info_card_show_zygisk_status, showZygiskStatus) {
+                        prefs.edit().putBoolean("info_card_show_zygisk_status", it).apply()
+                        showZygiskStatus = it
+                    },
+                    InfoCardItem("kernel_version", R.string.info_card_show_kernel_version, showKernelVersion) {
+                        prefs.edit().putBoolean("info_card_show_kernel_version", it).apply()
+                        showKernelVersion = it
+                    },
+                    InfoCardItem("android_version", R.string.info_card_show_android_version, showAndroidVersion) {
+                        prefs.edit().putBoolean("info_card_show_android_version", it).apply()
+                        showAndroidVersion = it
+                    },
+                    InfoCardItem("abi", R.string.info_card_show_abi, showAbi) {
+                        prefs.edit().putBoolean("info_card_show_abi", it).apply()
+                        showAbi = it
+                    },
+                    InfoCardItem("selinux_status", R.string.info_card_show_selinux_status, showSelinuxStatus) {
+                        prefs.edit().putBoolean("info_card_show_selinux_status", it).apply()
+                        showSelinuxStatus = it
+                    }
+                )
+            }
+
+            // Get current order from preferences
+            var itemOrder by remember {
+                val savedOrder = prefs.getString("info_card_items_order", "")
+                val defaultOrder = infoCardItems.map { it.key }
+                val currentOrder = if (savedOrder.isNullOrEmpty()) {
+                    defaultOrder
+                } else {
+                    val saved = savedOrder.split(",")
+                    // Ensure all items are present and add any new ones
+                    val result = saved.filter { key -> defaultOrder.contains(key) }.toMutableList()
+                    defaultOrder.forEach { key ->
+                        if (!result.contains(key)) result.add(key)
+                    }
+                    result
+                }
+                mutableStateOf(currentOrder)
+            }
+
+            // Reorder dialog
+            val reorderDialog = rememberCustomDialog { dismiss ->
+                AlertDialog(
+                    onDismissRequest = { dismiss() },
+                    title = {
+                        Text(
+                            text = "Reorder System Info Items",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    },
+                    text = {
+                        Column {
+                            Text(
+                                text = "Arrange the order of items in the system info card",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            
+                            itemOrder.forEachIndexed { index, itemKey ->
+                                val item = infoCardItems.find { it.key == itemKey }
+                                if (item != null) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = stringResource(item.titleRes),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        
+                                        Row {
+                                            // Move up button
+                                            IconButton(
+                                                onClick = {
+                                                    if (index > 0) {
+                                                        val newOrder = itemOrder.toMutableList()
+                                                        val temp = newOrder[index]
+                                                        newOrder[index] = newOrder[index - 1]
+                                                        newOrder[index - 1] = temp
+                                                        itemOrder = newOrder
+                                                    }
+                                                },
+                                                enabled = index > 0
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.KeyboardArrowUp,
+                                                    contentDescription = "Move up",
+                                                    tint = if (index > 0) MaterialTheme.colorScheme.primary 
+                                                          else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                                )
+                                            }
+                                            
+                                            // Move down button
+                                            IconButton(
+                                                onClick = {
+                                                    if (index < itemOrder.size - 1) {
+                                                        val newOrder = itemOrder.toMutableList()
+                                                        val temp = newOrder[index]
+                                                        newOrder[index] = newOrder[index + 1]
+                                                        newOrder[index + 1] = temp
+                                                        itemOrder = newOrder
+                                                    }
+                                                },
+                                                enabled = index < itemOrder.size - 1
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.KeyboardArrowDown,
+                                                    contentDescription = "Move down",
+                                                    tint = if (index < itemOrder.size - 1) MaterialTheme.colorScheme.primary 
+                                                          else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                // Save the new order
+                                prefs.edit().putString("info_card_items_order", itemOrder.joinToString(",")).apply()
+                                dismiss()
+                            }
+                        ) {
+                            Text("Save")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { dismiss() }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
             OutlinedCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -994,86 +1166,48 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Individual InfoCard Items
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_manager_version),
-                        summary = null,
-                        checked = showManagerVersion
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_manager_version", it).apply()
-                        showManagerVersion = it
-                    }
+                    // Reorder button
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = "Reorder System Info Items",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Customize the order of items in the system info card",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        trailingContent = {
+                            IconButton(
+                                onClick = { reorderDialog.show() }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Reorder,
+                                    contentDescription = "Reorder items",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        },
+                        modifier = Modifier.clickable { reorderDialog.show() }
+                    )
 
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_hook_mode),
-                        summary = null,
-                        checked = showHookMode
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_hook_mode", it).apply()
-                        showHookMode = it
-                    }
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_mount_system),
-                        summary = null,
-                        checked = showMountSystem
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_mount_system", it).apply()
-                        showMountSystem = it
-                    }
-
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_susfs_status),
-                        summary = null,
-                        checked = showSusfsStatus
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_susfs_status", it).apply()
-                        showSusfsStatus = it
-                    }
-
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_zygisk_status),
-                        summary = null,
-                        checked = showZygiskStatus
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_zygisk_status", it).apply()
-                        showZygiskStatus = it
-                    }
-
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_kernel_version),
-                        summary = null,
-                        checked = showKernelVersion
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_kernel_version", it).apply()
-                        showKernelVersion = it
-                    }
-
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_android_version),
-                        summary = null,
-                        checked = showAndroidVersion
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_android_version", it).apply()
-                        showAndroidVersion = it
-                    }
-
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_abi),
-                        summary = null,
-                        checked = showAbi
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_abi", it).apply()
-                        showAbi = it
-                    }
-
-                    SwitchItem(
-                        title = stringResource(R.string.info_card_show_selinux_status),
-                        summary = null,
-                        checked = showSelinuxStatus
-                    ) {
-                        prefs.edit().putBoolean("info_card_show_selinux_status", it).apply()
-                        showSelinuxStatus = it
+                    // Display items in order with switches
+                    itemOrder.forEach { itemKey ->
+                        val item = infoCardItems.find { it.key == itemKey }
+                        if (item != null) {
+                            SwitchItem(
+                                title = stringResource(item.titleRes),
+                                summary = null,
+                                checked = item.enabled,
+                                onCheckedChange = item.onToggle
+                            )
+                        }
                     }
                 }
             }
