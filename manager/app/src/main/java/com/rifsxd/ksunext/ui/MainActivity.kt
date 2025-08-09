@@ -47,7 +47,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Snowflake
+import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Eco
@@ -126,7 +126,7 @@ private fun getSeasonalIcon(): ImageVector {
     val month = calendar.get(Calendar.MONTH)
     
     return when (month) {
-        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> Icons.Filled.Snowflake // Winter
+        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> Icons.Filled.AcUnit // Winter (snowflake)
         Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> Icons.Filled.LocalFlorist // Spring
         Calendar.JUNE, Calendar.JULY, Calendar.AUGUST -> Icons.Filled.WbSunny // Summer
         Calendar.SEPTEMBER, Calendar.OCTOBER, Calendar.NOVEMBER -> Icons.Filled.Eco // Fall
