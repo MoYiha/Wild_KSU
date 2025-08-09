@@ -811,12 +811,14 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
             // DPI Scale Settings
             val systemDpi = remember { context.resources.displayMetrics.densityDpi }
-            val savedDpi = remember { 
-                if (prefs.contains("app_dpi")) {
-                    prefs.getInt("app_dpi", systemDpi)
-                } else {
-                    systemDpi // Use system DPI when no custom setting exists
-                }
+            var savedDpi by remember { 
+                mutableIntStateOf(
+                    if (prefs.contains("app_dpi")) {
+                        prefs.getInt("app_dpi", systemDpi)
+                    } else {
+                        systemDpi // Use system DPI when no custom setting exists
+                    }
+                )
             }
             var currentDpi by rememberSaveable { 
                 mutableIntStateOf(savedDpi)
