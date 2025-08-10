@@ -883,7 +883,7 @@ private fun RegularTopBar(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.RestartAlt,
+                        imageVector = Icons.Filled.SettingsBackupRestore,
                         contentDescription = "Reset info card settings"
                     )
                 }
@@ -945,7 +945,7 @@ private fun RegularTopBar(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Power,
+                            imageVector = Icons.Filled.PowerSettingsNew,
                             contentDescription = "Restart"
                         )
                     }

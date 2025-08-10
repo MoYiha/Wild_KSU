@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,6 +36,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -485,6 +488,7 @@ fun WarningCard(
 @Composable
 private fun InfoCard(autoExpand: Boolean = false) {
     val context = LocalContext.current
+    val hapticFeedback = LocalHapticFeedback.current
 
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     
@@ -507,6 +511,19 @@ private fun InfoCard(autoExpand: Boolean = false) {
 
     val developerOptionsEnabled by observePreferenceAsState(prefs, "enable_developer_options", false)
 
+    // Count enabled options
+    val enabledOptionsCount = listOf(
+        showManagerVersion,
+        showHookMode,
+        showMountSystem,
+        showSusfsStatus,
+        showZygiskStatus,
+        showKernelVersion,
+        showAndroidVersion,
+        showAbi,
+        showSelinuxStatus
+    ).count { it }
+
     LaunchedEffect(autoExpand, alwaysExpanded) {
         if (autoExpand || alwaysExpanded) {
             expanded = true
@@ -517,7 +534,16 @@ private fun InfoCard(autoExpand: Boolean = false) {
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
-        elevation = getCardElevation()
+        elevation = getCardElevation(),
+        modifier = Modifier.combinedClickable(
+            onClick = { },
+            onLongClick = {
+                if (expanded && !alwaysExpanded) {
+                    expanded = false
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            }
+        )
     ) {
         Column(
             modifier = Modifier
@@ -627,7 +653,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
                     )
                 }
 
-                if (!expanded && !alwaysExpanded) {
+                if (!expanded && !alwaysExpanded && enabledOptionsCount >= 5) {
                     Spacer(Modifier.height(16.dp))
                     Row(
                         modifier = Modifier

@@ -602,16 +602,7 @@ fun InfoCardSettingsScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     // Move up button (tap to move up one, hold to move to top)
-                                    IconButton(
-                                        onClick = {
-                                            if (index > 0) {
-                                                val newOrder = itemOrder.toMutableList()
-                                                val temp = newOrder[index]
-                                                newOrder[index] = newOrder[index - 1]
-                                                newOrder[index - 1] = temp
-                                                itemOrder = newOrder
-                                            }
-                                        },
+                                    Box(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .combinedClickable(
@@ -634,7 +625,8 @@ fun InfoCardSettingsScreen(
                                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                                     }
                                                 }
-                                            )
+                                            ),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.KeyboardArrowUp,
@@ -644,16 +636,7 @@ fun InfoCardSettingsScreen(
                                     }
                                     
                                     // Move down button (tap to move down one, hold to move to bottom)
-                                    IconButton(
-                                        onClick = {
-                                            if (index < itemOrder.size - 1) {
-                                                val newOrder = itemOrder.toMutableList()
-                                                val temp = newOrder[index]
-                                                newOrder[index] = newOrder[index + 1]
-                                                newOrder[index + 1] = temp
-                                                itemOrder = newOrder
-                                            }
-                                        },
+                                    Box(
                                         modifier = Modifier
                                             .size(40.dp)
                                             .combinedClickable(
@@ -676,7 +659,8 @@ fun InfoCardSettingsScreen(
                                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                                     }
                                                 }
-                                            )
+                                            ),
+                                        contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.KeyboardArrowDown,
