@@ -260,7 +260,7 @@ fun InfoCardSettingsScreen(
         "FALL" to "Fall",
         "KSU_NEXT" to "KSU Next",
         "CANNABIS" to "Cannabis",
-        "AMOGUS_SUSFS" to "Amogus SusFS"
+        "AMOGUS_SUSFS" to "Amogus"
     )
     
     val currentIconDisplay = iconOptions.find { it.first == selectedIconType }?.second ?: "Seasonal (Auto)"
@@ -602,7 +602,16 @@ fun InfoCardSettingsScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     // Move up button (tap to move up one, hold to move to top)
-                                    Box(
+                                    IconButton(
+                                        onClick = {
+                                            if (index > 0) {
+                                                val newOrder = itemOrder.toMutableList()
+                                                val temp = newOrder[index]
+                                                newOrder[index] = newOrder[index - 1]
+                                                newOrder[index - 1] = temp
+                                                itemOrder = newOrder
+                                            }
+                                        },
                                         modifier = Modifier
                                             .size(40.dp)
                                             .combinedClickable(
@@ -625,8 +634,7 @@ fun InfoCardSettingsScreen(
                                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                                     }
                                                 }
-                                            ),
-                                        contentAlignment = Alignment.Center
+                                            )
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.KeyboardArrowUp,
@@ -636,7 +644,16 @@ fun InfoCardSettingsScreen(
                                     }
                                     
                                     // Move down button (tap to move down one, hold to move to bottom)
-                                    Box(
+                                    IconButton(
+                                        onClick = {
+                                            if (index < itemOrder.size - 1) {
+                                                val newOrder = itemOrder.toMutableList()
+                                                val temp = newOrder[index]
+                                                newOrder[index] = newOrder[index + 1]
+                                                newOrder[index + 1] = temp
+                                                itemOrder = newOrder
+                                            }
+                                        },
                                         modifier = Modifier
                                             .size(40.dp)
                                             .combinedClickable(
@@ -659,8 +676,7 @@ fun InfoCardSettingsScreen(
                                                         hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                                                     }
                                                 }
-                                            ),
-                                        contentAlignment = Alignment.Center
+                                            )
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.KeyboardArrowDown,

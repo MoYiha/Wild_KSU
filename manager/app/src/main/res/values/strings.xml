@@ -256,10 +256,7 @@
     <string name="app_dpi_summary">Adjust the display density (DPI) of the app interface</string>
     <string name="dpi_current">Current DPI: %d</string>
     <string name="dpi_system">System DPI: %d</string>
-    <string name="dpi_preset_small">Small (240)</string>
-    <string name="dpi_preset_normal">Normal (320)</string>
-    <string name="dpi_preset_large">Large (400)</string>
-    <string name="dpi_preset_xlarge">Extra Large (480)</string>
+
     <string name="dpi_apply_settings">Apply Settings</string>
     <!-- InfoCard Customization -->
     <string name="info_card_customization">Home Settings</string>

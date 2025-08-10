@@ -148,7 +148,7 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
     FALL("Fall", Icons.Filled.Forest),
     KSU_NEXT("KSU Next", Icons.Filled.Whatshot), // Placeholder, actual icon is drawable
     CANNABIS("Cannabis", Icons.Filled.Whatshot), // Placeholder, actual icon is drawable
-    AMOGUS_SUSFS("Amogus SusFS", Icons.Filled.Whatshot) // Placeholder, actual icon is drawable
+    AMOGUS_SUSFS("Amogus", Icons.Filled.Whatshot) // Placeholder, actual icon is drawable
 }
 
 // Get icon based on type and season
