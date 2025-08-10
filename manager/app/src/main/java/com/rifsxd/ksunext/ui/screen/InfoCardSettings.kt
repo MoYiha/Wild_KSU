@@ -11,6 +11,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -82,7 +85,7 @@ fun InfoCardSettingsScreen(
         val titleRes: Int,
         val enabled: Boolean,
         val onToggle: (Boolean) -> Unit,
-        val icon: androidx.compose.ui.graphics.vector.ImageVector
+        val icon: Any // Can be ImageVector or Painter
     )
 
     val infoCardItems = remember(
@@ -93,7 +96,7 @@ fun InfoCardSettingsScreen(
             InfoCardItem("manager_version", R.string.home_manager_version, showManagerVersion, {
                 prefs.edit().putBoolean("info_card_show_manager_version", it).apply()
                 showManagerVersion = it
-            }, Icons.Filled.Apps),
+            }, painterResource(R.drawable.ic_ksu_next)),
             InfoCardItem("hook_mode", R.string.hook_mode, showHookMode, {
                 prefs.edit().putBoolean("info_card_show_hook_mode", it).apply()
                 showHookMode = it
@@ -101,31 +104,31 @@ fun InfoCardSettingsScreen(
             InfoCardItem("mount_system", R.string.home_mount_system, showMountSystem, {
                 prefs.edit().putBoolean("info_card_show_mount_system", it).apply()
                 showMountSystem = it
-            }, Icons.Filled.Storage),
+            }, Icons.Filled.SettingsSuggest),
             InfoCardItem("susfs_status", R.string.home_susfs_version, showSusfsStatus, {
                 prefs.edit().putBoolean("info_card_show_susfs_status", it).apply()
                 showSusfsStatus = it
-            }, Icons.Filled.Security),
+            }, painterResource(R.drawable.ic_sus)),
             InfoCardItem("zygisk_status", R.string.zygisk_status, showZygiskStatus, {
                 prefs.edit().putBoolean("info_card_show_zygisk_status", it).apply()
                 showZygiskStatus = it
-            }, Icons.Filled.Android),
+            }, Icons.Filled.Vaccines),
             InfoCardItem("kernel_version", R.string.home_kernel, showKernelVersion, {
                 prefs.edit().putBoolean("info_card_show_kernel_version", it).apply()
                 showKernelVersion = it
-            }, Icons.Filled.Computer),
+            }, painterResource(R.drawable.ic_linux)),
             InfoCardItem("android_version", R.string.home_android, showAndroidVersion, {
                 prefs.edit().putBoolean("info_card_show_android_version", it).apply()
                 showAndroidVersion = it
-            }, Icons.Filled.PhoneAndroid),
+            }, Icons.Filled.Android),
             InfoCardItem("abi", R.string.home_abi, showAbi, {
                 prefs.edit().putBoolean("info_card_show_abi", it).apply()
                 showAbi = it
-            }, Icons.Filled.Architecture),
+            }, Icons.Filled.Memory),
             InfoCardItem("selinux_status", R.string.home_selinux_status, showSelinuxStatus, {
                 prefs.edit().putBoolean("info_card_show_selinux_status", it).apply()
                 showSelinuxStatus = it
-            }, Icons.Filled.Shield)
+            }, Icons.Filled.Security)
         )
     }
 
@@ -238,12 +241,20 @@ fun InfoCardSettingsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             // Icon
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = null,
-                                modifier = Modifier.padding(end = 16.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                            when (item.icon) {
+                                is ImageVector -> Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                is Painter -> Icon(
+                                    painter = item.icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                             
                             // Title
                             Text(
