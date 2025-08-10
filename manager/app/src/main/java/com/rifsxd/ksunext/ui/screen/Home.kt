@@ -827,24 +827,13 @@ fun IssueReportCard() {
                 .padding(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Add home screen icon style if not OFF
-            if (selectedIconType != "OFF") {
-                val icon = getIcon(selectedIconType)
-                when (icon) {
-                    is ImageVector -> Icon(
-                        imageVector = icon,
-                        contentDescription = "Help Card Icon",
-                        modifier = Modifier.padding(end = 16.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    is Painter -> Icon(
-                        painter = icon,
-                        contentDescription = "Help Card Icon",
-                        modifier = Modifier.padding(end = 16.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
+            // Help icon
+            Icon(
+                imageVector = Icons.Filled.HelpOutline,
+                contentDescription = "Help Card Icon",
+                modifier = Modifier.padding(end = 16.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
