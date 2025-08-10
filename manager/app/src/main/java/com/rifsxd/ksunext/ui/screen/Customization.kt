@@ -663,60 +663,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             var currentDpi by rememberSaveable { 
                 mutableIntStateOf(savedDpi)
             }
-            var showDpiConfirmDialog by remember { mutableStateOf(false) }
-            
-            // DPI confirmation dialog
-            if (showDpiConfirmDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDpiConfirmDialog = false },
-                    title = { Text(stringResource(R.string.dpi_confirm_title)) },
-                    text = { 
-                        Column {
-                            Text(stringResource(R.string.dpi_confirm_message))
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(R.string.dpi_confirm_summary, currentDpi, savedDpi),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                // Apply DPI changes
-                                prefs.edit().putInt("app_dpi", currentDpi).apply()
-                                
-                                // Calculate scale factor for MainActivity
-                                val scale = currentDpi.toFloat() / systemDpi.toFloat()
-                                prefs.edit().putFloat("dpi_scale", scale).apply()
-                                
-                                showDpiConfirmDialog = false
-                                
-                                // Restart activity to apply changes
-                                (context as? Activity)?.recreate()
-                            }
-                        ) {
-                            Text(
-                                stringResource(R.string.dpi_apply_settings),
-                                style = MaterialTheme.typography.labelLarge,
-                                fontSize = 14.sp
-                            )
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = { showDpiConfirmDialog = false }
-                        ) {
-                            Text(
-                                stringResource(R.string.cancel),
-                                style = MaterialTheme.typography.labelLarge,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
-                )
-            }
             
             ListItem(
                 leadingContent = { Icon(Icons.Filled.ZoomIn, stringResource(R.string.app_dpi_title)) },
@@ -770,7 +716,17 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         if (currentDpi != savedDpi) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(
-                                onClick = { showDpiConfirmDialog = true },
+                                onClick = {
+                                    // Apply DPI changes directly
+                                    prefs.edit().putInt("app_dpi", currentDpi).apply()
+                                    
+                                    // Calculate scale factor for MainActivity
+                                    val scale = currentDpi.toFloat() / systemDpi.toFloat()
+                                    prefs.edit().putFloat("dpi_scale", scale).apply()
+                                    
+                                    // Restart activity to apply changes
+                                    (context as? Activity)?.recreate()
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primary
