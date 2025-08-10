@@ -834,7 +834,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 "WINTER" to "Winter",
                 "SPRING" to "Spring", 
                 "SUMMER" to "Summer",
-                "FALL" to "Fall"
+                "FALL" to "Fall",
+                "KSU_NEXT" to "KSU Next",
+                "CANNABIS" to "Cannabis"
             )
             
             val currentIconDisplay = iconOptions.find { it.first == selectedIconType }?.second ?: "Seasonal (Auto)"

@@ -20,6 +20,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -140,11 +142,14 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
     WINTER("Winter", Icons.Filled.AcUnit),
     SPRING("Spring", Icons.Filled.Spa),
     SUMMER("Summer", Icons.Filled.WbSunny),
-    FALL("Fall", Icons.Filled.Forest)
+    FALL("Fall", Icons.Filled.Forest),
+    KSU_NEXT("KSU Next", Icons.Filled.Whatshot), // Placeholder, actual icon is drawable
+    CANNABIS("Cannabis", Icons.Filled.Whatshot) // Placeholder, actual icon is drawable
 }
 
 // Get icon based on type and season
-private fun getIcon(iconType: IconType): ImageVector {
+@Composable
+private fun getIcon(iconType: IconType): Any {
     return when (iconType) {
         IconType.OFF -> Icons.Filled.VisibilityOff
         IconType.SEASONAL -> getSeasonalIcon()
@@ -152,6 +157,8 @@ private fun getIcon(iconType: IconType): ImageVector {
         IconType.SPRING -> Icons.Filled.Spa
         IconType.SUMMER -> Icons.Filled.WbSunny
         IconType.FALL -> Icons.Filled.Forest
+        IconType.KSU_NEXT -> painterResource(R.drawable.ic_ksu_next)
+        IconType.CANNABIS -> painterResource(R.drawable.ic_cannabis)
         else -> iconType.icon
     }
 }
@@ -807,11 +814,19 @@ private fun RegularTopBar(
                             rotationState += 360f
                         }
                     ) {
-                        Icon(
-                            imageVector = getIcon(selectedIconType),
-                            contentDescription = "Icon",
-                            modifier = Modifier.graphicsLayer(rotationZ = rotation)
-                        )
+                        val icon = getIcon(selectedIconType)
+                        when (icon) {
+                            is ImageVector -> Icon(
+                                imageVector = icon,
+                                contentDescription = "Icon",
+                                modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                            )
+                            is Painter -> Icon(
+                                painter = icon,
+                                contentDescription = "Icon",
+                                modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                            )
+                        }
                     }
                 }
                 Text(

@@ -790,7 +790,8 @@ private fun getSeasonalIcon(): ImageVector {
 }
 
 // Get icon based on type and season
-private fun getIcon(iconType: String): ImageVector {
+@Composable
+private fun getIcon(iconType: String): Any {
     return when (iconType) {
         "OFF" -> Icons.Filled.VisibilityOff
         "SEASONAL" -> getSeasonalIcon()
@@ -798,6 +799,8 @@ private fun getIcon(iconType: String): ImageVector {
         "SPRING" -> Icons.Filled.Spa
         "SUMMER" -> Icons.Filled.WbSunny
         "FALL" -> Icons.Filled.Forest
+        "KSU_NEXT" -> painterResource(R.drawable.ic_ksu_next)
+        "CANNABIS" -> painterResource(R.drawable.ic_cannabis)
         else -> getSeasonalIcon()
     }
 }
@@ -826,12 +829,21 @@ fun IssueReportCard() {
         ) {
             // Add home screen icon style if not OFF
             if (selectedIconType != "OFF") {
-                Icon(
-                    imageVector = getIcon(selectedIconType),
-                    contentDescription = "Help Card Icon",
-                    modifier = Modifier.padding(end = 16.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                val icon = getIcon(selectedIconType)
+                when (icon) {
+                    is ImageVector -> Icon(
+                        imageVector = icon,
+                        contentDescription = "Help Card Icon",
+                        modifier = Modifier.padding(end = 16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    is Painter -> Icon(
+                        painter = icon,
+                        contentDescription = "Help Card Icon",
+                        modifier = Modifier.padding(end = 16.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
             
             Column(modifier = Modifier.weight(1f)) {
