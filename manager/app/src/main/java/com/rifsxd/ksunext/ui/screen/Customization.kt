@@ -618,49 +618,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // Min/Low/Med/High/Max preset buttons
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            val presets = listOf(
-                                0.0f to "Min",
-                                0.25f to "Low", 
-                                0.5f to "Med",
-                                0.75f to "High",
-                                1.0f to "Max"
-                            )
-                            
-                            presets.forEach { (value, label) ->
-                                Button(
-                                    onClick = { 
-                                        backgroundBlur = value
-                                        prefs.edit().putFloat("background_blur", value).commit()
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (backgroundBlur == value) 
-                                            MaterialTheme.colorScheme.primary 
-                                        else 
-                                            MaterialTheme.colorScheme.surfaceVariant,
-                                        contentColor = if (backgroundBlur == value) 
-                                            MaterialTheme.colorScheme.onPrimary 
-                                        else 
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                ) {
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
                 )
@@ -718,49 +675,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // Min/Low/Med/High/Max preset buttons
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            val presets = listOf(
-                                0.0f to "Min",
-                                0.25f to "Low", 
-                                0.5f to "Med",
-                                0.75f to "High",
-                                1.0f to "Max"
-                            )
-                            
-                            presets.forEach { (value, label) ->
-                                Button(
-                                    onClick = { 
-                                        uiTransparency = value
-                                        prefs.edit().putFloat("ui_transparency", value).commit()
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (uiTransparency == value) 
-                                            MaterialTheme.colorScheme.primary 
-                                        else 
-                                            MaterialTheme.colorScheme.surfaceVariant,
-                                        contentColor = if (uiTransparency == value) 
-                                            MaterialTheme.colorScheme.onPrimary 
-                                        else 
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                ) {
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
             )
@@ -837,54 +751,16 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             ListItem(
                 leadingContent = { Icon(Icons.Filled.ZoomIn, stringResource(R.string.app_dpi_title)) },
                 headlineContent = { 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.app_dpi_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        // Reset button
-                        TextButton(
-                            onClick = { 
-                                // Reset to system DPI and save immediately
-                                currentDpi = systemDpi
-                                prefs.edit().putInt("dpi", systemDpi).commit()
-                                savedDpi = systemDpi
-                            },
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(
-                                "Reset", 
-                                style = MaterialTheme.typography.labelLarge,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
+                    Text(
+                        text = stringResource(R.string.app_dpi_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 },
                 supportingContent = { 
                     Column {
                         Text(stringResource(R.string.app_dpi_summary))
                         Spacer(modifier = Modifier.height(8.dp))
-                        
-                        // Current and System DPI info
-                        Text(
-                            text = stringResource(R.string.dpi_current, currentDpi),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = stringResource(R.string.dpi_system, systemDpi),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
                         
                         // DPI Slider (removed numbers)
                         Row(
