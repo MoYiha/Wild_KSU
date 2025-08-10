@@ -262,8 +262,8 @@
     <string name="dpi_preset_xlarge">Extra Large (480)</string>
     <string name="dpi_apply_settings">Apply Settings</string>
     <!-- InfoCard Customization -->
-    <string name="info_card_customization">System Info Card Settings</string>
-    <string name="info_card_customization_summary">Customize system information display, help card, and home screen icon style</string>
+    <string name="info_card_customization">Home Settings</string>
+    <string name="info_card_customization_summary">Customize home screen appearance, help card, and system information display</string>
     <string name="info_card_always_expanded">Always expanded</string>
     <string name="info_card_always_expanded_summary">Keep the info card expanded at all times</string>
     

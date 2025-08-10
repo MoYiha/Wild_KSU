@@ -2,17 +2,30 @@ package com.rifsxd.ksunext.ui.screen
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,16 +36,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.content.Context
 import kotlinx.coroutines.delay
+import java.util.*
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
@@ -44,6 +58,44 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
+
+// Get seasonal icon based on current month
+private fun getSeasonalIcon(): ImageVector {
+    val calendar = Calendar.getInstance()
+    return when (calendar.get(Calendar.MONTH)) {
+        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> Icons.Filled.AcUnit // Winter
+        Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> Icons.Filled.Spa // Spring
+        Calendar.JUNE, Calendar.JULY, Calendar.AUGUST -> Icons.Filled.WbSunny // Summer
+        else -> Icons.Filled.Forest // Fall
+    }
+}
+
+// Get seasonal icon name for display
+private fun getSeasonalIconName(): String {
+    val calendar = Calendar.getInstance()
+    return when (calendar.get(Calendar.MONTH)) {
+        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> "Winter"
+        Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> "Spring"
+        Calendar.JUNE, Calendar.JULY, Calendar.AUGUST -> "Summer"
+        else -> "Fall"
+    }
+}
+
+// Get icon based on type and season
+@Composable
+private fun getIcon(iconType: String): Any {
+    return when (iconType) {
+        "OFF" -> Icons.Filled.VisibilityOff
+        "SEASONAL" -> getSeasonalIcon()
+        "WINTER" -> Icons.Filled.AcUnit
+        "SPRING" -> Icons.Filled.Spa
+        "SUMMER" -> Icons.Filled.WbSunny
+        "FALL" -> Icons.Filled.Forest
+        "KSU_NEXT" -> painterResource(R.drawable.ic_ksu_next)
+        "CANNABIS" -> painterResource(R.drawable.ic_cannabis)
+        else -> getSeasonalIcon()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Destination<RootGraph>
@@ -209,25 +261,111 @@ fun InfoCardSettingsScreen(
     
     val currentIconDisplay = iconOptions.find { it.first == selectedIconType }?.second ?: "Seasonal (Auto)"
     
-    val iconDialog = rememberCustomDialog { dismiss ->
-        val options = iconOptions.map { (value, display) ->
-            ListOption(
-                titleText = display,
-                selected = value == selectedIconType
-            )
-        }
-        
-        ListDialog(
-            state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
-            header = Header.Default(title = stringResource(R.string.home_screen_icon_select_dialog_title)),
-            selection = ListSelection.Single(
-                showRadioButtons = true,
-                options = options
-            ) { index, _ ->
-                val selectedIcon = iconOptions[index].first
-                prefs.edit().putString("selected_icon_type", selectedIcon).apply()
-                selectedIconType = selectedIcon
-                dismiss()
+    // State for showing icon selection dialog
+    var showIconDialog by remember { mutableStateOf(false) }
+    
+    // Icon selection dialog with visual icons
+    if (showIconDialog) {
+        AlertDialog(
+            onDismissRequest = { showIconDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.home_screen_icon_select_dialog_title),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
+            text = {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(iconOptions) { (value, display) ->
+                        val isSelected = value == selectedIconType
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    prefs.edit().putString("selected_icon_type", value).apply()
+                                    selectedIconType = value
+                                    showIconDialog = false
+                                },
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isSelected) 
+                                    MaterialTheme.colorScheme.primaryContainer 
+                                else 
+                                    MaterialTheme.colorScheme.surface
+                            ),
+                            border = if (isSelected) 
+                                BorderStroke(2.dp, MaterialTheme.colorScheme.primary) 
+                            else null
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                // Icon preview
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                            CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    val icon = getIcon(value)
+                                    when (icon) {
+                                        is ImageVector -> Icon(
+                                            imageVector = icon,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        is Painter -> Icon(
+                                            painter = icon,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                                
+                                // Text
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = display,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                    if (value == "SEASONAL") {
+                                        Text(
+                                            text = "Currently: ${getSeasonalIconName()}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                                
+                                // Selection indicator
+                                if (isSelected) {
+                                    Icon(
+                                        imageVector = Icons.Filled.CheckCircle,
+                                        contentDescription = "Selected",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showIconDialog = false }) {
+                    Text("Done")
+                }
             }
         )
     }
@@ -238,7 +376,7 @@ fun InfoCardSettingsScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-            // Always Expanded Toggle
+            // Home Screen Icon Style (moved to first position)
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -249,41 +387,63 @@ fun InfoCardSettingsScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp),
+                            .padding(20.dp)
+                            .clickable {
+                                showIconDialog = true
+                            },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.ExpandMore,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
+                        // Show current icon preview
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    CircleShape
+                                )
+                                .padding(end = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val currentIcon = getIcon(selectedIconType)
+                            when (currentIcon) {
+                                is ImageVector -> Icon(
+                                    imageVector = currentIcon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                is Painter -> Icon(
+                                    painter = currentIcon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                         Column(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = stringResource(R.string.info_card_always_expanded),
+                                text = stringResource(R.string.home_screen_icon_style),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = stringResource(R.string.info_card_always_expanded_summary),
+                                text = stringResource(R.string.home_screen_icon_style_summary) + ". " + stringResource(R.string.home_screen_icon_current, currentIconDisplay),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Switch(
-                            checked = infoCardAlwaysExpanded,
-                            onCheckedChange = {
-                                prefs.edit().putBoolean("info_card_always_expanded", it).apply()
-                                infoCardAlwaysExpanded = it
-                            }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Navigate to settings",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
 
-            // Help Card Toggle
+            // Help Card Toggle (moved to second position)
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -333,7 +493,7 @@ fun InfoCardSettingsScreen(
                 }
             }
 
-            // Home Screen Icon Style
+            // Always Expanded Toggle (moved to third position)
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -344,14 +504,11 @@ fun InfoCardSettingsScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp)
-                            .clickable {
-                                iconDialog.show()
-                            },
+                            .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Palette,
+                            imageVector = Icons.Filled.ExpandMore,
                             contentDescription = null,
                             modifier = Modifier.padding(end = 16.dp),
                             tint = MaterialTheme.colorScheme.primary
@@ -360,20 +517,22 @@ fun InfoCardSettingsScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = stringResource(R.string.home_screen_icon_style),
+                                text = stringResource(R.string.info_card_always_expanded),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = stringResource(R.string.home_screen_icon_style_summary) + ". " + stringResource(R.string.home_screen_icon_current, currentIconDisplay),
+                                text = stringResource(R.string.info_card_always_expanded_summary),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = "Navigate to settings",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        Switch(
+                            checked = infoCardAlwaysExpanded,
+                            onCheckedChange = {
+                                prefs.edit().putBoolean("info_card_always_expanded", it).apply()
+                                infoCardAlwaysExpanded = it
+                            }
                         )
                     }
                 }
@@ -389,22 +548,34 @@ fun InfoCardSettingsScreen(
                 )
             }
 
-            // Info card items
+            // Info card items with drag and drop
             itemsIndexed(
                 items = itemOrder,
                 key = { _, itemKey -> itemKey }
             ) { index, itemKey ->
                 val item = infoCardItems.find { it.key == itemKey }
                 if (item != null) {
+                    var isDragging by remember { mutableStateOf(false) }
+                    var dragOffset by remember { mutableStateOf(0f) }
+                    
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .animateItem(
                                 fadeInSpec = null,
                                 fadeOutSpec = null
+                            )
+                            .offset(y = dragOffset.dp)
+                            .alpha(if (isDragging) 0.8f else 1f)
+                            .shadow(
+                                elevation = if (isDragging) 8.dp else 1.dp,
+                                shape = RoundedCornerShape(12.dp)
                             ),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            containerColor = if (isDragging) 
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            else 
+                                MaterialTheme.colorScheme.surfaceContainer
                         )
                     ) {
                         Row(
@@ -413,6 +584,45 @@ fun InfoCardSettingsScreen(
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            // Drag handle
+                            Icon(
+                                imageVector = Icons.Filled.DragHandle,
+                                contentDescription = "Drag to reorder",
+                                modifier = Modifier
+                                    .padding(end = 12.dp)
+                                    .pointerInput(Unit) {
+                                        detectDragGestures(
+                                            onDragStart = {
+                                                isDragging = true
+                                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            },
+                                            onDragEnd = {
+                                                isDragging = false
+                                                dragOffset = 0f
+                                                
+                                                // Determine new position based on drag offset
+                                                val itemHeight = 80.dp.value // Approximate item height
+                                                val draggedPositions = (dragOffset / itemHeight).toInt()
+                                                val newIndex = (index + draggedPositions).coerceIn(0, itemOrder.size - 1)
+                                                
+                                                if (newIndex != index) {
+                                                    val newOrder = itemOrder.toMutableList()
+                                                    val draggedItem = newOrder.removeAt(index)
+                                                    newOrder.add(newIndex, draggedItem)
+                                                    itemOrder = newOrder
+                                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                }
+                                            }
+                                        ) { _, dragAmount ->
+                                            dragOffset += dragAmount.y
+                                        }
+                                    },
+                                tint = if (isDragging) 
+                                    MaterialTheme.colorScheme.primary 
+                                else 
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            
                             // Icon
                             getIconForItem(item.iconType, item.iconData)()
                             
@@ -428,14 +638,14 @@ fun InfoCardSettingsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Move up button (tap = move up 1, long press = move to top)
+                                // Move up button (improved functionality)
                                 ReorderButton(
                                     icon = Icons.Filled.KeyboardArrowUp,
                                     contentDescription = "Move up",
                                     enabled = index > 0,
                                     onTap = {
                                         if (index > 0) {
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                             val newOrder = itemOrder.toMutableList()
                                             val temp = newOrder[index]
                                             newOrder[index] = newOrder[index - 1]
@@ -454,14 +664,14 @@ fun InfoCardSettingsScreen(
                                     }
                                 )
                                 
-                                // Move down button (tap = move down 1, long press = move to bottom)
+                                // Move down button (improved functionality)
                                 ReorderButton(
                                     icon = Icons.Filled.KeyboardArrowDown,
                                     contentDescription = "Move down",
                                     enabled = index < itemOrder.size - 1,
                                     onTap = {
                                         if (index < itemOrder.size - 1) {
-                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                            hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                             val newOrder = itemOrder.toMutableList()
                                             val temp = newOrder[index]
                                             newOrder[index] = newOrder[index + 1]
