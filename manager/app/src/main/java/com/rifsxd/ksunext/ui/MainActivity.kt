@@ -66,6 +66,7 @@ import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -1013,7 +1014,15 @@ private fun RegularTopBar(
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = containerColor
+            containerColor = if (currentDestination?.route == FlashScreenDestination.route) {
+                when (flashViewModel.flashingStatus) {
+                    FlashingStatus.FLASHING -> Color(0xFFFF9800) // Orange
+                    FlashingStatus.SUCCESS -> Color(0xFF4CAF50) // Green
+                    FlashingStatus.FAILED -> Color(0xFFF44336) // Red
+                }
+            } else {
+                containerColor
+            }
         )
     )
 }
