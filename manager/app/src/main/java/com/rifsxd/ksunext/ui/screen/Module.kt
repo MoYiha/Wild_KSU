@@ -931,7 +931,11 @@ fun ModuleItem(
                                     modifier = Modifier.defaultMinSize(52.dp, 32.dp),
                                     enabled = !module.remove,
                                     onClick = { onUpdate(module) },
-                                    contentPadding = ButtonDefaults.TextButtonContentPadding
+                                    contentPadding = ButtonDefaults.TextButtonContentPadding,
+                                    colors = ButtonDefaults.filledTonalButtonColors(
+                                        containerColor = Color.Transparent,
+                                        disabledContainerColor = Color.Transparent
+                                    )
                                 ) {
                                     Icon(
                                         modifier = Modifier.size(20.dp),
