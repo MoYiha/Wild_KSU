@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,6 +36,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -51,6 +55,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.animation.core.*
 import coil.compose.rememberAsyncImagePainter
 import com.rifsxd.ksunext.ui.util.ImageCropUtils
 
@@ -114,64 +119,16 @@ fun AdvancedImageCropDialog(
                 .fillMaxSize()
                 .background(Color.Black)
         ) {
-            // Unified Top Bar
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Photo Editor",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color.White
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onDismiss) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Close",
-                            tint = Color.White
-                        )
-                    }
-                },
-                actions = {
-                    // Quick rotation button
-                    IconButton(onClick = {
-                        rotation = (rotation + 90f) % 360f
-                    }) {
-                        Icon(
-                            Icons.Default.RotateRight,
-                            contentDescription = "Rotate 90°",
-                            tint = Color.White
-                        )
-                    }
-                    
-                    // Flip horizontal button
-                    IconButton(onClick = {
-                        flipHorizontal = !flipHorizontal
-                    }) {
-                        Icon(
-                            Icons.Default.Flip,
-                            contentDescription = "Flip Horizontal",
-                            tint = if (flipHorizontal) MaterialTheme.colorScheme.primary else Color.White
-                        )
-                    }
-                    
-                    // More options button
-                    IconButton(onClick = {
-                        showMoreOptions = !showMoreOptions
-                    }) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "More Options",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black.copy(alpha = 0.8f)
-                ),
+            // Unified TopAppBar with home layout structure
+            UnifiedPhotoEditorTopBar(
                 modifier = Modifier
                     .statusBarsPadding()
-                    .zIndex(1f)
+                    .zIndex(1f),
+                onDismiss = onDismiss,
+                onRotate = { rotation = (rotation + 90f) % 360f },
+                onFlipHorizontal = { flipHorizontal = !flipHorizontal },
+                onToggleMoreOptions = { showMoreOptions = !showMoreOptions },
+                flipHorizontal = flipHorizontal
             )
             // Image preview with full transformations (zoom, drag, and rotation)
             Box(
@@ -239,8 +196,8 @@ fun AdvancedImageCropDialog(
                     )
                 )
                 
-                // Template overlay showing where UI elements will be
-                UITemplateOverlay(backgroundTransparency = backgroundTransparency)
+                // Home layout card template overlay
+                HomeLayoutCardTemplate()
             }
             
             // Expanded options panel
@@ -616,5 +573,206 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
             topAppBarHeight + statusBarHeight + padding + primaryCardHeight + cardSpacing + secondaryCardHeight + cardSpacing + 25.dp.toPx(),
             textPaint
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UnifiedPhotoEditorTopBar(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onRotate: () -> Unit,
+    onFlipHorizontal: () -> Unit,
+    onToggleMoreOptions: () -> Unit,
+    flipHorizontal: Boolean = false
+) {
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = remember(surfaceContainer) { surfaceContainer }
+    
+    // Animation state for the icon rotation
+    var rotationState by remember { mutableStateOf(0f) }
+    val rotation by animateFloatAsState(
+        targetValue = rotationState,
+        animationSpec = tween(durationMillis = 1000),
+        label = "rotation"
+    )
+    
+    TopAppBar(
+        modifier = modifier,
+        title = { 
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Photo editor icon with rotation animation
+                IconButton(
+                    onClick = { 
+                        rotationState += 360f
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PhotoCamera,
+                        contentDescription = "Photo Editor Icon",
+                        modifier = Modifier.graphicsLayer(rotationZ = rotation),
+                        tint = Color.White
+                    )
+                }
+                Text(
+                    text = "Photo Editor",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = onDismiss
+            ) { 
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack, 
+                    contentDescription = "Back",
+                    tint = Color.White
+                ) 
+            }
+        },
+        actions = {
+            // Quick rotation button
+            IconButton(
+                onClick = onRotate
+            ) {
+                Icon(
+                    Icons.Default.RotateRight, 
+                    contentDescription = "Rotate",
+                    tint = Color.White
+                )
+            }
+            
+            // Quick horizontal flip button
+            IconButton(
+                onClick = onFlipHorizontal
+            ) {
+                Icon(
+                    Icons.Default.Flip, 
+                    contentDescription = "Flip Horizontal",
+                    tint = if (flipHorizontal) MaterialTheme.colorScheme.primary else Color.White
+                )
+            }
+            
+            // More options button
+            IconButton(
+                onClick = onToggleMoreOptions
+            ) {
+                Icon(
+                    Icons.Default.MoreVert, 
+                    contentDescription = "More Options",
+                    tint = Color.White
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+             containerColor = Color.Black.copy(alpha = 0.8f)
+         )
+     )
+ }
+
+@Composable
+private fun HomeLayoutCardTemplate() {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 80.dp), // Account for top bar
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            // Status Card template (mimicking StatusCard from Home.kt)
+            ElevatedCard(
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Empty card - no text as requested
+                }
+            }
+        }
+
+        item {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Two cards in a row (mimicking SuperuserCard and ModuleCard)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Box(modifier = Modifier.weight(1f)) { 
+                        ElevatedCard(
+                            colors = CardDefaults.elevatedCardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                            ),
+                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .height(80.dp)
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                // Empty card - no text as requested
+                            }
+                        }
+                    }
+                    Box(modifier = Modifier.weight(1f)) { 
+                        ElevatedCard(
+                            colors = CardDefaults.elevatedCardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                            ),
+                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .height(80.dp)
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                // Empty card - no text as requested
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            // Info Card template (mimicking InfoCard from Home.kt)
+            ElevatedCard(
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Empty card - no text as requested
+                }
+            }
+        }
     }
 }
