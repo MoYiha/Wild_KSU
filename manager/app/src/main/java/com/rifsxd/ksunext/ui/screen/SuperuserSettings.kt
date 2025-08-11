@@ -30,7 +30,9 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-    Scaffold { paddingValues ->
+    Scaffold(
+        contentWindowInsets = WindowInsets(0)
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -97,7 +99,7 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
             }
 
             item {
-                // Disable Favorite Button Setting
+                // Disable Favorite Button Setting (includes sorting)
                 var disableFavoriteButton by rememberSaveable {
                     mutableStateOf(
                         prefs.getBoolean("disable_favorite_button", false)
@@ -110,27 +112,13 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                     summary = "Hide the favorite button and disable favorite sorting",
                     checked = disableFavoriteButton
                 ) {
-                    prefs.edit().putBoolean("disable_favorite_button", it).apply()
+                    prefs.edit().apply {
+                        putBoolean("disable_favorite_button", it)
+                        // Also set the sorting preference to match
+                        putBoolean("disable_favorite_sorting", it)
+                        apply()
+                    }
                     disableFavoriteButton = it
-                }
-            }
-
-            item {
-                // Disable Favorite Sorting Setting
-                var disableFavoriteSorting by rememberSaveable {
-                    mutableStateOf(
-                        prefs.getBoolean("disable_favorite_sorting", false)
-                    )
-                }
-
-                SwitchItem(
-                    icon = Icons.Filled.Sort,
-                    title = "Disable Favorite Sorting",
-                    summary = "Don't prioritize favorite apps at the top of the list",
-                    checked = disableFavoriteSorting
-                ) {
-                    prefs.edit().putBoolean("disable_favorite_sorting", it).apply()
-                    disableFavoriteSorting = it
                 }
             }
         }

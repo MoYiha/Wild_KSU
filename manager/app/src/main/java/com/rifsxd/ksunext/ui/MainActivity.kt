@@ -783,6 +783,9 @@ private fun SettingsTopBar(
     navigator: DestinationsNavigator,
     modifier: Modifier = Modifier
 ) {
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = remember(surfaceContainer) { surfaceContainer }
+    
     TopAppBar(
         modifier = modifier,
         title = { 
@@ -798,7 +801,11 @@ private fun SettingsTopBar(
             ) { 
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) 
             }
-        }
+        },
+        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor
+        )
     )
 }
 

@@ -30,7 +30,9 @@ import com.rifsxd.ksunext.ui.component.SwitchItem
 fun ModuleSettingsScreen(
     navigator: DestinationsNavigator
 ) {
-    Scaffold { innerPadding ->
+    Scaffold(
+        contentWindowInsets = WindowInsets(0)
+    ) { innerPadding ->
         ModuleSettingsContent(
             modifier = Modifier.padding(innerPadding)
         )
