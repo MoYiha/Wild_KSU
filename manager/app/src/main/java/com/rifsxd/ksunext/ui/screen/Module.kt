@@ -896,7 +896,7 @@ fun ModuleItem(
                                         imageVector = Icons.Outlined.Terminal,
                                         contentDescription = null
                                     )
-                                    if (!module.hasWebUi && updateUrl.isEmpty()) {
+                                    if (!module.hasWebUi) {
                                         Text(
                                             modifier = Modifier.padding(start = 7.dp),
                                             text = stringResource(R.string.action),
@@ -922,7 +922,7 @@ fun ModuleItem(
                                         imageVector = Icons.AutoMirrored.Outlined.Wysiwyg,
                                         contentDescription = null
                                     )
-                                    if (!module.hasActionScript && updateUrl.isEmpty()) {
+                                    if (!module.hasActionScript) {
                                         Text(
                                             modifier = Modifier.padding(start = 7.dp),
                                             fontFamily = MaterialTheme.typography.labelMedium.fontFamily,
@@ -951,7 +951,7 @@ fun ModuleItem(
                                         imageVector = Icons.Outlined.Download,
                                         contentDescription = null
                                     )
-                                    if (!module.hasActionScript || !module.hasWebUi) {
+                                    if (!module.hasActionScript && !module.hasWebUi) {
                                         Text(
                                             modifier = Modifier.padding(start = 7.dp),
                                             fontFamily = MaterialTheme.typography.labelMedium.fontFamily,
@@ -975,7 +975,7 @@ fun ModuleItem(
                                         imageVector = Icons.Outlined.Restore,
                                         contentDescription = null
                                     )
-                                    if (!module.hasActionScript && !module.hasWebUi && updateUrl.isEmpty()) {
+                                    if (!module.hasActionScript && !module.hasWebUi) {
                                         Text(
                                             modifier = Modifier.padding(start = 7.dp),
                                             fontFamily = MaterialTheme.typography.labelMedium.fontFamily,
@@ -996,7 +996,7 @@ fun ModuleItem(
                                         imageVector = Icons.Outlined.Delete,
                                         contentDescription = null
                                     )
-                                    if (!module.hasActionScript && !module.hasWebUi && updateUrl.isEmpty()) {
+                                    if (!module.hasActionScript && !module.hasWebUi) {
                                         Text(
                                             modifier = Modifier.padding(start = 7.dp),
                                             fontFamily = MaterialTheme.typography.labelMedium.fontFamily,
