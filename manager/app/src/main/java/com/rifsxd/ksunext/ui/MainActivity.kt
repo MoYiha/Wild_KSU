@@ -49,6 +49,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -837,9 +838,10 @@ private fun RegularTopBar(
         HomeSettingsScreenDestination.route -> stringResource(R.string.info_card_customization) to true
         FlashScreenDestination.route -> {
             val title = when (flashViewModel.flashingStatus) {
-                FlashingStatus.FLASHING -> stringResource(R.string.flashing)
-                FlashingStatus.SUCCESS -> "flashing success"
-                FlashingStatus.FAILED -> "flashing fail"
+                FlashingStatus.WAITING -> "Waiting"
+                FlashingStatus.FLASHING -> "Flashing"
+                FlashingStatus.SUCCESS -> "Flash Success"
+                FlashingStatus.FAILED -> "Flash Failed"
             }
             title to true
         }
@@ -896,6 +898,16 @@ private fun RegularTopBar(
                     text = title,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Black,
+                    color = if (currentDestination?.route == FlashScreenDestination.route) {
+                        when (flashViewModel.flashingStatus) {
+                            FlashingStatus.WAITING -> Color(0xFFFFEB3B) // Yellow
+                            FlashingStatus.FLASHING -> Color(0xFFFF9800) // Orange
+                            FlashingStatus.SUCCESS -> Color(0xFF4CAF50) // Green
+                            FlashingStatus.FAILED -> Color(0xFFF44336) // Red
+                        }
+                    } else {
+                        LocalContentColor.current
+                    }
                 )
             }
         },
@@ -1070,15 +1082,7 @@ private fun RegularTopBar(
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = if (currentDestination?.route == FlashScreenDestination.route) {
-                when (flashViewModel.flashingStatus) {
-                    FlashingStatus.FLASHING -> Color(0xFFFF9800) // Orange
-                    FlashingStatus.SUCCESS -> Color(0xFF4CAF50) // Green
-                    FlashingStatus.FAILED -> Color(0xFFF44336) // Red
-                }
-            } else {
-                containerColor
-            }
+            containerColor = containerColor
         )
     )
 }

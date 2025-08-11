@@ -195,6 +195,8 @@ fun FlashScreen(
     LaunchedEffect(confirmed, pendingFlashIt) {
         if (!confirmed || pendingFlashIt == null || text.isNotEmpty() || hasFlashed) return@LaunchedEffect
         hasFlashed = true
+        // Set status to FLASHING when operation begins
+        flashViewModel.updateFlashingStatus(FlashingStatus.FLASHING)
         withContext(Dispatchers.IO) {
             flashIt(pendingFlashIt!!, onStdout = {
                 tempText = "$it\n"

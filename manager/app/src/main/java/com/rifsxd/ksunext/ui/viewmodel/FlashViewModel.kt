@@ -6,13 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 enum class FlashingStatus {
+    WAITING,
     FLASHING,
     SUCCESS,
     FAILED
 }
 
 class FlashViewModel : ViewModel() {
-    var flashingStatus by mutableStateOf(FlashingStatus.FLASHING)
+    var flashingStatus by mutableStateOf(FlashingStatus.WAITING)
         private set
 
     fun updateFlashingStatus(status: FlashingStatus) {
@@ -20,6 +21,6 @@ class FlashViewModel : ViewModel() {
     }
 
     fun resetFlashingStatus() {
-        flashingStatus = FlashingStatus.FLASHING
+        flashingStatus = FlashingStatus.WAITING
     }
 }
