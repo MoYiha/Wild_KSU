@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.FitScreen
+import androidx.compose.material.icons.filled.ZoomOutMap
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -132,10 +133,10 @@ fun AdvancedImageCropDialog(
                     )
                     .padding(16.dp)
             ) {
-                // Auto-fit button (centered)
+                // Fit options row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     // Auto-fit button - centers and resets transformations
                     OutlinedButton(
@@ -147,11 +148,32 @@ fun AdvancedImageCropDialog(
                             rotation = 0.0f
                         },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+                        modifier = Modifier.weight(1f)
                     ) {
                         Icon(Icons.Default.FitScreen, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Auto Fit")
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Fit to Screen")
+                    }
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    // Zoom to fit button - scales to fill screen while maintaining aspect ratio
+                    OutlinedButton(
+                        onClick = {
+                            // Zoom to fit - scale to fill screen, center, no rotation
+                            scale = 1.5f // Scale up to fill more of the screen
+                            offsetX = 0.0f
+                            offsetY = 0.0f
+                            rotation = 0.0f
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f)),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Default.ZoomOutMap, contentDescription = null)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Zoom to Fit")
                     }
                 }
                 
@@ -224,11 +246,19 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         val padding = 16.dp.toPx()
         val cardSpacing = 16.dp.toPx()
         
-        // Account for top bar and status bar
-        var currentY = padding + 80.dp.toPx()
+        // Account for top bar, status bar, and bottom navigation bar
+        // This ensures the preview matches the actual saved photo positioning
+        val topSystemUIHeight = 80.dp.toPx() // Status bar + top app bar
+        val bottomNavigationHeight = 80.dp.toPx() // Bottom navigation bar
+        val availableHeight = height - topSystemUIHeight - bottomNavigationHeight
+        
+        var currentY = padding + topSystemUIHeight
         
         // 1. Primary Status Card (Working card)
-        val primaryCardHeight = 100.dp.toPx()
+        // Scale card heights to fit within available space
+        val scaleFactor = availableHeight / (100.dp.toPx() + 80.dp.toPx() + 200.dp.toPx() + 3 * cardSpacing + 2 * padding)
+        val primaryCardHeight = (100.dp.toPx() * scaleFactor).coerceAtLeast(60.dp.toPx())
+        
         drawRoundRect(
             color = primaryCardColor,
             topLeft = androidx.compose.ui.geometry.Offset(padding, currentY),
@@ -246,7 +276,7 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         currentY += primaryCardHeight + cardSpacing
         
         // 2. Two Secondary Cards (Superusers and Modules)
-        val secondaryCardHeight = 80.dp.toPx()
+        val secondaryCardHeight = (80.dp.toPx() * scaleFactor).coerceAtLeast(50.dp.toPx())
         val secondaryCardWidth = (width - 2 * padding - cardSpacing) / 2
         
         // Superusers card
@@ -282,7 +312,7 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         currentY += secondaryCardHeight + cardSpacing
         
         // 3. Info Card (System information)
-        val infoCardHeight = 200.dp.toPx()
+        val infoCardHeight = (200.dp.toPx() * scaleFactor).coerceAtLeast(100.dp.toPx())
         drawRoundRect(
             color = infoCardColor,
             topLeft = androidx.compose.ui.geometry.Offset(padding, currentY),
@@ -311,7 +341,7 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         drawContext.canvas.nativeCanvas.drawText(
             "Working Status",
             padding + 12.dp.toPx(),
-            padding + 80.dp.toPx() + 25.dp.toPx(),
+            topSystemUIHeight + padding + 25.dp.toPx(),
             textPaint
         )
         
@@ -319,14 +349,14 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         drawContext.canvas.nativeCanvas.drawText(
             "Superusers",
             padding + 12.dp.toPx(),
-            padding + 80.dp.toPx() + primaryCardHeight + cardSpacing + 25.dp.toPx(),
+            topSystemUIHeight + padding + primaryCardHeight + cardSpacing + 25.dp.toPx(),
             textPaint
         )
         
         drawContext.canvas.nativeCanvas.drawText(
             "Modules",
             padding + secondaryCardWidth + cardSpacing + 12.dp.toPx(),
-            padding + 80.dp.toPx() + primaryCardHeight + cardSpacing + 25.dp.toPx(),
+            topSystemUIHeight + padding + primaryCardHeight + cardSpacing + 25.dp.toPx(),
             textPaint
         )
         
@@ -334,7 +364,7 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         drawContext.canvas.nativeCanvas.drawText(
             "System Info",
             padding + 12.dp.toPx(),
-            padding + 80.dp.toPx() + primaryCardHeight + cardSpacing + secondaryCardHeight + cardSpacing + 25.dp.toPx(),
+            topSystemUIHeight + padding + primaryCardHeight + cardSpacing + secondaryCardHeight + cardSpacing + 25.dp.toPx(),
             textPaint
         )
     }
