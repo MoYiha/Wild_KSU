@@ -8,7 +8,12 @@ import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +27,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -225,7 +231,7 @@ fun FlashScreen(
         floatingActionButton = {
             if (flashIt is FlashIt.FlashModules && (flashing == FlashingStatus.SUCCESS)) {
                 // Reboot button for modules flashing
-                ExtendedFloatingActionButton(
+                FilledTonalButton(
                     onClick = {
                         scope.launch {
                             withContext(Dispatchers.IO) {
@@ -233,21 +239,37 @@ fun FlashScreen(
                             }
                         }
                     },
-                    icon = { Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.reboot)) },
-                    text = { Text(text = stringResource(R.string.reboot)) }
-                )
+                    modifier = Modifier.defaultMinSize(minWidth = 140.dp, minHeight = 56.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = stringResource(R.string.reboot),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = stringResource(R.string.reboot))
+                }
             }
 
             if (flashIt is FlashIt.FlashModules && (flashing == FlashingStatus.FAILED)) {
                 // Close button for modules flashing
-                ExtendedFloatingActionButton(
-                    text = { Text(text = stringResource(R.string.close)) },
-                    icon = { Icon(Icons.Filled.Close, contentDescription = null) },
+                FilledTonalButton(
                     onClick = {
                         navigator.popBackStack()
                         if (finishIntent) activity?.finish()
-                    }
-                )
+                    },
+                    modifier = Modifier.defaultMinSize(minWidth = 140.dp, minHeight = 56.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = stringResource(R.string.close))
+                }
             }
 
             if (flashIt is FlashIt.FlashBoot && (flashing == FlashingStatus.SUCCESS || flashing == FlashingStatus.FAILED)) {
@@ -256,26 +278,42 @@ fun FlashScreen(
 
                 if (flashing == FlashingStatus.FAILED) {
                     // Always show close on failure
-                    ExtendedFloatingActionButton(
-                        text = { Text(text = stringResource(R.string.close)) },
-                        icon = { Icon(Icons.Filled.Close, contentDescription = null) },
+                    FilledTonalButton(
                         onClick = {
                             navigator.popBackStack()
-                        }
-                    )
+                        },
+                        modifier = Modifier.defaultMinSize(minWidth = 140.dp, minHeight = 56.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(text = stringResource(R.string.close))
+                    }
                 } else if (flashing == FlashingStatus.SUCCESS) {
                     if (isLocalPatch) {
                         // Local patching: show only Close
-                        ExtendedFloatingActionButton(
-                            text = { Text(text = stringResource(R.string.close)) },
-                            icon = { Icon(Icons.Filled.Close, contentDescription = null) },
+                        FilledTonalButton(
                             onClick = {
                                 navigator.popBackStack()
-                            }
-                        )
+                            },
+                            modifier = Modifier.defaultMinSize(minWidth = 140.dp, minHeight = 56.dp),
+                            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(text = stringResource(R.string.close))
+                        }
                     } else if (isDirectOrOta) {
                         // Direct install or OTA inactive slot: show only Reboot
-                        ExtendedFloatingActionButton(
+                        FilledTonalButton(
                             onClick = {
                                 scope.launch {
                                     withContext(Dispatchers.IO) {
@@ -283,9 +321,17 @@ fun FlashScreen(
                                     }
                                 }
                             },
-                            icon = { Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.reboot)) },
-                            text = { Text(text = stringResource(R.string.reboot)) }
-                        )
+                            modifier = Modifier.defaultMinSize(minWidth = 140.dp, minHeight = 56.dp),
+                            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Refresh,
+                                contentDescription = stringResource(R.string.reboot),
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(text = stringResource(R.string.reboot))
+                        }
                     }
                 }
             }
