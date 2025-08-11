@@ -928,12 +928,12 @@ fun ModuleItem(
                             Spacer(modifier = Modifier.weight(1f, true))
 
                             if (updateUrl.isNotEmpty() && !module.remove && !module.update) {
-                                TextButton(
+                                FilledTonalButton(
                                     modifier = Modifier.defaultMinSize(52.dp, 32.dp),
                                     enabled = !module.remove,
                                     onClick = { onUpdate(module) },
                                     contentPadding = ButtonDefaults.TextButtonContentPadding,
-                                    colors = ButtonDefaults.textButtonColors(
+                                    colors = ButtonDefaults.filledTonalButtonColors(
                                         containerColor = Color.Transparent,
                                         disabledContainerColor = Color.Transparent
                                     )
