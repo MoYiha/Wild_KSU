@@ -289,15 +289,15 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                         }
                         selectZipLauncher.launch(intent)
                     },
-                    modifier = Modifier.defaultMinSize(minWidth = 120.dp, minHeight = 48.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                    modifier = Modifier.defaultMinSize(minWidth = 140.dp, minHeight = 56.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
                         contentDescription = moduleInstall,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(24.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     Text(text = moduleInstall)
                 }
             }
