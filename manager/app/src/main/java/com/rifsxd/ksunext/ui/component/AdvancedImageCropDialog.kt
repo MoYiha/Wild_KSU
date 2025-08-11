@@ -56,6 +56,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.animation.core.*
+import androidx.compose.material3.Surface
 import coil.compose.rememberAsyncImagePainter
 import com.rifsxd.ksunext.ui.util.ImageCropUtils
 
@@ -114,91 +115,101 @@ fun AdvancedImageCropDialog(
             decorFitsSystemWindows = false
         )
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
         ) {
-            // Photo Editor TopAppBar
-            PhotoEditorTopBar(
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .zIndex(1f),
-                onDismiss = onDismiss,
-                onRotate = { rotation = (rotation + 90f) % 360f },
-                onFlipHorizontal = { flipHorizontal = !flipHorizontal },
-                onToggleMoreOptions = { showMoreOptions = !showMoreOptions }
-            )
-            // Image preview with full transformations (zoom, drag, and rotation)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        detectTransformGestures(
-                            panZoomLock = false
-                        ) { _, pan, zoom, rotationDelta ->
-                            // Apply zoom
-                            scale = (scale * zoom).coerceIn(minScale, maxScale)
-                            // Apply pan/drag
-                            offsetX = (offsetX + pan.x).coerceIn(minTranslation, maxTranslation)
-                            offsetY = (offsetY + pan.y).coerceIn(minTranslation, maxTranslation)
-                            // Apply rotation with finger drag
-                            rotation = (rotation + rotationDelta) % 360f
-                        }
-                    },
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Image(
-                    painter = painter,
-                    contentDescription = "Background Image Preview",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer(
-                            scaleX = scale * if (flipHorizontal) -1f else 1f,
-                            scaleY = scale * if (flipVertical) -1f else 1f,
-                            translationX = offsetX,
-                            translationY = offsetY,
-                            rotationZ = rotation,
-                            alpha = brightness.coerceIn(0.1f, 2.0f)
-                        ),
-                    contentScale = ContentScale.Fit, // Match the actual background behavior
-                    colorFilter = ColorFilter.colorMatrix(
-                            ColorMatrix().apply {
-                            // Apply contrast
-                            val contrastValue = contrast.coerceIn(0.1f, 3.0f)
-                            val translate = (1.0f - contrastValue) / 2.0f * 255.0f
-                            val scale = contrastValue
-                            this[0, 0] = scale // Red
-                            this[1, 1] = scale // Green  
-                            this[2, 2] = scale // Blue
-                            this[0, 4] = translate // Red offset
-                            this[1, 4] = translate // Green offset
-                            this[2, 4] = translate // Blue offset
-                            
-                            // Apply saturation
-                            val satValue = saturation.coerceIn(0.0f, 2.0f)
-                            val lumR = 0.3086f
-                            val lumG = 0.6094f
-                            val lumB = 0.0820f
-                            val sr = (1 - satValue) * lumR
-                            val sg = (1 - satValue) * lumG
-                            val sb = (1 - satValue) * lumB
-                            
-                            this[0, 0] = sr + satValue
-                            this[0, 1] = sr
-                            this[0, 2] = sr
-                            this[1, 0] = sg
-                            this[1, 1] = sg + satValue
-                            this[1, 2] = sg
-                            this[2, 0] = sb
-                            this[2, 1] = sb
-                            this[2, 2] = sb + satValue
-                        }
-                    )
+                // Photo Editor TopAppBar with proper status bar handling
+                PhotoEditorTopBar(
+                    onDismiss = onDismiss,
+                    onRotate = { rotation = (rotation + 90f) % 360f },
+                    onFlipHorizontal = { flipHorizontal = !flipHorizontal },
+                    onToggleMoreOptions = { showMoreOptions = !showMoreOptions }
                 )
                 
-                // Home layout card template overlay
-                HomeLayoutCardTemplate()
+                // Main content area
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    // Image preview with full transformations (zoom, drag, and rotation)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .pointerInput(Unit) {
+                                detectTransformGestures(
+                                    panZoomLock = false
+                                ) { _, pan, zoom, rotationDelta ->
+                                    // Apply zoom
+                                    scale = (scale * zoom).coerceIn(minScale, maxScale)
+                                    // Apply pan/drag
+                                    offsetX = (offsetX + pan.x).coerceIn(minTranslation, maxTranslation)
+                                    offsetY = (offsetY + pan.y).coerceIn(minTranslation, maxTranslation)
+                                    // Apply rotation with finger drag
+                                    rotation = (rotation + rotationDelta) % 360f
+                                }
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painter,
+                            contentDescription = "Background Image Preview",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer(
+                                    scaleX = scale * if (flipHorizontal) -1f else 1f,
+                                    scaleY = scale * if (flipVertical) -1f else 1f,
+                                    translationX = offsetX,
+                                    translationY = offsetY,
+                                    rotationZ = rotation,
+                                    alpha = brightness.coerceIn(0.1f, 2.0f)
+                                ),
+                            contentScale = ContentScale.Fit,
+                            colorFilter = ColorFilter.colorMatrix(
+                                    ColorMatrix().apply {
+                                    // Apply contrast
+                                    val contrastValue = contrast.coerceIn(0.1f, 3.0f)
+                                    val translate = (1.0f - contrastValue) / 2.0f * 255.0f
+                                    val scale = contrastValue
+                                    this[0, 0] = scale // Red
+                                    this[1, 1] = scale // Green  
+                                    this[2, 2] = scale // Blue
+                                    this[0, 4] = translate // Red offset
+                                    this[1, 4] = translate // Green offset
+                                    this[2, 4] = translate // Blue offset
+                                    
+                                    // Apply saturation
+                                    val satValue = saturation.coerceIn(0.0f, 2.0f)
+                                    val lumR = 0.3086f
+                                    val lumG = 0.6094f
+                                    val lumB = 0.0820f
+                                    val sr = (1 - satValue) * lumR
+                                    val sg = (1 - satValue) * lumG
+                                    val sb = (1 - satValue) * lumB
+                                    
+                                    this[0, 0] = sr + satValue
+                                    this[0, 1] = sr
+                                    this[0, 2] = sr
+                                    this[1, 0] = sg
+                                    this[1, 1] = sg + satValue
+                                    this[1, 2] = sg
+                                    this[2, 0] = sb
+                                    this[2, 1] = sb
+                                    this[2, 2] = sb + satValue
+                                }
+                            )
+                        )
+                    }
+                    
+                    // Home layout card template overlay - non-blocking for touch
+                    HomeLayoutCardTemplate(
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
             
             // Expanded options panel
@@ -583,91 +594,121 @@ private fun PhotoEditorTopBar(
     onDismiss: () -> Unit,
     onRotate: () -> Unit,
     onFlipHorizontal: () -> Unit,
-    onToggleMoreOptions: () -> Unit,
-    modifier: Modifier = Modifier
+    onToggleMoreOptions: () -> Unit
 ) {
-    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
-    val containerColor = remember(surfaceContainer) { surfaceContainer }
-    
-    // Animation state for the icon
-    var rotationState by remember { mutableStateOf(0f) }
-    val rotation by animateFloatAsState(
-        targetValue = rotationState,
-        animationSpec = tween(durationMillis = 1000),
-        label = "rotation"
-    )
-    
-    // Auto-rotate on initial composition
-    LaunchedEffect(Unit) {
-        rotationState = 360f
-    }
-    
-    TopAppBar(
-        modifier = modifier,
-        title = { 
-            Row(
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-            ) {
-                // Photo editor icon with rotation animation
-                IconButton(
-                    onClick = { 
-                        rotationState += 360f
-                    }
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsPadding(),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 4.dp
+    ) {
+        TopAppBar(
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "rotation")
+                    val rotation by infiniteTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 360f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(3000, easing = LinearEasing),
+                            repeatMode = RepeatMode.Restart
+                        ),
+                        label = "rotation"
+                    )
+                    
                     Icon(
                         imageVector = Icons.Default.PhotoCamera,
                         contentDescription = "Photo Editor",
-                        modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                        modifier = Modifier
+                            .size(24.dp)
+                            .graphicsLayer { rotationZ = rotation },
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                    
+                    Text(
+                        text = "Photo Editor",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                Text(
-                    text = "Photo Editor",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Black,
-                )
-            }
-        },
-        navigationIcon = {
-            IconButton(
-                onClick = onDismiss
-            ) { 
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") 
-            }
-        },
-        actions = {
-            IconButton(onClick = onRotate) {
-                Icon(Icons.Default.RotateRight, contentDescription = "Rotate")
-            }
-            IconButton(
-                onClick = onFlipHorizontal,
-                modifier = Modifier.graphicsLayer(
-                    scaleX = -1f // Visual feedback for flip
-                )
-            ) {
-                Icon(Icons.Default.Flip, contentDescription = "Flip Horizontal")
-            }
-            IconButton(onClick = onToggleMoreOptions) {
-                Icon(Icons.Default.MoreVert, contentDescription = "More Options")
-            }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = containerColor
+            },
+            navigationIcon = {
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = onRotate) {
+                    Icon(
+                        imageVector = Icons.Default.RotateRight,
+                        contentDescription = "Rotate",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                
+                val flipHorizontalPressed = remember { mutableStateOf(false) }
+                IconButton(
+                    onClick = {
+                        flipHorizontalPressed.value = true
+                        onFlipHorizontal()
+                    },
+                    modifier = Modifier.scale(if (flipHorizontalPressed.value) 0.9f else 1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Flip,
+                        contentDescription = "Flip Horizontal",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                
+                LaunchedEffect(flipHorizontalPressed.value) {
+                    if (flipHorizontalPressed.value) {
+                        delay(100)
+                        flipHorizontalPressed.value = false
+                    }
+                }
+                
+                IconButton(onClick = onToggleMoreOptions) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More Options",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                actionIconContentColor = MaterialTheme.colorScheme.onSurface
+            )
         )
-    )
+    }
 }
 
 @Composable
 private fun HomeLayoutCardTemplate(
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    // Make cards non-interactive to allow touch passthrough to image
+    Box(
         modifier = modifier
-            .fillMaxSize()
-            .padding(top = 80.dp), // Account for top bar
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            userScrollEnabled = false // Disable scrolling to allow touch passthrough
+        ) {
         // Status Card Template (mimicking StatusCard from Home.kt)
         item {
             ElevatedCard(
@@ -762,6 +803,7 @@ private fun HomeLayoutCardTemplate(
                     // Empty content as requested - no text
                 }
             }
+        }
         }
     }
 }
