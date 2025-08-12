@@ -101,13 +101,13 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.generated.destinations.HomeSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ModuleSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SuperuserSettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.PhotoEditorScreenDestination
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.component.SwitchItem
-import com.rifsxd.ksunext.ui.component.AdvancedImageCropDialog
 import com.rifsxd.ksunext.ui.component.IconThemeManagerDialog
 import com.rifsxd.ksunext.ui.util.ImageCropUtils
 import com.rifsxd.ksunext.ui.util.LocaleHelper
@@ -380,10 +380,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 )
             }
             
-            // State for crop dialog
-            var showCropDialog by remember { mutableStateOf(false) }
-            var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
             val selectImageLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) { result ->
@@ -394,8 +390,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         if (internalPath != null) {
                             // Convert to file URI for consistent handling
                             val fileUri = ImageStorageUtils.filePathToUri(internalPath)
-                            selectedImageUri = Uri.parse(fileUri)
-                            showCropDialog = true
+                            // Navigate to PhotoEditor screen
+                            navigator.navigate(PhotoEditorScreenDestination(imageUri = fileUri))
                         } else {
                             // Fallback: try to use original URI with permissions
                             try {
@@ -403,8 +399,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     uri,
                                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                                 )
-                                selectedImageUri = uri
-                                showCropDialog = true
+                                // Navigate to PhotoEditor screen
+                                navigator.navigate(PhotoEditorScreenDestination(imageUri = uri.toString()))
                             } catch (e: Exception) {
                                 // Last resort: save original URI directly
                                 e.printStackTrace()
@@ -414,27 +410,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 }
-            }
-
-            // Advanced image crop dialog
-            if (showCropDialog && selectedImageUri != null) {
-                AdvancedImageCropDialog(
-                    imageUri = selectedImageUri!!,
-                    onDismiss = {
-                        showCropDialog = false
-                        selectedImageUri = null
-                    },
-                    onSave = {
-                        // Save the image URI
-                        prefs.edit().apply {
-                            putString("background_image_uri", selectedImageUri.toString())
-                            apply()
-                        }
-                        backgroundImageUri = selectedImageUri.toString()
-                        showCropDialog = false
-                        selectedImageUri = null
-                    }
-                )
             }
 
             // Background Image Selection
