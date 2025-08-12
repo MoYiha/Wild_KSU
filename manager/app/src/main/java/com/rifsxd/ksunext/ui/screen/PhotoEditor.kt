@@ -196,7 +196,7 @@ fun PhotoEditor(
     var flipVertical by remember { mutableStateOf(false) }
     
     // UI states
-    var freeFormMode by remember { mutableStateOf(true) }
+    var freeFormMode by remember { mutableStateOf(false) }
     var showAdjustments by remember { mutableStateOf(false) }
     var showTransforms by remember { mutableStateOf(false) }
     
@@ -619,32 +619,60 @@ fun PhotoEditor(
                         )
                     }
                     
-                    // Save theme button
+                    // Save to gallery button
                     val context = LocalContext.current
                     IconButton(
                         onClick = {
-                            // Save current photo settings as a theme
-                            val prefs = context.getSharedPreferences("photo_themes", android.content.Context.MODE_PRIVATE)
-                            val themeId = "theme_${System.currentTimeMillis()}"
-                            prefs.edit()
-                                .putFloat("${themeId}_scale", scale)
-                                .putFloat("${themeId}_offsetX", offsetX)
-                                .putFloat("${themeId}_offsetY", offsetY)
-                                .putFloat("${themeId}_rotation", rotation)
-                                .putFloat("${themeId}_brightness", brightness)
-                                .putFloat("${themeId}_contrast", contrast)
-                                .putFloat("${themeId}_saturation", saturation)
-                                .putFloat("${themeId}_hue", hue)
-                                .putBoolean("${themeId}_flipHorizontal", flipHorizontal)
-                                .putBoolean("${themeId}_flipVertical", flipVertical)
-                                .putString("${themeId}_imageUri", imageUri.toString())
-                                .putLong("${themeId}_timestamp", System.currentTimeMillis())
-                                .apply()
-                            
-                            // Add theme ID to saved themes list
-                            val savedThemes = prefs.getStringSet("saved_themes", mutableSetOf()) ?: mutableSetOf()
-                            savedThemes.add(themeId)
-                            prefs.edit().putStringSet("saved_themes", savedThemes).apply()
+                            // Save edited photo to gallery
+                            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                                try {
+                                    val editedImageUri = saveEditedImage(
+                                        context = context,
+                                        originalUri = imageUri!!,
+                                        offsetX = offsetX,
+                                        offsetY = offsetY,
+                                        rotation = rotation,
+                                        scale = scale,
+                                        brightness = brightness,
+                                        contrast = contrast,
+                                        saturation = saturation,
+                                        hue = hue,
+                                        flipHorizontal = flipHorizontal,
+                                        flipVertical = flipVertical
+                                    )
+                                    
+                                    if (editedImageUri != null) {
+                                        // Copy the edited image to Downloads folder
+                                        val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+                                        val fileName = "edited_photo_${System.currentTimeMillis()}.jpg"
+                                        val destFile = java.io.File(downloadsDir, fileName)
+                                        
+                                        // Copy file from internal storage to Downloads
+                                        val sourceFile = java.io.File(android.net.Uri.parse(editedImageUri).path!!)
+                                        sourceFile.copyTo(destFile, overwrite = true)
+                                        
+                                        // Notify media scanner
+                                        android.media.MediaScannerConnection.scanFile(
+                                            context,
+                                            arrayOf(destFile.absolutePath),
+                                            arrayOf("image/jpeg"),
+                                            null
+                                        )
+                                        
+                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                            android.widget.Toast.makeText(context, "Photo saved to Downloads", android.widget.Toast.LENGTH_SHORT).show()
+                                        }
+                                    } else {
+                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                            android.widget.Toast.makeText(context, "Failed to save photo", android.widget.Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                        android.widget.Toast.makeText(context, "Error saving photo: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
                         },
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -652,7 +680,7 @@ fun PhotoEditor(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Save,
-                            contentDescription = "Save Theme",
+                            contentDescription = "Save to Gallery",
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
