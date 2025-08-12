@@ -21,10 +21,10 @@ import kotlin.math.max
 import kotlin.math.min
 
 object ImageCropUtils {
-    // Constants for transformation limits (inspired by SukiSU Ultra's security limits)
-    private const val MIN_SCALE = 0.5f
-    private const val MAX_SCALE = 3.0f
-    private const val MAX_TRANSLATION = 500f
+    // Constants for transformation limits (matching PhotoEditor ranges)
+    private const val MIN_SCALE = 0.1f
+    private const val MAX_SCALE = 5.0f
+    private const val MAX_TRANSLATION = 1000f
     private const val TAG = "ImageCropUtils"
     
     fun saveImageCropSettings(prefs: SharedPreferences, uri: String, settings: ImageCropSettings) {

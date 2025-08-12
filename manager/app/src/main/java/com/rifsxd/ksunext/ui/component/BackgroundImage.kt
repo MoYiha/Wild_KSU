@@ -17,6 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -101,6 +103,43 @@ fun BackgroundImageWrapper(
                 val cropSettings = ImageCropUtils.loadImageCropSettings(prefs)
                 Log.d("BackgroundImage", "Loaded crop settings: scale=${cropSettings.scale}, offsetX=${cropSettings.offsetX}, offsetY=${cropSettings.offsetY}, rotation=${cropSettings.rotation}")
                 
+                // Load color adjustment settings from SharedPreferences
+                val brightness = prefs.getFloat("image_brightness", 0f)
+                val contrast = prefs.getFloat("image_contrast", 1f)
+                val saturation = prefs.getFloat("image_saturation", 1f)
+                val hue = prefs.getFloat("image_hue", 0f)
+                
+                // Create color matrix for adjustments (matching PhotoEditor logic)
+                val colorMatrix = remember(brightness, contrast, saturation, hue) {
+                    ColorMatrix().apply {
+                        // Apply brightness (-200 to 200 range)
+                        val brightnessValue = brightness / 255f
+                        this[4] = brightnessValue // Red offset
+                        this[9] = brightnessValue // Green offset
+                        this[14] = brightnessValue // Blue offset
+                        
+                        // Apply contrast (0 to 4 range)
+                        val contrastValue = contrast
+                        this[0] = contrastValue // Red scale
+                        this[6] = contrastValue // Green scale
+                        this[12] = contrastValue // Blue scale
+                        
+                        // Apply saturation (0 to 3 range)
+                        val saturationMatrix = ColorMatrix()
+                        saturationMatrix.setToSaturation(saturation)
+                        this.timesAssign(saturationMatrix)
+                        
+                        // Apply hue rotation (-360 to 360 range)
+                        if (hue != 0f) {
+                            val hueMatrix = ColorMatrix()
+                            hueMatrix.setToRotateRed(hue)
+                            this.timesAssign(hueMatrix)
+                        }
+                    }
+                }
+                
+                Log.d("BackgroundImage", "Loaded adjustment settings: brightness=$brightness, contrast=$contrast, saturation=$saturation, hue=$hue")
+                
                 // Use ContentScale.Fit to match editor behavior and preserve aspect ratio
                 val contentScale = ContentScale.Fit
                 
@@ -109,7 +148,8 @@ fun BackgroundImageWrapper(
                     contentDescription = null,
                     modifier = imageModifier,
                     contentScale = contentScale,
-                    alignment = androidx.compose.ui.Alignment.Center
+                    alignment = androidx.compose.ui.Alignment.Center,
+                    colorFilter = ColorFilter.colorMatrix(colorMatrix)
                 )
             }
         }
