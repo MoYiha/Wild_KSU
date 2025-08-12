@@ -533,9 +533,11 @@ fun PhotoEditor(
                                     valueRange = -360f..360f,
                                     modifier = Modifier.fillMaxWidth()
                                 )
+                                )
                             }
                         }
                     }
+                }
                 }
             }
         }
