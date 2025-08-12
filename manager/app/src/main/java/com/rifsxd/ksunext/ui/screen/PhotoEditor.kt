@@ -1,6 +1,7 @@
 package com.rifsxd.ksunext.ui.screen
 
 import android.net.Uri
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -13,6 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
@@ -68,6 +72,7 @@ fun PhotoEditor(
     var brightness by remember { mutableFloatStateOf(0f) }
     var contrast by remember { mutableFloatStateOf(1f) }
     var saturation by remember { mutableFloatStateOf(1f) }
+    var hue by remember { mutableFloatStateOf(0f) }
     var flipHorizontal by remember { mutableStateOf(false) }
     var flipVertical by remember { mutableStateOf(false) }
     
@@ -91,10 +96,38 @@ fun PhotoEditor(
     }
     
     // Create color matrix for image adjustments
-    val colorMatrix = remember(brightness, contrast, saturation) {
+    val colorMatrix = remember(brightness, contrast, saturation, hue) {
         ColorMatrix().apply {
             // Apply saturation first
             setToSaturation(saturation)
+            
+            // Apply hue rotation using manual matrix calculation
+            if (hue != 0f) {
+                val hueRadians = hue * kotlin.math.PI / 180f
+                val cosHue = kotlin.math.cos(hueRadians).toFloat()
+                val sinHue = kotlin.math.sin(hueRadians).toFloat()
+                
+                // Create hue rotation matrix manually
+                val hueMatrix = floatArrayOf(
+                    0.213f + cosHue * 0.787f - sinHue * 0.213f, 0.715f - cosHue * 0.715f - sinHue * 0.715f, 0.072f - cosHue * 0.072f + sinHue * 0.928f, 0f, 0f,
+                    0.213f - cosHue * 0.213f + sinHue * 0.143f, 0.715f + cosHue * 0.285f + sinHue * 0.140f, 0.072f - cosHue * 0.072f - sinHue * 0.283f, 0f, 0f,
+                    0.213f - cosHue * 0.213f - sinHue * 0.787f, 0.715f - cosHue * 0.715f + sinHue * 0.715f, 0.072f + cosHue * 0.928f + sinHue * 0.072f, 0f, 0f,
+                    0f, 0f, 0f, 1f, 0f
+                )
+                
+                // Apply hue matrix to current values
+                val currentValues = this.values.copyOf()
+                for (i in 0 until 4) {
+                    for (j in 0 until 5) {
+                        var sum = 0f
+                        for (k in 0 until 4) {
+                            sum += hueMatrix[i * 5 + k] * currentValues[k * 5 + j]
+                        }
+                        if (j == 4) sum += hueMatrix[i * 5 + 4]
+                        this.values[i * 5 + j] = sum
+                    }
+                }
+            }
             
             // Apply brightness and contrast
             val brightnessOffset = brightness * 255f
@@ -126,6 +159,7 @@ fun PhotoEditor(
         brightness = 0f
         contrast = 1f
         saturation = 1f
+        hue = 0f
         flipHorizontal = false
         flipVertical = false
     }
@@ -133,6 +167,26 @@ fun PhotoEditor(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        // Checkerboard background
+        Canvas(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val checkerSize = 20.dp.toPx()
+            val cols = (size.width / checkerSize).toInt() + 1
+            val rows = (size.height / checkerSize).toInt() + 1
+            
+            for (i in 0..cols) {
+                for (j in 0..rows) {
+                    val isEven = (i + j) % 2 == 0
+                    drawRect(
+                        color = if (isEven) Color(0xFFE0E0E0) else Color(0xFFF5F5F5),
+                        topLeft = Offset(i * checkerSize, j * checkerSize),
+                        size = Size(checkerSize, checkerSize)
+                    )
+                }
+            }
+        }
+        
         // Main photo area
         Image(
             painter = painter,
@@ -164,7 +218,7 @@ fun PhotoEditor(
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )
         
-        // Top controls panel
+        // Free-form mode toggle at top
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -175,28 +229,40 @@ fun PhotoEditor(
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Free-form Editing",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Switch(
+                    checked = freeFormMode,
+                    onCheckedChange = { freeFormMode = it }
+                )
+            }
+        }
+        
+        // Bottom controls and action bar
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+                .padding(bottom = 80.dp), // Extra padding to avoid navigation bar
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+        ) {
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
-                // Free-form mode toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Free-form Editing",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Switch(
-                        checked = freeFormMode,
-                        onCheckedChange = { freeFormMode = it }
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
                 // Quick action buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -207,12 +273,12 @@ fun PhotoEditor(
                         onClick = { rotation -= 90f },
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(MaterialTheme.colorScheme.surface)
                     ) {
                         Icon(
                             imageVector = Icons.Default.RotateLeft,
                             contentDescription = "Rotate Left",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     
@@ -221,12 +287,12 @@ fun PhotoEditor(
                         onClick = { rotation += 90f },
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(MaterialTheme.colorScheme.surface)
                     ) {
                         Icon(
                             imageVector = Icons.Default.RotateRight,
                             contentDescription = "Rotate Right",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                     
@@ -237,14 +303,14 @@ fun PhotoEditor(
                             .clip(RoundedCornerShape(8.dp))
                             .background(
                                 if (flipHorizontal) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.primaryContainer
+                                else MaterialTheme.colorScheme.surface
                             )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Flip,
                             contentDescription = "Flip Horizontal",
                             tint = if (flipHorizontal) MaterialTheme.colorScheme.onPrimary
-                                   else MaterialTheme.colorScheme.onPrimaryContainer
+                                   else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     
@@ -255,7 +321,7 @@ fun PhotoEditor(
                             .clip(RoundedCornerShape(8.dp))
                             .background(
                                 if (flipVertical) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.primaryContainer
+                                else MaterialTheme.colorScheme.surface
                             )
                     ) {
                         Icon(
@@ -263,11 +329,29 @@ fun PhotoEditor(
                             contentDescription = "Flip Vertical",
                             modifier = Modifier.graphicsLayer(rotationZ = 90f),
                             tint = if (flipVertical) MaterialTheme.colorScheme.onPrimary
-                                   else MaterialTheme.colorScheme.onPrimaryContainer
+                                   else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     
-                    // Reset
+                    // Toggle advanced controls (switched position with reset)
+                    IconButton(
+                        onClick = { showControls = !showControls },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(
+                                if (showControls) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surface
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Tune,
+                            contentDescription = "Advanced Controls",
+                            tint = if (showControls) MaterialTheme.colorScheme.onPrimary
+                                   else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    
+                    // Reset (switched position with menu)
                     IconButton(
                         onClick = { resetAll() },
                         modifier = Modifier
@@ -278,24 +362,6 @@ fun PhotoEditor(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Reset",
                             tint = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
-                    
-                    // Toggle advanced controls
-                    IconButton(
-                        onClick = { showControls = !showControls },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(
-                                if (showControls) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.primaryContainer
-                            )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Tune,
-                            contentDescription = "Advanced Controls",
-                            tint = if (showControls) MaterialTheme.colorScheme.onPrimary
-                                   else MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }
@@ -346,68 +412,56 @@ fun PhotoEditor(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    // Scale
+                    // Hue (new color slider)
                     Text(
-                        text = "Scale: ${(scale * 100).toInt()}%",
+                        text = "Hue: ${(hue).toInt()}°",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Slider(
-                        value = scale,
-                        onValueChange = { scale = it },
-                        valueRange = 0.1f..3f,
+                        value = hue,
+                        onValueChange = { hue = it },
+                        valueRange = -180f..180f,
                         modifier = Modifier.fillMaxWidth()
                     )
-                }
-            }
-        }
-        
-        // Bottom action bar with proper spacing from navigation bar
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
-                .padding(bottom = 80.dp), // Extra padding to avoid navigation bar
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Cancel button
-                OutlinedButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cancel",
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Cancel")
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
                 
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                // Confirm button
-                Button(
-                    onClick = onSave,
-                    modifier = Modifier.weight(1f)
+                // Action buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Confirm",
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Confirm")
+                    // Cancel button
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cancel",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Cancel")
+                    }
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    // Confirm button
+                    Button(
+                        onClick = onSave,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Confirm",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Confirm")
+                    }
                 }
             }
         }
