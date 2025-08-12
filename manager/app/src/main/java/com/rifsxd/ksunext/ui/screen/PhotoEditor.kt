@@ -617,10 +617,10 @@ fun PhotoEditor(
                     }
                     
                     // Clear background button
+                    val context = LocalContext.current
                     IconButton(
                         onClick = {
                             // Clear background image completely
-                            val context = LocalContext.current
                             val prefs = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
                             ImageStorageUtils.deleteInternalBackgroundImage(context)
                             prefs.edit()

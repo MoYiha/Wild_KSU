@@ -107,54 +107,38 @@ fun BackgroundImageWrapper(
                         val flipVertical = prefs.getBoolean("edit_flip_vertical", false)
                         
                         if (brightness != 0f || contrast != 0f || saturation != 0f || hue != 0f || flipHorizontal || flipVertical) {
-                            // Create color matrix for image adjustments
-                            val colorMatrix = remember(brightness, contrast, saturation, hue) {
-                                androidx.compose.ui.graphics.ColorMatrix().apply {
-                                    // Apply saturation first (convert from -100/100 range to 0-2 range)
-                                    val saturationValue = (saturation + 100f) / 100f
-                                    setToSaturation(saturationValue)
-                                    
-                                    // Apply hue rotation using manual matrix calculation
-                                    if (hue != 0f) {
-                                        val hueRadians = hue * kotlin.math.PI / 180f
-                                        val cosHue = kotlin.math.cos(hueRadians).toFloat()
-                                        val sinHue = kotlin.math.sin(hueRadians).toFloat()
-                                        
-                                        // Create hue rotation matrix manually
-                                        val hueMatrix = floatArrayOf(
-                                            0.213f + cosHue * 0.787f - sinHue * 0.213f, 0.715f - cosHue * 0.715f - sinHue * 0.715f, 0.072f - cosHue * 0.072f + sinHue * 0.928f, 0f, 0f,
-                                            0.213f - cosHue * 0.213f + sinHue * 0.143f, 0.715f + cosHue * 0.285f + sinHue * 0.140f, 0.072f - cosHue * 0.072f - sinHue * 0.283f, 0f, 0f,
-                                            0.213f - cosHue * 0.213f - sinHue * 0.787f, 0.715f - cosHue * 0.715f + sinHue * 0.715f, 0.072f + cosHue * 0.928f + sinHue * 0.072f, 0f, 0f,
-                                            0f, 0f, 0f, 1f, 0f
-                                        )
-                                        postConcat(androidx.compose.ui.graphics.ColorMatrix(hueMatrix))
-                                    }
-                                    
-                                    // Apply brightness and contrast
-                                    val brightnessMatrix = androidx.compose.ui.graphics.ColorMatrix().apply {
-                                        val brightnessValue = brightness / 100f
-                                        val contrastValue = (contrast + 100f) / 100f
-                                        val contrastTranslate = (1f - contrastValue) * 0.5f
-                                        
-                                        setToScale(
-                                            contrastValue, contrastValue, contrastValue, 1f
-                                        )
-                                        
-                                        val values = colorMatrix
-                                        values[4] = brightnessValue + contrastTranslate // R offset
-                                        values[9] = brightnessValue + contrastTranslate // G offset
-                                        values[14] = brightnessValue + contrastTranslate // B offset
-                                    }
-                                    postConcat(brightnessMatrix)
-                                }
-                            }
-                            
-                            modifier
-                                .graphicsLayer {
-                                    colorFilter = androidx.compose.ui.graphics.ColorFilter.colorMatrix(colorMatrix)
-                                    scaleX = if (flipHorizontal) -1f else 1f
-                                    scaleY = if (flipVertical) -1f else 1f
-                                }
+                             // Create color matrix for image adjustments
+                             val colorMatrix = remember(brightness, contrast, saturation, hue) {
+                                 androidx.compose.ui.graphics.ColorMatrix().apply {
+                                     // Apply saturation first (convert from -100/100 range to 0-2 range)
+                                     val saturationValue = (saturation + 100f) / 100f
+                                     setToSaturation(saturationValue)
+                                     
+                                     // Apply brightness and contrast adjustments
+                                     val brightnessValue = brightness / 100f
+                                     val contrastValue = (contrast + 100f) / 100f
+                                     
+                                     // Manual matrix manipulation for brightness and contrast
+                                     val values = this.values
+                                     // Apply contrast scaling
+                                     values[0] *= contrastValue  // R
+                                     values[6] *= contrastValue  // G
+                                     values[12] *= contrastValue // B
+                                     
+                                     // Apply brightness offset
+                                     val contrastTranslate = (1f - contrastValue) * 0.5f
+                                     values[4] = brightnessValue + contrastTranslate  // R offset
+                                     values[9] = brightnessValue + contrastTranslate  // G offset
+                                     values[14] = brightnessValue + contrastTranslate // B offset
+                                 }
+                             }
+                             
+                             modifier
+                                 .graphicsLayer {
+                                     colorFilter = androidx.compose.ui.graphics.ColorFilter.colorMatrix(colorMatrix)
+                                     scaleX = if (flipHorizontal) -1f else 1f
+                                     scaleY = if (flipVertical) -1f else 1f
+                                 }
                         } else {
                             modifier
                         }
