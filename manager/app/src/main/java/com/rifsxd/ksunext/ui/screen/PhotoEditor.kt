@@ -300,6 +300,10 @@ fun PhotoEditor(
         model = ImageRequest.Builder(LocalContext.current)
             .data(imageUri)
             .allowHardware(false)
+            .decoderFactory { result, options, _ ->
+                // Use a custom decoder that doesn't apply EXIF orientation
+                coil.decode.BitmapFactoryDecoder(result.source, options)
+            }
             .build(),
         onError = { error ->
             android.util.Log.e("PhotoEditor", "Failed to load image URI: $imageUri, Error: ${error.result.throwable?.message}")
