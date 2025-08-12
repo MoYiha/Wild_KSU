@@ -461,7 +461,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             if (backgroundImageUri != null) {
                 var backgroundTransparency by rememberSaveable {
                     mutableFloatStateOf(
-                        prefs.getFloat("background_transparency", 1.0f)
+                        prefs.getFloat("background_transparency", 0.0f)
                     )
                 }
                 

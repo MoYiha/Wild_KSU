@@ -28,14 +28,14 @@ object ImageCropUtils {
     
     fun saveImageCropSettings(prefs: SharedPreferences, uri: String, settings: ImageCropSettings) {
         prefs.edit().apply {
-            putString("background_image_uri", uri)
+            // Don't save URI here - it's already saved by PhotoEditor
             putFloat("background_scale_x", settings.scale)
             putFloat("background_pos_x", settings.offsetX)
             putFloat("background_pos_y", settings.offsetY)
             putFloat("background_rotation", settings.rotation)
             apply()
         }
-        Log.d(TAG, "Saved crop settings: scale=${settings.scale}, offsetX=${settings.offsetX}, offsetY=${settings.offsetY}, rotation=${settings.rotation}")
+        Log.d(TAG, "Saved crop settings for URI $uri: scale=${settings.scale}, offsetX=${settings.offsetX}, offsetY=${settings.offsetY}, rotation=${settings.rotation}")
     }
     
     fun loadImageCropSettings(prefs: SharedPreferences): ImageCropSettings {

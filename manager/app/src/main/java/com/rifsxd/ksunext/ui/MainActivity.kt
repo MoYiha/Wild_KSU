@@ -263,7 +263,7 @@ class MainActivity : ComponentActivity() {
                     } ?: prefs.getString("background_image_uri", null)
                 )
             }
-            var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 1.0f)) } // Default 100% darkness
+            var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 0.0f)) } // Default 0% darkness (fully visible)
             var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 0.0f)) } // Default 0% UI transparency
 
             var backgroundBlur by remember { mutableStateOf(prefs.getFloat("background_blur", 0.0f)) } // Default 0px blur
@@ -301,7 +301,7 @@ class MainActivity : ComponentActivity() {
                             } ?: prefs.getString("background_image_uri", null)
                         }
                         "background_transparency" -> {
-                            backgroundTransparency = prefs.getFloat("background_transparency", 1.0f)
+                            backgroundTransparency = prefs.getFloat("background_transparency", 0.0f)
                         }
                         "ui_transparency" -> {
                             uiTransparency = prefs.getFloat("ui_transparency", 0.0f)
