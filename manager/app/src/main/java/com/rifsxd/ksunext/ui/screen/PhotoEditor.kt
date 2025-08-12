@@ -1,5 +1,12 @@
 package com.rifsxd.ksunext.ui.screen
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
+import android.graphics.Paint
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -26,6 +32,126 @@ import coil.compose.rememberAsyncImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.rifsxd.ksunext.ui.util.ImageStorageUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+
+// Function to save edited image with transformations
+suspend fun saveEditedImage(
+    context: Context,
+    originalUri: Uri,
+    offsetX: Float,
+    offsetY: Float,
+    rotation: Float,
+    scale: Float,
+    brightness: Float,
+    contrast: Float,
+    saturation: Float,
+    hue: Float,
+    flipHorizontal: Boolean,
+    flipVertical: Boolean
+): String? {
+    return withContext(Dispatchers.IO) {
+        try {
+            // Load the original bitmap
+            val imageLoader = ImageLoader(context)
+            val request = ImageRequest.Builder(context)
+                .data(originalUri)
+                .build()
+            
+            val result = imageLoader.execute(request)
+            if (result !is SuccessResult) return@withContext null
+            
+            val originalBitmap = (result.drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
+                ?: return@withContext null
+            
+            // Create a new bitmap with transformations applied
+            val width = originalBitmap.width
+            val height = originalBitmap.height
+            
+            // Create transformation matrix
+            val matrix = Matrix().apply {
+                // Apply scale
+                postScale(
+                    scale * (if (flipHorizontal) -1f else 1f),
+                    scale * (if (flipVertical) -1f else 1f),
+                    width / 2f,
+                    height / 2f
+                )
+                // Apply rotation
+                postRotate(rotation, width / 2f, height / 2f)
+                // Apply translation
+                postTranslate(offsetX, offsetY)
+            }
+            
+            // Create color matrix for adjustments
+            val colorMatrix = android.graphics.ColorMatrix().apply {
+                // Brightness
+                val brightnessMatrix = android.graphics.ColorMatrix(floatArrayOf(
+                    1f, 0f, 0f, 0f, brightness * 255f,
+                    0f, 1f, 0f, 0f, brightness * 255f,
+                    0f, 0f, 1f, 0f, brightness * 255f,
+                    0f, 0f, 0f, 1f, 0f
+                ))
+                postConcat(brightnessMatrix)
+                
+                // Contrast
+                val contrastValue = contrast + 1f
+                val contrastMatrix = android.graphics.ColorMatrix(floatArrayOf(
+                    contrastValue, 0f, 0f, 0f, 0f,
+                    0f, contrastValue, 0f, 0f, 0f,
+                    0f, 0f, contrastValue, 0f, 0f,
+                    0f, 0f, 0f, 1f, 0f
+                ))
+                postConcat(contrastMatrix)
+                
+                // Saturation
+                setSaturation(saturation + 1f)
+            }
+            
+            // Create new bitmap with transformations
+            val transformedBitmap = Bitmap.createBitmap(
+                width, height, Bitmap.Config.ARGB_8888
+            )
+            
+            val canvas = Canvas(transformedBitmap)
+            val paint = Paint().apply {
+                isAntiAlias = true
+                colorFilter = ColorMatrixColorFilter(colorMatrix)
+            }
+            
+            canvas.drawBitmap(originalBitmap, matrix, paint)
+            
+            // Save to internal storage
+            val imagesDir = File(context.filesDir, "images")
+            if (!imagesDir.exists()) {
+                imagesDir.mkdirs()
+            }
+            
+            val fileName = "background_edited_${System.currentTimeMillis()}.png"
+            val file = File(imagesDir, fileName)
+            
+            FileOutputStream(file).use { out ->
+                transformedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+            
+            // Clean up
+            transformedBitmap.recycle()
+            
+            // Return file URI
+            ImageStorageUtils.filePathToUri(file.absolutePath)
+        } catch (e: Exception) {
+            android.util.Log.e("PhotoEditor", "Failed to save edited image", e)
+            null
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -37,16 +163,42 @@ fun PhotoEditorScreen(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
     val uri = Uri.parse(imageUri)
+    val coroutineScope = rememberCoroutineScope()
     
     PhotoEditor(
         imageUri = uri,
         onDismiss = {
             navigator.popBackStack()
         },
-        onSave = {
-            // Save the edited image URI as background
-            prefs.edit().putString("background_image_uri", imageUri).apply()
-            navigator.popBackStack()
+        onSave = { offsetX, offsetY, rotation, scale, brightness, contrast, saturation, hue, flipHorizontal, flipVertical ->
+            coroutineScope.launch {
+                val editedImageUri = saveEditedImage(
+                    context = context,
+                    originalUri = uri,
+                    offsetX = offsetX,
+                    offsetY = offsetY,
+                    rotation = rotation,
+                    scale = scale,
+                    brightness = brightness,
+                    contrast = contrast,
+                    saturation = saturation,
+                    hue = hue,
+                    flipHorizontal = flipHorizontal,
+                    flipVertical = flipVertical
+                )
+                
+                if (editedImageUri != null) {
+                    // Clean up old background image
+                    ImageStorageUtils.deleteInternalBackgroundImage(context)
+                    // Save the edited image URI as background
+                    prefs.edit().putString("background_image_uri", editedImageUri).apply()
+                } else {
+                    // Fallback: save original URI if editing failed
+                    prefs.edit().putString("background_image_uri", imageUri).apply()
+                }
+                
+                navigator.popBackStack()
+            }
         }
     )
 }
@@ -56,7 +208,7 @@ fun PhotoEditorScreen(
 fun PhotoEditor(
     imageUri: Uri?,
     onDismiss: () -> Unit,
-    onSave: () -> Unit
+    onSave: (Float, Float, Float, Float, Float, Float, Float, Float, Boolean, Boolean) -> Unit
 ) {
     // Transform states
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -94,7 +246,7 @@ fun PhotoEditor(
     
     // Create color matrix for image adjustments
     val colorMatrix = remember(brightness, contrast, saturation, hue) {
-        ColorMatrix().apply {
+        androidx.compose.ui.graphics.ColorMatrix().apply {
             // Apply saturation first (convert from -100/100 range to 0-2 range)
             val saturationValue = (saturation + 100f) / 100f
             setToSaturation(saturationValue)
@@ -535,7 +687,13 @@ fun PhotoEditor(
                     
                     // Confirm button
                     Button(
-                        onClick = onSave,
+                        onClick = {
+                            onSave(
+                                offsetX, offsetY, rotation, scale,
+                                brightness, contrast, saturation, hue,
+                                flipHorizontal, flipVertical
+                            )
+                        },
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(
