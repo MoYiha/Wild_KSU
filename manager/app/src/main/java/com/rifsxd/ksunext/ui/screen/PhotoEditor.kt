@@ -241,7 +241,7 @@ fun PhotoEditor(
                             )
                     ) {
                         Icon(
-                            imageVector = Icons.Default.FlipToFront,
+                            imageVector = Icons.Default.Flip,
                             contentDescription = "Flip Horizontal",
                             tint = if (flipHorizontal) MaterialTheme.colorScheme.onPrimary
                                    else MaterialTheme.colorScheme.onPrimaryContainer
@@ -259,8 +259,9 @@ fun PhotoEditor(
                             )
                     ) {
                         Icon(
-                            imageVector = Icons.Default.FlipToBack,
+                            imageVector = Icons.Default.Flip,
                             contentDescription = "Flip Vertical",
+                            modifier = Modifier.graphicsLayer(rotationZ = 90f),
                             tint = if (flipVertical) MaterialTheme.colorScheme.onPrimary
                                    else MaterialTheme.colorScheme.onPrimaryContainer
                         )
