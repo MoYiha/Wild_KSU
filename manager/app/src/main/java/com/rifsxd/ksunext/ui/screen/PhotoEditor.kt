@@ -61,39 +61,58 @@ suspend fun saveEditedImage(
                 BitmapFactory.decodeStream(input)
             } ?: return@withContext null
             
-            // Create a canvas to apply transformations
+            // Calculate output dimensions considering rotation
+            val radians = Math.toRadians(rotation.toDouble())
+            val cos = kotlin.math.abs(kotlin.math.cos(radians))
+            val sin = kotlin.math.abs(kotlin.math.sin(radians))
+            
+            val scaledWidth = (originalBitmap.width * scale).toInt()
+            val scaledHeight = (originalBitmap.height * scale).toInt()
+            
+            val rotatedWidth = (scaledWidth * cos + scaledHeight * sin).toInt()
+            val rotatedHeight = (scaledWidth * sin + scaledHeight * cos).toInt()
+            
+            // Create output bitmap with proper dimensions
+            val transformedBitmap = Bitmap.createBitmap(
+                rotatedWidth,
+                rotatedHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            
+            val canvas = android.graphics.Canvas(transformedBitmap)
+            val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+            
+            // Create transformation matrix
             val matrix = android.graphics.Matrix()
             
-            // Apply transformations in the correct order
-            // 1. Scale
+            // Move to center of output canvas
+            matrix.postTranslate(
+                rotatedWidth / 2f - originalBitmap.width / 2f,
+                rotatedHeight / 2f - originalBitmap.height / 2f
+            )
+            
+            // Apply scale and flip
             matrix.postScale(
                 scale * (if (flipHorizontal) -1f else 1f),
                 scale * (if (flipVertical) -1f else 1f),
-                originalBitmap.width / 2f,
-                originalBitmap.height / 2f
+                rotatedWidth / 2f,
+                rotatedHeight / 2f
             )
             
-            // 2. Rotation around center
+            // Apply rotation around center
             if (rotation != 0f) {
                 matrix.postRotate(
                     rotation,
-                    originalBitmap.width / 2f,
-                    originalBitmap.height / 2f
+                    rotatedWidth / 2f,
+                    rotatedHeight / 2f
                 )
             }
             
-            // 3. Translation (offset)
+            // Apply translation (offset)
             matrix.postTranslate(offsetX, offsetY)
             
-            // Create transformed bitmap
-            val transformedBitmap = Bitmap.createBitmap(
-                originalBitmap,
-                0, 0,
-                originalBitmap.width,
-                originalBitmap.height,
-                matrix,
-                true
-            )
+            // Draw the transformed bitmap
+            canvas.drawBitmap(originalBitmap, matrix, paint)
             
             // Apply color adjustments
             val finalBitmap = if (brightness != 0f || contrast != 0f || saturation != 0f || hue != 0f) {
