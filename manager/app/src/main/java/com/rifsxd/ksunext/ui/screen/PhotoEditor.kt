@@ -295,7 +295,6 @@ fun PhotoEditor(
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
             .data(imageUri)
-            .respectCacheHeaders(false)
             .build(),
         onError = { error ->
             android.util.Log.e("PhotoEditor", "Failed to load image URI: $imageUri, Error: ${error.result.throwable?.message}")
