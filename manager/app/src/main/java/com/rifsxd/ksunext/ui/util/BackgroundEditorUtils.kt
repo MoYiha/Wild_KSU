@@ -14,12 +14,17 @@ import androidx.compose.ui.graphics.TransformOrigin
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import coil.request.SuccessResult
-import com.rifsxd.ksunext.ui.component.ImageTransformSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 import kotlin.math.min
+
+data class ImageTransformSettings(
+    val scale: Float = 1f,
+    val offsetX: Float = 0f,
+    val offsetY: Float = 0f,
+    val rotation: Float = 0f
+)
 
 object BackgroundEditorUtils {
     // Constants for transformation limits (matching PhotoEditor ranges)

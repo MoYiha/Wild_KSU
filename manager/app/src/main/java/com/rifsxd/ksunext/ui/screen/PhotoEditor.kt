@@ -32,7 +32,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.rifsxd.ksunext.ui.component.ImageTransformSettings
+import com.rifsxd.ksunext.ui.util.ImageTransformSettings
 import com.rifsxd.ksunext.ui.util.BackgroundEditorUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,15 +122,15 @@ fun PhotoEditor(
             ColorMatrix().apply {
                 // Apply brightness (-200 to 200 range)
                 val brightnessValue = brightness / 255f
-                this[4] = brightnessValue // Red offset
-                this[9] = brightnessValue // Green offset
-                this[14] = brightnessValue // Blue offset
+                set(0, 4, brightnessValue) // Red offset
+                set(1, 4, brightnessValue) // Green offset
+                set(2, 4, brightnessValue) // Blue offset
                 
                 // Apply contrast (0 to 4 range)
                 val contrastValue = contrast
-                this[0] = contrastValue // Red scale
-                this[6] = contrastValue // Green scale
-                this[12] = contrastValue // Blue scale
+                set(0, 0, contrastValue) // Red scale
+                set(1, 1, contrastValue) // Green scale
+                set(2, 2, contrastValue) // Blue scale
                 
                 // Apply saturation (0 to 3 range)
                 val saturationMatrix = ColorMatrix()
