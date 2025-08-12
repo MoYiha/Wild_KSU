@@ -69,6 +69,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
@@ -866,7 +867,7 @@ fun PhotoEditorTopBar(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Default.Check,
+                    imageVector = Icons.Default.Save,
                     contentDescription = "Save",
                     tint = MaterialTheme.colorScheme.primary
                 )
