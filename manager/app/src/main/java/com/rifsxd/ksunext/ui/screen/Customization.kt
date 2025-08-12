@@ -380,6 +380,17 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 )
             }
             
+            // Listen for changes to background image URI in SharedPreferences
+            LaunchedEffect(Unit) {
+                // Update state when returning from PhotoEditor
+                backgroundImageUri = prefs.getString("background_image_uri", null)
+            }
+            
+            // Also listen for preference changes during composition
+            LaunchedEffect(prefs) {
+                backgroundImageUri = prefs.getString("background_image_uri", null)
+            }
+            
             val selectImageLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) { result ->
