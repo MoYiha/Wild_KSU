@@ -152,6 +152,3 @@ fun ExecuteModuleActionScreen(navigator: DestinationsNavigator, moduleId: String
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable

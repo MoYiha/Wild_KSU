@@ -120,10 +120,6 @@ fun DeveloperScreen(navigator: DestinationsNavigator) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-
-
 @Preview
 @Composable
 private fun DeveloperPreview() {

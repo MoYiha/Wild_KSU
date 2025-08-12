@@ -226,6 +226,3 @@ private fun TemplateItem(
         },
     )
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable

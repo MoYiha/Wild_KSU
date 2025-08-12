@@ -638,10 +638,6 @@ fun rememberUninstallDialog(onSelected: (UninstallType) -> Unit): DialogHandle {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-
-
 @Preview
 @Composable
 private fun SettingsPreview() {

@@ -270,10 +270,6 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-
-
 @Preview
 @Composable
 private fun BackupPreview() {
