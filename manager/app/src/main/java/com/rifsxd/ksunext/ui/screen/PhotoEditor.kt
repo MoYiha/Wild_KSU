@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -72,56 +71,39 @@ fun PhotoEditor(
         android.util.Log.d("PhotoEditor", "Screen opened with imageUri: $imageUri")
     }
     
-    Column(
+    // Main content area with draggable photo - no top bar, handled by MainActivity
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Simple Unified Top Bar
-        TopAppBar(
-            title = { Text("Photo Editor") },
-            navigationIcon = {
-                IconButton(onClick = onDismiss) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
-            }
+        // Draggable photo
+        Image(
+            painter = painter,
+            contentDescription = "Photo to edit",
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer(
+                    translationX = offsetX,
+                    translationY = offsetY,
+                    rotationZ = rotation,
+                    scaleX = scale,
+                    scaleY = scale
+                )
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, rotationChange ->
+                        offsetX += pan.x
+                        offsetY += pan.y
+                        scale *= zoom
+                        rotation += rotationChange
+                    }
+                },
+            contentScale = ContentScale.Fit
         )
         
-        // Main content area with draggable photo
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-        ) {
-            // Draggable photo
-            Image(
-                painter = painter,
-                contentDescription = "Photo to edit",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer(
-                        translationX = offsetX,
-                        translationY = offsetY,
-                        rotationZ = rotation,
-                        scaleX = scale,
-                        scaleY = scale
-                    )
-                    .pointerInput(Unit) {
-                        detectTransformGestures { _, pan, zoom, rotationChange ->
-                            offsetX += pan.x
-                            offsetY += pan.y
-                            scale *= zoom
-                            rotation += rotationChange
-                        }
-                    },
-                contentScale = ContentScale.Fit
-            )
-        }
-        
-        // Bottom confirm button
+        // Bottom confirm button positioned at the bottom
         Surface(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter),
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 8.dp
         ) {
@@ -129,7 +111,7 @@ fun PhotoEditor(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.Center
             ) {
                 Button(
                     onClick = onSave,

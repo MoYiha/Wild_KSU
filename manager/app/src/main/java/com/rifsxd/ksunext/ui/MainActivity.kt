@@ -110,6 +110,7 @@ import com.ramcosta.composedestinations.generated.destinations.InstallScreenDest
 import com.ramcosta.composedestinations.generated.destinations.HomeSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ModuleSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SuperuserSettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.PhotoEditorScreenDestination
 import com.ramcosta.composedestinations.generated.NavGraphs
 import androidx.navigation.NavDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
@@ -836,6 +837,7 @@ private fun RegularTopBar(
         AppProfileTemplateScreenDestination.route -> stringResource(R.string.settings_profile_template) to true
         InstallScreenDestination.route -> stringResource(R.string.install) to true
         HomeSettingsScreenDestination.route -> stringResource(R.string.info_card_customization) to true
+        PhotoEditorScreenDestination.route -> "Photo Editor" to true
         FlashScreenDestination.route -> {
             val title = when (flashViewModel.flashingStatus) {
                 FlashingStatus.WAITING -> "Waiting"
