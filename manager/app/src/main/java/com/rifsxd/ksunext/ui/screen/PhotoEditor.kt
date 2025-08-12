@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,10 +31,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import coil.compose.rememberAsyncImagePainter
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.util.ImageTransformSettings
 import com.rifsxd.ksunext.ui.util.BackgroundEditorUtils
 
@@ -50,50 +53,109 @@ fun PhotoEditorScreen(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val uri = Uri.parse(imageUri)
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     
     // Create a mutable state to hold the save function
     var saveFunction by remember { mutableStateOf<(() -> Unit)?>(null) }
     
     CompositionLocalProvider(LocalPhotoEditorSave provides saveFunction) {
-        PhotoEditor(
-            imageUri = uri,
-            onDismiss = {
-                navigator.popBackStack()
-            },
-            onSave = { scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue ->
-                // Clear any previous photo settings first
-                BackgroundEditorUtils.clearImageTransformSettings(prefs)
-                
-                // Save image URI and reset transparency (like original AdvancedImageTransformDialog)
-                prefs.edit()
-                    .putString("background_image_uri", imageUri)
-                    .putFloat("background_transparency", 0.0f) // Reset darkness so image is visible
-                    .apply()
-                
-                // Save transform settings for graphicsLayer transformations
-                val transformSettings = ImageTransformSettings(
-                    scale = scale,
-                    offsetX = offsetX,
-                    offsetY = offsetY,
-                    rotation = rotation
+        Scaffold(
+            topBar = {
+                TopBar(
+                    onBack = { navigator.popBackStack() },
+                    onSave = {
+                        saveFunction?.invoke()
+                    },
+                    scrollBehavior = scrollBehavior
                 )
-                BackgroundEditorUtils.saveImageTransformSettings(prefs, imageUri, transformSettings)
-                
-                // Save adjustment settings
-                prefs.edit()
-                    .putFloat("image_brightness", brightness)
-                    .putFloat("image_contrast", contrast)
-                    .putFloat("image_saturation", saturation)
-                    .putFloat("image_hue", hue)
-                    .apply()
-                
-                navigator.popBackStack()
             },
-            onProvideSaveFunction = { saveFunc ->
-                saveFunction = saveFunc
-            }
-        )
+            contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+        ) { innerPadding ->
+            PhotoEditor(
+                imageUri = uri,
+                onDismiss = {
+                    navigator.popBackStack()
+                },
+                onSave = { scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue ->
+                    // Clear any previous photo settings first
+                    BackgroundEditorUtils.clearImageTransformSettings(prefs)
+                    
+                    // Save image URI and reset transparency (like original AdvancedImageTransformDialog)
+                    prefs.edit()
+                        .putString("background_image_uri", imageUri)
+                        .putFloat("background_transparency", 0.0f) // Reset darkness so image is visible
+                        .apply()
+                    
+                    // Save transform settings for graphicsLayer transformations
+                    val transformSettings = ImageTransformSettings(
+                        scale = scale,
+                        offsetX = offsetX,
+                        offsetY = offsetY,
+                        rotation = rotation
+                    )
+                    BackgroundEditorUtils.saveImageTransformSettings(prefs, imageUri, transformSettings)
+                    
+                    // Save adjustment settings
+                    prefs.edit()
+                        .putFloat("image_brightness", brightness)
+                        .putFloat("image_contrast", contrast)
+                        .putFloat("image_saturation", saturation)
+                        .putFloat("image_hue", hue)
+                        .apply()
+                    
+                    navigator.popBackStack()
+                },
+                onProvideSaveFunction = { saveFunc ->
+                    saveFunction = saveFunc
+                },
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+            )
+        }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(
+    onBack: () -> Unit,
+    onSave: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior? = null
+) {
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = remember(surfaceContainer) { surfaceContainer }
+    
+    TopAppBar(
+        title = { 
+            Text(
+                text = stringResource(R.string.background_image_edit),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black
+            ) 
+        },
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = onSave) {
+                Icon(
+                    imageVector = Icons.Default.Save,
+                    contentDescription = "Save"
+                )
+            }
+        },
+        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+        scrollBehavior = scrollBehavior,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor
+        )
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,7 +164,8 @@ fun PhotoEditor(
     imageUri: Uri?,
     onDismiss: () -> Unit,
     onSave: (Float, Float, Float, Float, Float, Float, Float, Float) -> Unit, // scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue
-    onProvideSaveFunction: (((() -> Unit)) -> Unit)? = null // Callback to provide save function to parent
+    onProvideSaveFunction: (((() -> Unit)) -> Unit)? = null, // Callback to provide save function to parent
+    modifier: Modifier = Modifier
 ) {
     // Transform states - simple like original AdvancedImageTransformDialog
     var scale by remember { mutableFloatStateOf(1f) }
@@ -167,7 +230,7 @@ fun PhotoEditor(
     }
     
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         
         // Show Controls FAB (only show when controls are hidden)
