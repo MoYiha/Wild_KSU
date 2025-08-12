@@ -44,7 +44,8 @@ fun PhotoEditorScreen(
             navigator.popBackStack()
         },
         onSave = {
-            // Photo editing completed - no background setting
+            // Save the edited image URI as background
+            prefs.edit().putString("background_image_uri", imageUri).apply()
             navigator.popBackStack()
         }
     )

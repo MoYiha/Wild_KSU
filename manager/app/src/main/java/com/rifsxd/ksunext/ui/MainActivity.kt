@@ -357,7 +357,7 @@ class MainActivity : ComponentActivity() {
                 uiTransparency = uiTransparency
             ) {
                 BackgroundImageWrapper(
-                    backgroundImageUri = backgroundImageUri,
+                    backgroundImageUri = effectiveBackgroundUri,
                     backgroundFitMode = "custom_crop", // Default to advanced crop editor
                     backgroundTransparency = backgroundTransparency,
                     backgroundBlur = backgroundBlur
@@ -367,6 +367,10 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = navController.currentBackStackEntryAsState()?.value?.destination
 
                 val navigator = navController.rememberDestinationsNavigator()
+                
+                // Disable background when in PhotoEditor
+                val isInPhotoEditor = currentDestination?.route == PhotoEditorScreenDestination.route
+                val effectiveBackgroundUri = if (isInPhotoEditor) null else backgroundImageUri
 
                 LaunchedEffect(zipUri) {
                     if (zipUri != null) {
