@@ -28,7 +28,7 @@ import coil.request.ImageRequest
 import com.rifsxd.ksunext.R
 
 
-data class ImageCropSettings(
+data class ImageTransformSettings(
     val scale: Float = 1f,
     val offsetX: Float = 0f,
     val offsetY: Float = 0f,
@@ -36,10 +36,10 @@ data class ImageCropSettings(
 )
 
 @Composable
-fun ImageCropDialog(
+fun ImageTransformDialog(
     imageUri: Uri,
     onDismiss: () -> Unit,
-    onConfirm: (ImageCropSettings) -> Unit
+    onConfirm: (ImageTransformSettings) -> Unit
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -154,7 +154,7 @@ fun ImageCropDialog(
                     
                     Button(
                         onClick = {
-                            onConfirm(ImageCropSettings(scale, offsetX, offsetY))
+                            onConfirm(ImageTransformSettings(scale, offsetX, offsetY))
                         },
                         modifier = Modifier.weight(1f)
                     ) {

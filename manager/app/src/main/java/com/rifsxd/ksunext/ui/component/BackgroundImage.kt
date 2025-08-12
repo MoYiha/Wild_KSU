@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.rifsxd.ksunext.ui.util.ImageCropUtils
+import com.rifsxd.ksunext.ui.util.ImageEditorUtils
 
 @Composable
 fun BackgroundImageWrapper(
@@ -80,11 +80,11 @@ fun BackgroundImageWrapper(
                 // Only apply transformations when explicitly set, default to no transformation
                 val effectiveFitMode = if (backgroundFitMode.isEmpty()) "fit" else backgroundFitMode
                 
-                // Apply transformations using enhanced ImageCropUtils
+                // Apply transformations using enhanced ImageEditorUtils
                 val imageModifier = Modifier
                     .fillMaxSize()
                     .let { modifier ->
-                        val transformation = ImageCropUtils.getImageTransformation(prefs, effectiveFitMode)
+                        val transformation = ImageEditorUtils.getImageTransformation(prefs, effectiveFitMode)
                         transformation(modifier)
                     }
                     .let { modifier ->
@@ -99,9 +99,9 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Applying transformation for fit mode: $effectiveFitMode")
                 
-                // Load saved crop settings for debugging
-                val cropSettings = ImageCropUtils.loadImageCropSettings(prefs)
-                Log.d("BackgroundImage", "Loaded crop settings: scale=${cropSettings.scale}, offsetX=${cropSettings.offsetX}, offsetY=${cropSettings.offsetY}, rotation=${cropSettings.rotation}")
+                // Load saved transform settings for debugging
+                val transformSettings = ImageEditorUtils.loadImageTransformSettings(prefs)
+                Log.d("BackgroundImage", "Loaded transform settings: scale=${transformSettings.scale}, offsetX=${transformSettings.offsetX}, offsetY=${transformSettings.offsetY}, rotation=${transformSettings.rotation}")
                 
                 // Load color adjustment settings from SharedPreferences
                 val brightness = prefs.getFloat("image_brightness", 0f)

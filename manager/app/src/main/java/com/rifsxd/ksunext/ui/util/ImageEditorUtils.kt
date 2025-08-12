@@ -14,20 +14,21 @@ import androidx.compose.ui.graphics.TransformOrigin
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import com.rifsxd.ksunext.ui.component.ImageCropSettings
+import coil.request.SuccessResult
+import com.rifsxd.ksunext.ui.component.ImageTransformSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 import kotlin.math.min
 
-object ImageCropUtils {
+object ImageEditorUtils {
     // Constants for transformation limits (matching PhotoEditor ranges)
     private const val MIN_SCALE = 0.1f
     private const val MAX_SCALE = 5.0f
     private const val MAX_TRANSLATION = 1000f
-    private const val TAG = "ImageCropUtils"
+    private const val TAG = "ImageEditorUtils"
     
-    fun saveImageCropSettings(prefs: SharedPreferences, uri: String, settings: ImageCropSettings) {
+    fun saveImageTransformSettings(prefs: SharedPreferences, uri: String, settings: ImageTransformSettings) {
         prefs.edit().apply {
             // Don't save URI here - it's already saved by PhotoEditor
             putFloat("background_scale_x", settings.scale)
@@ -36,16 +37,27 @@ object ImageCropUtils {
             putFloat("background_rotation", settings.rotation)
             apply()
         }
-        Log.d(TAG, "Saved crop settings for URI $uri: scale=${settings.scale}, offsetX=${settings.offsetX}, offsetY=${settings.offsetY}, rotation=${settings.rotation}")
+        Log.d(TAG, "Saved transform settings for URI $uri: scale=${settings.scale}, offsetX=${settings.offsetX}, offsetY=${settings.offsetY}, rotation=${settings.rotation}")
     }
     
-    fun loadImageCropSettings(prefs: SharedPreferences): ImageCropSettings {
-        return ImageCropSettings(
+    fun loadImageTransformSettings(prefs: SharedPreferences): ImageTransformSettings {
+        return ImageTransformSettings(
             scale = prefs.getFloat("background_scale_x", 1f),
             offsetX = prefs.getFloat("background_pos_x", 0f),
             offsetY = prefs.getFloat("background_pos_y", 0f),
             rotation = prefs.getFloat("background_rotation", 0f)
         )
+    }
+    
+    fun clearImageTransformSettings(prefs: SharedPreferences) {
+        prefs.edit().apply {
+            remove("background_scale_x")
+            remove("background_pos_x")
+            remove("background_pos_y")
+            remove("background_rotation")
+            apply()
+        }
+        Log.d(TAG, "Cleared image transform settings")
     }
     
     suspend fun loadImageBitmap(context: Context, uri: Uri): Bitmap? {
@@ -80,9 +92,9 @@ object ImageCropUtils {
         }
     }
     
-    fun applyCropTransformation(
+    fun applyImageTransformation(
         bitmap: Bitmap,
-        settings: ImageCropSettings,
+        settings: ImageTransformSettings,
         targetWidth: Int,
         targetHeight: Int
     ): Bitmap {
@@ -104,27 +116,27 @@ object ImageCropUtils {
             val paint = Paint(Paint.ANTI_ALIAS_FLAG)
             canvas.drawBitmap(bitmap, matrix, paint)
             
-            Log.d(TAG, "Applied crop transformation: scale=${settings.scale}, offsetX=${settings.offsetX}, offsetY=${settings.offsetY}, rotation=${settings.rotation}")
+            Log.d(TAG, "Applied image transformation: scale=${settings.scale}, offsetX=${settings.offsetX}, offsetY=${settings.offsetY}, rotation=${settings.rotation}")
             return croppedBitmap
         } catch (e: Exception) {
-            Log.e(TAG, "Error applying crop transformation", e)
+            Log.e(TAG, "Error applying image transformation", e)
             return bitmap
         }
     }
     
-    // Simplified transformation for crop settings only
-    // Note: All transformations are now applied via graphicsLayer (like original AdvancedImageCropDialog)
-    fun getSimpleCropTransformation(
+    // Simplified transformation for image settings only
+    // Note: All transformations are now applied via graphicsLayer
+    fun getSimpleImageTransformation(
         prefs: SharedPreferences
     ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
         return {
-            val cropSettings = loadImageCropSettings(prefs)
+            val transformSettings = loadImageTransformSettings(prefs)
             graphicsLayer(
-                scaleX = constrainScale(cropSettings.scale),
-                scaleY = constrainScale(cropSettings.scale),
-                translationX = constrainTranslation(cropSettings.offsetX),
-                translationY = constrainTranslation(cropSettings.offsetY),
-                rotationZ = constrainRotation(cropSettings.rotation), // Restored: rotation via graphicsLayer
+                scaleX = constrainScale(transformSettings.scale),
+                scaleY = constrainScale(transformSettings.scale),
+                translationX = constrainTranslation(transformSettings.offsetX),
+                translationY = constrainTranslation(transformSettings.offsetY),
+                rotationZ = constrainRotation(transformSettings.rotation), // Restored: rotation via graphicsLayer
                 transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
             )
         }
@@ -160,13 +172,13 @@ object ImageCropUtils {
     fun getScaleLimits(): Pair<Float, Float> = Pair(MIN_SCALE, MAX_SCALE)
     fun getTranslationLimits(): Pair<Float, Float> = Pair(-MAX_TRANSLATION, MAX_TRANSLATION)
     
-    // Get image transformation based on fit mode and crop settings
+    // Get image transformation based on fit mode and transform settings
     fun getImageTransformation(
         prefs: SharedPreferences,
         fitMode: String
     ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
         return when (fitMode) {
-            "custom_crop", "position_adjust" -> getSimpleCropTransformation(prefs)
+            "custom_crop", "position_adjust" -> getSimpleImageTransformation(prefs)
             else -> { { this } } // No transformation for other modes
         }
     }
