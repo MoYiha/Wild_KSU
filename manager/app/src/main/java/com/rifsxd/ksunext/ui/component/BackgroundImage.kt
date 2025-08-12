@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.colorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -135,10 +136,12 @@ fun BackgroundImageWrapper(
                              
                              modifier
                                  .graphicsLayer {
-                                     colorFilter = androidx.compose.ui.graphics.ColorFilter.colorMatrix(colorMatrix)
                                      scaleX = if (flipHorizontal) -1f else 1f
                                      scaleY = if (flipVertical) -1f else 1f
                                  }
+                                 .then(
+                                     Modifier.colorFilter(androidx.compose.ui.graphics.ColorFilter.colorMatrix(colorMatrix))
+                                 )
                         } else {
                             modifier
                         }
