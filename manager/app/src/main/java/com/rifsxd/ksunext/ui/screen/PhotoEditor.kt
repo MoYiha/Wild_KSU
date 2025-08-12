@@ -181,8 +181,12 @@ fun PhotoEditor(
                         scaleX = scale * (if (flipHorizontal) -1f else 1f),
                         scaleY = scale * (if (flipVertical) -1f else 1f)
                     )
-                    .pointerInput(scale) {
+                    .pointerInput(Unit) {
                         detectTransformGestures { _, pan, zoom, rotationChange ->
+                            // Always allow zoom regardless of free-form mode
+                            val newScale = (scale * zoom).coerceIn(0.1f, 5f)
+                            scale = newScale
+                            
                             if (freeFormMode) {
                                 // Normalize pan by current scale to maintain consistent drag speed
                                 // This ensures that dragging feels the same regardless of zoom level
@@ -194,10 +198,6 @@ fun PhotoEditor(
                                 // Apply rotation
                                 rotation += rotationChange
                             }
-                            
-                            // Always allow zoom regardless of free-form mode
-                            val newScale = (scale * zoom).coerceIn(0.1f, 5f)
-                            scale = newScale
                         }
                     },
                 contentScale = ContentScale.Fit,
