@@ -331,11 +331,34 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          TITLE: CI Manager (SPOOFED BUILD)
+          TITLE: Spoofed Manager (TEST BUILD)
         run: |
           if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
             export VERSION=$(git rev-list --count HEAD)
             APK=$(find ./app/build/outputs/apk/release -name "*.apk")
             pip3 install telethon
             python3 $GITHUB_WORKSPACE/scripts/ksunextbot.py $APK
+          fi
+
+      - name: Send APK to Telegram
+        run: |
+          APK=$(find ./app/build/outputs/apk/release -name "*.apk")
+          if [ -f "$APK" ]; then
+            VERSION=$(git rev-list --count HEAD)
+            CAPTION="🔧 Spoofed Manager (TEST BUILD) #spoofed_${VERSION}
+            
+            📝 ${{ github.event.head_commit.message }}
+            
+            🔗 [Commit](${{ github.event.head_commit.url }})
+            🏃 [Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            
+            curl -F "chat_id=${{ secrets.CHAT_ID }}" \
+                 -F "document=@${APK}" \
+                 -F "caption=${CAPTION}" \
+                 -F "parse_mode=Markdown" \
+                 -F "reply_to_message_id=${{ secrets.MESSAGE_THREAD_ID }}" \
+                 "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendDocument"
+          else
+            echo "APK file not found!"
+            exit 1
           fi
