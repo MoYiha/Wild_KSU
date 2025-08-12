@@ -33,7 +33,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rifsxd.ksunext.ui.component.ImageTransformSettings
-import com.rifsxd.ksunext.ui.util.ImageEditorUtils
+import com.rifsxd.ksunext.ui.util.BackgroundEditorUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -53,7 +53,7 @@ fun PhotoEditorScreen(
         },
         onSave = { scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue ->
             // Clear any previous photo settings first
-            ImageEditorUtils.clearImageTransformSettings(prefs)
+            BackgroundEditorUtils.clearImageTransformSettings(prefs)
             
             // Save image URI and reset transparency (like original AdvancedImageTransformDialog)
             prefs.edit()
@@ -68,7 +68,7 @@ fun PhotoEditorScreen(
                 offsetY = offsetY,
                 rotation = rotation
             )
-            ImageEditorUtils.saveImageTransformSettings(prefs, imageUri, transformSettings)
+            BackgroundEditorUtils.saveImageTransformSettings(prefs, imageUri, transformSettings)
             
             // Save adjustment settings
             prefs.edit()

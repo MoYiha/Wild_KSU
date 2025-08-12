@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.rifsxd.ksunext.ui.util.ImageEditorUtils
+import com.rifsxd.ksunext.ui.util.BackgroundEditorUtils
 
 @Composable
 fun BackgroundImageWrapper(
@@ -80,11 +80,11 @@ fun BackgroundImageWrapper(
                 // Only apply transformations when explicitly set, default to no transformation
                 val effectiveFitMode = if (backgroundFitMode.isEmpty()) "fit" else backgroundFitMode
                 
-                // Apply transformations using enhanced ImageEditorUtils
+                // Apply transformations using enhanced BackgroundEditorUtils
                 val imageModifier = Modifier
                     .fillMaxSize()
                     .let { modifier ->
-                        val transformation = ImageEditorUtils.getImageTransformation(prefs, effectiveFitMode)
+                        val transformation = BackgroundEditorUtils.getImageTransformation(prefs, effectiveFitMode)
                         transformation(modifier)
                     }
                     .let { modifier ->
@@ -100,7 +100,7 @@ fun BackgroundImageWrapper(
                 Log.d("BackgroundImage", "Applying transformation for fit mode: $effectiveFitMode")
                 
                 // Load saved transform settings for debugging
-                val transformSettings = ImageEditorUtils.loadImageTransformSettings(prefs)
+                val transformSettings = BackgroundEditorUtils.loadImageTransformSettings(prefs)
                 Log.d("BackgroundImage", "Loaded transform settings: scale=${transformSettings.scale}, offsetX=${transformSettings.offsetX}, offsetY=${transformSettings.offsetY}, rotation=${transformSettings.rotation}")
                 
                 // Load color adjustment settings from SharedPreferences
