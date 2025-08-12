@@ -3,7 +3,7 @@ package com.rifsxd.ksunext.ui.screen
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.ExifInterface
+// Removed ExifInterface import - not needed for simple rotation
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -66,26 +66,8 @@ suspend fun saveEditedImage(
                 BitmapFactory.decodeStream(input, null, options)
             } ?: return@withContext null
             
-            // Read EXIF orientation and apply correction
-            val exifOrientation = try {
-                context.contentResolver.openInputStream(originalUri)?.use { input ->
-                    val exif = ExifInterface(input)
-                    exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-                }
-            } catch (e: Exception) {
-                ExifInterface.ORIENTATION_NORMAL
-            } ?: ExifInterface.ORIENTATION_NORMAL
-            
-            // Calculate EXIF rotation correction
-            val exifRotation = when (exifOrientation) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> -90f
-                ExifInterface.ORIENTATION_ROTATE_180 -> -180f
-                ExifInterface.ORIENTATION_ROTATE_270 -> -270f
-                else -> 0f
-            }
-            
-            // Apply EXIF correction to user rotation
-            val correctedRotation = rotation + exifRotation
+            // Use rotation directly without EXIF correction (like AdvancedImageCropDialog)
+            val correctedRotation = rotation
             
             // Calculate output dimensions considering rotation
             val radians = Math.toRadians(correctedRotation.toDouble())
