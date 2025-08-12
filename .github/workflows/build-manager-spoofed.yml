@@ -326,15 +326,15 @@ jobs:
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          MESSAGE_THREAD_ID: ${{ secrets.MESSAGE_THREAD_ID }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           TITLE: Spoofed Manager (TEST BUILD)
         run: |
-          if [ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
+          if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
             export VERSION=$(git rev-list --count HEAD)
             APK=$(find ./app/build/outputs/apk/release -name "*.apk")
             pip3 install telethon
