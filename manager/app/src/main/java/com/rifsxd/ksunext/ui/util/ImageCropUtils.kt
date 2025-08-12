@@ -10,6 +10,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.TransformOrigin
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
@@ -122,7 +123,8 @@ object ImageCropUtils {
                 scaleY = constrainScale(cropSettings.scale),
                 translationX = constrainTranslation(cropSettings.offsetX),
                 translationY = constrainTranslation(cropSettings.offsetY),
-                rotationZ = constrainRotation(cropSettings.rotation)
+                rotationZ = constrainRotation(cropSettings.rotation),
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
             )
         }
     }

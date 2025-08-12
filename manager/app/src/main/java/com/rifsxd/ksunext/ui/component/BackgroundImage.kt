@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -111,14 +112,15 @@ fun BackgroundImageWrapper(
                 val cropSettings = ImageCropUtils.loadImageCropSettings(prefs)
                 Log.d("BackgroundImage", "Loaded crop settings: scale=${cropSettings.scale}, offsetX=${cropSettings.offsetX}, offsetY=${cropSettings.offsetY}, rotation=${cropSettings.rotation}")
                 
-                // Always use ContentScale.Fit to preserve aspect ratio for custom crop
-                val contentScale = ContentScale.Fit
+                // Use ContentScale.Crop for better alignment and positioning
+                val contentScale = ContentScale.Crop
                 
                 Image(
                     painter = painter,
                     contentDescription = null,
                     modifier = imageModifier,
-                    contentScale = contentScale
+                    contentScale = contentScale,
+                    alignment = androidx.compose.ui.Alignment.Center
                 )
             }
         }
