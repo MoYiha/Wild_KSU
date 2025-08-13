@@ -101,9 +101,6 @@ fun PhotoEditorScreen(
             },
             onProvideSaveFunction = { saveFunc ->
                 saveFunction = saveFunc
-            },
-            onProvideHideControlsFunction = { hideFunc ->
-                hideControlsFunction = hideFunc
             }
         )
     }
