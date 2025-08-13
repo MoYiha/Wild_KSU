@@ -207,9 +207,9 @@ fun PhotoEditor(
                 .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, rotationChange ->
                         scale = (scale * zoom).coerceIn(0.1f, 5f)
-                        offsetX += pan.x
-                        offsetY += pan.y
-                        rotation += rotationChange
+                        offsetX = (offsetX + pan.x).coerceIn(-1000f, 1000f)
+                        offsetY = (offsetY + pan.y).coerceIn(-1000f, 1000f)
+                        rotation = (rotation + rotationChange) % 360f
                     }
                 }
                 .graphicsLayer(
