@@ -346,14 +346,14 @@ fun PhotoEditor(
                         "Position X" -> {
                             Column {
                                 Text(
-                                    text = "Position X: ${currentTransformSettings.value.offsetX.toInt()}px",
+                                    text = "Position X: ${currentTransformSettings.offsetX.toInt()}px",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
-                                    value = currentTransformSettings.value.offsetX,
+                                    value = currentTransformSettings.offsetX,
                                     onValueChange = { 
                                         BackgroundEditorUtils.saveConstrainedTranslation(prefs, "background_pos_x", it)
                                         transformTrigger++
@@ -366,14 +366,14 @@ fun PhotoEditor(
                         "Position Y" -> {
                             Column {
                                 Text(
-                                    text = "Position Y: ${currentTransformSettings.value.offsetY.toInt()}px",
+                                    text = "Position Y: ${currentTransformSettings.offsetY.toInt()}px",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
-                                    value = currentTransformSettings.value.offsetY,
+                                    value = currentTransformSettings.offsetY,
                                     onValueChange = { 
                                         BackgroundEditorUtils.saveConstrainedTranslation(prefs, "background_pos_y", it)
                                         transformTrigger++
@@ -386,14 +386,14 @@ fun PhotoEditor(
                         "Rotation" -> {
                             Column {
                                 Text(
-                                    text = "Rotation: ${currentTransformSettings.value.rotation.toInt()}°",
+                                    text = "Rotation: ${currentTransformSettings.rotation.toInt()}°",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
-                                    value = currentTransformSettings.value.rotation,
+                                    value = currentTransformSettings.rotation,
                                     onValueChange = { 
                                         BackgroundEditorUtils.saveConstrainedRotation(prefs, "background_rotation", it)
                                         transformTrigger++
@@ -409,7 +409,7 @@ fun PhotoEditor(
                                 ) {
                                     IconButton(
                                         onClick = { 
-                                            val newRotation = currentTransformSettings.value.rotation - 90f
+                                            val newRotation = currentTransformSettings.rotation - 90f
                                             BackgroundEditorUtils.saveConstrainedRotation(prefs, "background_rotation", newRotation)
                                             transformTrigger++
                                         },
@@ -425,7 +425,7 @@ fun PhotoEditor(
                                     }
                                     IconButton(
                                         onClick = { 
-                                            val newRotation = currentTransformSettings.value.rotation + 90f
+                                            val newRotation = currentTransformSettings.rotation + 90f
                                             BackgroundEditorUtils.saveConstrainedRotation(prefs, "background_rotation", newRotation)
                                             transformTrigger++
                                         },
@@ -445,14 +445,14 @@ fun PhotoEditor(
                         "Scale" -> {
                             Column {
                                 Text(
-                                    text = "Scale: ${String.format("%.1f", currentTransformSettings.value.scale)}x",
+                                    text = "Scale: ${String.format("%.1f", currentTransformSettings.scale)}x",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
-                                    value = currentTransformSettings.value.scale,
+                                    value = currentTransformSettings.scale,
                                     onValueChange = { 
                                         BackgroundEditorUtils.saveConstrainedScale(prefs, "background_scale_x", it)
                                         transformTrigger++
