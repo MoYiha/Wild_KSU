@@ -120,10 +120,14 @@ fun PhotoEditor(
     onProvideHideControlsFunction: (((() -> Unit)) -> Unit)? = null // Callback to provide hide controls function to parent
 ) {
     // Transform states - simple like original AdvancedImageTransformDialog
-    var scale by remember { mutableFloatStateOf(1f) }
     var offsetX by remember { mutableFloatStateOf(0f) }
     var offsetY by remember { mutableFloatStateOf(0f) }
+    var scale by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
+    
+    // Track previous pan values to calculate delta
+    var lastPanX by remember { mutableFloatStateOf(0f) }
+    var lastPanY by remember { mutableFloatStateOf(0f) }
     
     // Image adjustment states with expanded ranges for better effects
     var brightness by remember { mutableFloatStateOf(0f) } // -200 to 200 (expanded from -100 to 100)
@@ -213,20 +217,30 @@ fun PhotoEditor(
                     )
                     .pointerInput(Unit) {
                         // Use single transform gestures for all interactions
-                        detectTransformGestures { _, pan, zoom, rotationChange ->
+                        detectTransformGestures(
+                            onGestureStart = {
+                                // Reset pan tracking when gesture starts
+                                lastPanX = 0f
+                                lastPanY = 0f
+                            }
+                        ) { _, pan, zoom, rotationChange ->
                             if (freeFormMode) {
-                                // Direct pan - move the photo exactly as finger moves
-                                val dragX = pan.x
-                                val dragY = pan.y
+                                // Calculate delta pan (change since last gesture)
+                                val deltaPanX = pan.x - lastPanX
+                                val deltaPanY = pan.y - lastPanY
+                                
+                                // Update last pan values
+                                lastPanX = pan.x
+                                lastPanY = pan.y
                                 
                                 // Convert current rotation to radians for coordinate transformation
                                 val rotationRad = Math.toRadians(rotation.toDouble())
                                 val cosRotation = kotlin.math.cos(rotationRad).toFloat()
                                 val sinRotation = kotlin.math.sin(rotationRad).toFloat()
                                 
-                                // Transform drag coordinates to account for current rotation
-                                val transformedDragX = dragX * cosRotation + dragY * sinRotation
-                                val transformedDragY = -dragX * sinRotation + dragY * cosRotation
+                                // Transform delta pan coordinates to account for current rotation
+                                val transformedDragX = deltaPanX * cosRotation + deltaPanY * sinRotation
+                                val transformedDragY = -deltaPanX * sinRotation + deltaPanY * cosRotation
                                 
                                 // Normalize by scale to maintain consistent movement speed regardless of zoom level
                                 val normalizedDragX = transformedDragX / scale
