@@ -136,12 +136,16 @@ object BackgroundEditorUtils {
     ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
         return {
             val transformSettings = loadImageTransformSettings(prefs)
+            // Apply scale-normalized translation to match PhotoEditor behavior
+            // In PhotoEditor, pan values are normalized by scale (pan.x / scale)
+            // So we need to apply the same scaling when displaying
+            val scale = constrainScale(transformSettings.scale)
             graphicsLayer(
-                scaleX = constrainScale(transformSettings.scale),
-                scaleY = constrainScale(transformSettings.scale),
-                translationX = constrainTranslation(transformSettings.offsetX),
-                translationY = constrainTranslation(transformSettings.offsetY),
-                rotationZ = constrainRotation(transformSettings.rotation), // Restored: rotation via graphicsLayer
+                scaleX = scale,
+                scaleY = scale,
+                translationX = constrainTranslation(transformSettings.offsetX * scale),
+                translationY = constrainTranslation(transformSettings.offsetY * scale),
+                rotationZ = constrainRotation(transformSettings.rotation),
                 transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
             )
         }
