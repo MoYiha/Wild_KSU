@@ -232,7 +232,7 @@ fun PhotoEditor(
                         transformTrigger++
                     }
                 },
-            contentScale = ContentScale.Crop,
+            contentScale = ContentScale.Fit,
             alignment = androidx.compose.ui.Alignment.Center,
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )

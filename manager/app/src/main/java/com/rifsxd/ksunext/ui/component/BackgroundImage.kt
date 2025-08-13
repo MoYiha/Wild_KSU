@@ -140,8 +140,8 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Loaded adjustment settings: brightness=$brightness, contrast=$contrast, saturation=$saturation, hue=$hue")
                 
-                // Use ContentScale.Crop to match editor behavior exactly
-                val contentScale = ContentScale.Crop
+                // Use ContentScale.Fit for custom_crop mode to match PhotoEditor behavior
+                val contentScale = if (effectiveFitMode == "custom_crop") ContentScale.Fit else ContentScale.Crop
                 
                 Image(
                     painter = painter,

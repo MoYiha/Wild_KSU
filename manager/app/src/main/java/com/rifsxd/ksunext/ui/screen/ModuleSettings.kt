@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ViewCarousel
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -66,6 +67,22 @@ private fun ModuleSettingsContent(
         ) {
             prefs.edit().putBoolean("keep_modules_expanded", it).apply()
             keepModulesExpanded = it
+        }
+
+        // Banner Toggle Setting
+        var useBanner by rememberSaveable {
+            mutableStateOf(
+                prefs.getBoolean("use_banner", true)
+            )
+        }
+        SwitchItem(
+            icon = Icons.Filled.ViewCarousel,
+            title = "Enable Module Banners",
+            summary = "Show background banners for modules",
+            checked = useBanner
+        ) {
+            prefs.edit().putBoolean("use_banner", it).apply()
+            useBanner = it
         }
 
         // Hide Module Details Text Setting
