@@ -85,7 +85,7 @@ fun PhotoEditorScreen(
                 prefs.edit()
                     .putString("background_image_uri", imageUri)
                     .putFloat("background_transparency", 0.0f) // Reset darkness so image is visible
-                    .putString("background_fit_mode", "fit") // Use fit mode for proper screen scaling
+                    .putString("background_fit_mode", "center") // Use center mode to match ContentScale.None
                     .apply()
                 
                 // Save all transform and adjustment settings using ImageTransformSettings
@@ -123,11 +123,6 @@ fun PhotoEditor(
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val scope = rememberCoroutineScope()
     
-    // Clear any previous transform settings when PhotoEditor loads to start fresh
-    LaunchedEffect(imageUri) {
-        BackgroundEditorUtils.clearImageTransformSettings(prefs)
-    }
-    
     // Load saved transform settings or use defaults
     val savedSettings = remember { ImageTransformSettings.loadFromPrefs(prefs) }
     
@@ -137,11 +132,12 @@ fun PhotoEditor(
         derivedStateOf { BackgroundEditorUtils.loadImageTransformSettings(prefs) }
     }
     
-    // Local state for gesture handling - start with default values
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
-    var rotation by remember { mutableFloatStateOf(0f) }
+    // Local state for gesture handling - initialize with current SharedPreferences values
+    val currentTransform = BackgroundEditorUtils.loadImageTransformSettings(prefs)
+    var scale by remember { mutableFloatStateOf(currentTransform.scale) }
+    var offsetX by remember { mutableFloatStateOf(currentTransform.offsetX) }
+    var offsetY by remember { mutableFloatStateOf(currentTransform.offsetY) }
+    var rotation by remember { mutableFloatStateOf(currentTransform.rotation) }
     
     // Image adjustment states with expanded ranges for better effects - load from saved settings
     var brightness by remember { mutableFloatStateOf(savedSettings.brightness) } // -200 to 200 (expanded from -100 to 100)
@@ -247,7 +243,7 @@ fun PhotoEditor(
                     rotationZ = rotation,
                     transformOrigin = TransformOrigin.Center
                 ),
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.None,
             alignment = androidx.compose.ui.Alignment.Center,
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )
