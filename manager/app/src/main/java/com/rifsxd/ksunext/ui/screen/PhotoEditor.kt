@@ -221,6 +221,7 @@ fun PhotoEditor(
                     transformOrigin = TransformOrigin.Center
                 ),
             contentScale = ContentScale.Crop,
+            alignment = androidx.compose.ui.Alignment.Center,
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )
         
