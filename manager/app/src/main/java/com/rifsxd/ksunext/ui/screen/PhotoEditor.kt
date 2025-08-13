@@ -190,60 +190,61 @@ fun PhotoEditor(
         }
     }
     
-    Box(
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        
-
-        
-        // Main image display with graphicsLayer transformations and color adjustments
-        Image(
-            painter = painter,
-            contentDescription = "Photo to edit",
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    translationX = offsetX,
-                    translationY = offsetY,
-                    rotationZ = rotation,
-                    transformOrigin = TransformOrigin.Center
-                )
-                .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, rotationChange ->
-                        if (freeFormMode) {
-                            // Convert pan to radians for rotation calculation
-                            val rotationRad = Math.toRadians(-rotation.toDouble())
-                            val cosRotation = kotlin.math.cos(rotationRad).toFloat()
-                            val sinRotation = kotlin.math.sin(rotationRad).toFloat()
-                            
-                            // Apply inverse rotation to pan vector to maintain correct direction
-                            // regardless of current rotation state
-                            val rotatedPanX = pan.x * cosRotation - pan.y * sinRotation
-                            val rotatedPanY = pan.x * sinRotation + pan.y * cosRotation
-                            
-                            // Apply consistent movement speed regardless of zoom level
-                            // Use a fixed sensitivity factor instead of dividing by scale
-                            val sensitivity = 1.0f
-                            offsetX += rotatedPanX * sensitivity
-                            offsetY += rotatedPanY * sensitivity
-                            
-                            rotation += rotationChange
+        // Main image display area - takes remaining space after controls
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            // Main image display with graphicsLayer transformations and color adjustments
+            Image(
+                painter = painter,
+                contentDescription = "Photo to edit",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = offsetX,
+                        translationY = offsetY,
+                        rotationZ = rotation,
+                        transformOrigin = TransformOrigin.Center
+                    )
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zoom, rotationChange ->
+                            if (freeFormMode) {
+                                // Convert pan to radians for rotation calculation
+                                val rotationRad = Math.toRadians(-rotation.toDouble())
+                                val cosRotation = kotlin.math.cos(rotationRad).toFloat()
+                                val sinRotation = kotlin.math.sin(rotationRad).toFloat()
+                                
+                                // Apply inverse rotation to pan vector to maintain correct direction
+                                // regardless of current rotation state
+                                val rotatedPanX = pan.x * cosRotation - pan.y * sinRotation
+                                val rotatedPanY = pan.x * sinRotation + pan.y * cosRotation
+                                
+                                // Apply consistent movement speed regardless of zoom level
+                                // Use a fixed sensitivity factor instead of dividing by scale
+                                val sensitivity = 1.0f
+                                offsetX += rotatedPanX * sensitivity
+                                offsetY += rotatedPanY * sensitivity
+                                
+                                rotation += rotationChange
+                            }
+                            // Always allow zoom
+                            scale = (scale * zoom).coerceIn(0.1f, 5f)
                         }
-                        // Always allow zoom
-                        scale = (scale * zoom).coerceIn(0.1f, 5f)
-                    }
-                },
-            contentScale = ContentScale.Fit,
-            colorFilter = ColorFilter.colorMatrix(colorMatrix)
-        )
+                    },
+                contentScale = ContentScale.Fit,
+                colorFilter = ColorFilter.colorMatrix(colorMatrix)
+            )
+        }
         
         // Bottom controls
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
