@@ -198,7 +198,7 @@ fun PhotoEditor(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Main image display - use exact same transformation as BackgroundImage
         Image(
