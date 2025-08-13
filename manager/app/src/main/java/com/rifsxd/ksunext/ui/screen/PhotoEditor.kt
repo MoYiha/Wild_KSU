@@ -85,7 +85,7 @@ fun PhotoEditorScreen(
                 prefs.edit()
                     .putString("background_image_uri", imageUri)
                     .putFloat("background_transparency", 0.0f) // Reset darkness so image is visible
-                    .putString("background_fit_mode", "center") // Use center mode to match ContentScale.None
+                    .putString("background_fit_mode", "fit") // Use fit mode to match ContentScale.Fit
                     .apply()
                 
                 // Save all transform and adjustment settings using ImageTransformSettings
@@ -243,7 +243,7 @@ fun PhotoEditor(
                     rotationZ = rotation,
                     transformOrigin = TransformOrigin.Center
                 ),
-            contentScale = ContentScale.None,
+            contentScale = ContentScale.Fit,
             alignment = androidx.compose.ui.Alignment.Center,
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )
