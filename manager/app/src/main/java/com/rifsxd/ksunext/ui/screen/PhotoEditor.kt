@@ -214,11 +214,11 @@ fun PhotoEditor(
                     )
                     .pointerInput(Unit) {
                         // Handle dragging separately for more direct control
-                        detectDragGestures { change ->
+                        detectDragGestures { change, dragAmount ->
                             if (freeFormMode) {
                                 // Direct drag - move the photo exactly as finger moves
-                                val dragX = change.x
-                                val dragY = change.y
+                                val dragX = dragAmount.x
+                                val dragY = dragAmount.y
                                 
                                 // Convert current rotation to radians for coordinate transformation
                                 val rotationRad = Math.toRadians(rotation.toDouble())
