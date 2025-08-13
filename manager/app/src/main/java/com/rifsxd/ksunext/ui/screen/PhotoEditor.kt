@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -213,12 +212,12 @@ fun PhotoEditor(
                         transformOrigin = TransformOrigin.Center
                     )
                     .pointerInput(Unit) {
-                        // Handle dragging separately for more direct control
-                        detectDragGestures { change, dragAmount ->
+                        // Use single transform gestures for all interactions
+                        detectTransformGestures { _, pan, zoom, rotationChange ->
                             if (freeFormMode) {
-                                // Direct drag - move the photo exactly as finger moves
-                                val dragX = dragAmount.x
-                                val dragY = dragAmount.y
+                                // Direct pan - move the photo exactly as finger moves
+                                val dragX = pan.x
+                                val dragY = pan.y
                                 
                                 // Convert current rotation to radians for coordinate transformation
                                 val rotationRad = Math.toRadians(rotation.toDouble())
@@ -236,13 +235,8 @@ fun PhotoEditor(
                                 // Apply direct movement - no sensitivity reduction for more responsive dragging
                                 offsetX += normalizedDragX
                                 offsetY += normalizedDragY
-                            }
-                        }
-                    }
-                    .pointerInput(Unit) {
-                        // Handle zoom and rotation separately
-                        detectTransformGestures { _, _, zoom, rotationChange ->
-                            if (freeFormMode) {
+                                
+                                // Handle rotation
                                 rotation += rotationChange
                             }
                             // Always allow zoom
