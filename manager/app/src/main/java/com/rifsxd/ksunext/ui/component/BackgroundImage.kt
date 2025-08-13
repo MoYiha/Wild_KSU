@@ -140,8 +140,8 @@ fun BackgroundImageWrapper(
                 
                 Log.d("BackgroundImage", "Loaded adjustment settings: brightness=$brightness, contrast=$contrast, saturation=$saturation, hue=$hue")
                 
-                // Use ContentScale.Fit to match editor behavior and preserve aspect ratio
-                val contentScale = ContentScale.Fit
+                // Use ContentScale.Crop to match editor behavior exactly
+                val contentScale = ContentScale.Crop
                 
                 Image(
                     painter = painter,
