@@ -199,7 +199,7 @@ fun PhotoEditor(
             FloatingActionButton(
                 onClick = { hideControls = !hideControls },
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
+                    .align(Alignment.TopEnd)
                     .padding(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
@@ -258,26 +258,12 @@ fun PhotoEditor(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    // Main button row - 5 buttons inline
+                    // Main button row - 4 buttons inline
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Cancel button
-                        IconButton(
-                            onClick = { onDismiss() },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Cancel",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        
                         // Crop menu button
                         IconButton(
                             onClick = { 
