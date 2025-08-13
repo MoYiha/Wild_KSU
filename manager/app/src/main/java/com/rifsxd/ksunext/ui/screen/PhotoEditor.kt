@@ -215,18 +215,19 @@ fun PhotoEditor(
                         // Use single transform gestures for all interactions
                         detectTransformGestures { _, pan, zoom, rotationChange ->
                             if (freeFormMode) {
-                                // Normalize pan by scale to maintain consistent drag speed
-                                val normalizedPanX = pan.x / scale
-                                val normalizedPanY = pan.y / scale
+                                // Apply consistent sensitivity factor for drag speed
+                                val sensitivityFactor = 0.5f
+                                val dragX = pan.x * sensitivityFactor
+                                val dragY = pan.y * sensitivityFactor
                                 
                                 // Transform drag coordinates to account for current rotation
                                 val rotationRad = Math.toRadians(rotation.toDouble())
                                 val cosRotation = kotlin.math.cos(rotationRad).toFloat()
                                 val sinRotation = kotlin.math.sin(rotationRad).toFloat()
                                 
-                                // Apply rotation transformation to normalized pan values
-                                val transformedDragX = normalizedPanX * cosRotation + normalizedPanY * sinRotation
-                                val transformedDragY = -normalizedPanX * sinRotation + normalizedPanY * cosRotation
+                                // Apply rotation transformation to drag values
+                                val transformedDragX = dragX * cosRotation + dragY * sinRotation
+                                val transformedDragY = -dragX * sinRotation + dragY * cosRotation
                                 
                                 offsetX += transformedDragX
                                 offsetY += transformedDragY
