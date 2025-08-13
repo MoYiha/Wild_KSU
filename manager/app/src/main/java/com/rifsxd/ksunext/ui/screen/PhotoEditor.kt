@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -80,56 +78,31 @@ fun PhotoEditorScreen(
                 navigator.popBackStack()
             },
             onSave = { scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue ->
-                // Use coroutine scope to handle async bitmap operations
-                val scope = rememberCoroutineScope()
-                scope.launch {
-                    try {
-                        // Create transformation object
-                        val transformation = BackgroundTransformation(
-                            scale = scale,
-                            offsetX = offsetX,
-                            offsetY = offsetY,
-                            rotation = rotation
-                        )
-                        
-                        // Save transformed image as new bitmap file
-                        val transformedUri = context.saveTransformedBackground(
-                            Uri.parse(imageUri), 
-                            transformation
-                        )
-                        
-                        if (transformedUri != null) {
-                            // Clear any previous photo settings first
-                            BackgroundEditorUtils.clearImageTransformSettings(prefs)
-                            
-                            // Save the transformed image URI and reset settings
-                            prefs.edit()
-                                .putString("background_image_uri", transformedUri.toString())
-                                .putFloat("background_transparency", 0.0f) // Reset darkness so image is visible
-                                .putString("background_fit_mode", "fit") // Use fit mode since image is pre-transformed
-                                .apply()
-                            
-                            // Save color adjustments only (since position/scale are baked into the image)
-                            val colorSettings = ImageTransformSettings(
-                                scale = 1f, // Reset to 1 since transformation is baked in
-                                offsetX = 0f, // Reset to 0 since transformation is baked in
-                                offsetY = 0f, // Reset to 0 since transformation is baked in
-                                rotation = 0f, // Reset to 0 since transformation is baked in
-                                brightness = brightness,
-                                contrast = contrast,
-                                saturation = saturation,
-                                hue = hue
-                            )
-                            ImageTransformSettings.saveToPrefs(prefs, colorSettings)
-                            BackgroundEditorUtils.saveImageTransformSettings(prefs, transformedUri.toString(), colorSettings)
-                        }
-                        
-                        navigator.popBackStack()
-                    } catch (e: Exception) {
-                        // Handle error - could show a toast or log
-                        navigator.popBackStack()
-                    }
-                }
+                // Clear any previous photo settings first
+                BackgroundEditorUtils.clearImageTransformSettings(prefs)
+                
+                // Save image URI and reset transparency (like original AdvancedImageTransformDialog)
+                prefs.edit()
+                    .putString("background_image_uri", imageUri)
+                    .putFloat("background_transparency", 0.0f) // Reset darkness so image is visible
+                    .putString("background_fit_mode", "custom_crop") // Ensure custom crop mode is set
+                    .apply()
+                
+                // Save all transform and adjustment settings using ImageTransformSettings
+                val allSettings = ImageTransformSettings(
+                    scale = scale,
+                    offsetX = offsetX,
+                    offsetY = offsetY,
+                    rotation = rotation,
+                    brightness = brightness,
+                    contrast = contrast,
+                    saturation = saturation,
+                    hue = hue
+                )
+                ImageTransformSettings.saveToPrefs(prefs, allSettings)
+                BackgroundEditorUtils.saveImageTransformSettings(prefs, imageUri, allSettings)
+                
+                navigator.popBackStack()
             },
             onProvideSaveFunction = { saveFunc ->
                 saveFunction = saveFunc
@@ -148,6 +121,7 @@ fun PhotoEditor(
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val scope = rememberCoroutineScope()
     
     // Load saved transform settings or use defaults
     val savedSettings = remember { ImageTransformSettings.loadFromPrefs(prefs) }
