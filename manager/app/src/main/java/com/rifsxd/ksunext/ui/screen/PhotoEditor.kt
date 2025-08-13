@@ -224,10 +224,15 @@ fun PhotoEditor(
                                 val transformedPanX = pan.x * cosRotation + pan.y * sinRotation
                                 val transformedPanY = -pan.x * sinRotation + pan.y * cosRotation
                                 
-                                // Apply movement with reduced sensitivity for better control
+                                // Normalize by scale to maintain consistent movement speed regardless of zoom level
+                                // When zoomed in, the same screen movement should result in proportionally less image movement
+                                val normalizedPanX = transformedPanX / scale
+                                val normalizedPanY = transformedPanY / scale
+                                
+                                // Apply movement with consistent sensitivity
                                 val sensitivity = 0.5f
-                                offsetX += transformedPanX * sensitivity
-                                offsetY += transformedPanY * sensitivity
+                                offsetX += normalizedPanX * sensitivity
+                                offsetY += normalizedPanY * sensitivity
                                 
                                 rotation += rotationChange
                             }
