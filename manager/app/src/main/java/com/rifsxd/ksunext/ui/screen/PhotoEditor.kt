@@ -205,10 +205,11 @@ fun PhotoEditor(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, _ ->
+                    detectTransformGestures { _, pan, zoom, rotationChange ->
                         scale = (scale * zoom).coerceIn(0.1f, 5f)
                         offsetX += pan.x
                         offsetY += pan.y
+                        rotation += rotationChange
                     }
                 }
                 .graphicsLayer(
