@@ -214,21 +214,20 @@ fun PhotoEditor(
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, zoom, rotationChange ->
                             if (freeFormMode) {
-                                // Convert pan to radians for rotation calculation
-                                val rotationRad = Math.toRadians(-rotation.toDouble())
+                                // Convert current rotation to radians for coordinate transformation
+                                val rotationRad = Math.toRadians(rotation.toDouble())
                                 val cosRotation = kotlin.math.cos(rotationRad).toFloat()
                                 val sinRotation = kotlin.math.sin(rotationRad).toFloat()
                                 
-                                // Apply inverse rotation to pan vector to maintain correct direction
-                                // regardless of current rotation state
-                                val rotatedPanX = pan.x * cosRotation - pan.y * sinRotation
-                                val rotatedPanY = pan.x * sinRotation + pan.y * cosRotation
+                                // Transform pan coordinates to account for current rotation
+                                // This ensures dragging always follows finger direction regardless of rotation
+                                val transformedPanX = pan.x * cosRotation + pan.y * sinRotation
+                                val transformedPanY = -pan.x * sinRotation + pan.y * cosRotation
                                 
-                                // Apply consistent movement speed regardless of zoom level
-                                // Use a fixed sensitivity factor instead of dividing by scale
-                                val sensitivity = 1.0f
-                                offsetX += rotatedPanX * sensitivity
-                                offsetY += rotatedPanY * sensitivity
+                                // Apply movement with reduced sensitivity for better control
+                                val sensitivity = 0.5f
+                                offsetX += transformedPanX * sensitivity
+                                offsetY += transformedPanY * sensitivity
                                 
                                 rotation += rotationChange
                             }
