@@ -123,6 +123,11 @@ fun PhotoEditor(
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val scope = rememberCoroutineScope()
     
+    // Clear any previous transform settings when PhotoEditor loads to start fresh
+    LaunchedEffect(imageUri) {
+        BackgroundEditorUtils.clearImageTransformSettings(prefs)
+    }
+    
     // Load saved transform settings or use defaults
     val savedSettings = remember { ImageTransformSettings.loadFromPrefs(prefs) }
     
@@ -132,12 +137,11 @@ fun PhotoEditor(
         derivedStateOf { BackgroundEditorUtils.loadImageTransformSettings(prefs) }
     }
     
-    // Local state for gesture handling - initialize with current SharedPreferences values
-    val currentTransform = BackgroundEditorUtils.loadImageTransformSettings(prefs)
-    var scale by remember { mutableFloatStateOf(currentTransform.scale) }
-    var offsetX by remember { mutableFloatStateOf(currentTransform.offsetX) }
-    var offsetY by remember { mutableFloatStateOf(currentTransform.offsetY) }
-    var rotation by remember { mutableFloatStateOf(currentTransform.rotation) }
+    // Local state for gesture handling - start with default values
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
+    var rotation by remember { mutableFloatStateOf(0f) }
     
     // Image adjustment states with expanded ranges for better effects - load from saved settings
     var brightness by remember { mutableFloatStateOf(savedSettings.brightness) } // -200 to 200 (expanded from -100 to 100)
