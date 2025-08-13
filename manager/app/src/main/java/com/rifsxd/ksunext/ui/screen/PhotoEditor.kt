@@ -250,10 +250,10 @@ fun PhotoEditor(
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, rotationChange ->
-                        scale = (scale * zoom).coerceIn(0.1f, 5f)
-                        offsetX = (offsetX + pan.x).coerceIn(-1000f, 1000f)
-                        offsetY = (offsetY + pan.y).coerceIn(-1000f, 1000f)
-                        rotation = (rotation + rotationChange) % 360f
+                        scale = BackgroundEditorUtils.constrainScale(scale * zoom)
+                        offsetX = BackgroundEditorUtils.constrainTranslation(offsetX + pan.x)
+                        offsetY = BackgroundEditorUtils.constrainTranslation(offsetY + pan.y)
+                        rotation = BackgroundEditorUtils.constrainRotation(rotation + rotationChange)
                     }
                 }
                 .graphicsLayer(
