@@ -46,8 +46,6 @@ import com.rifsxd.ksunext.ui.util.BackgroundEditorUtils
 
 // CompositionLocal for sharing save function with top bar
 val LocalPhotoEditorSave = compositionLocalOf<(() -> Unit)?> { null }
-// CompositionLocal for sharing hide controls state with top bar
-val LocalPhotoEditorHideControls = compositionLocalOf<(() -> Unit)?> { null }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -60,13 +58,11 @@ fun PhotoEditorScreen(
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val uri = Uri.parse(imageUri)
     
-    // Create mutable states to hold the save function and hide controls function
+    // Create mutable state to hold the save function
     var saveFunction by remember { mutableStateOf<(() -> Unit)?>(null) }
-    var hideControlsFunction by remember { mutableStateOf<(() -> Unit)?>(null) }
     
     CompositionLocalProvider(
-        LocalPhotoEditorSave provides saveFunction,
-        LocalPhotoEditorHideControls provides hideControlsFunction
+        LocalPhotoEditorSave provides saveFunction
     ) {
         PhotoEditor(
             imageUri = uri,
@@ -119,8 +115,7 @@ fun PhotoEditor(
     imageUri: Uri?,
     onDismiss: () -> Unit,
     onSave: (Float, Float, Float, Float, Float, Float, Float, Float) -> Unit, // scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue
-    onProvideSaveFunction: (((() -> Unit)) -> Unit)? = null, // Callback to provide save function to parent
-    onProvideHideControlsFunction: (((() -> Unit)) -> Unit)? = null // Callback to provide hide controls function to parent
+    onProvideSaveFunction: (((() -> Unit)) -> Unit)? = null // Callback to provide save function to parent
 ) {
     // Transform states - simple like original AdvancedImageTransformDialog
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -159,13 +154,7 @@ fun PhotoEditor(
         onProvideSaveFunction?.invoke(saveFunc)
     }
     
-    // Provide hide controls function
-    LaunchedEffect(Unit) {
-        val hideControlsFunc = {
-            hideControls = !hideControls
-        }
-        onProvideHideControlsFunction?.invoke(hideControlsFunc)
-    }
+
     
     // Simple image painter without custom decoders
     val painter = rememberAsyncImagePainter(
