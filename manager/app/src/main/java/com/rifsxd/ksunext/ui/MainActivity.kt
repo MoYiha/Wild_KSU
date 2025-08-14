@@ -569,7 +569,11 @@ private fun UnifiedTopBar(
             )
         }
         PhotoEditorScreenDestination.route -> {
-            // PhotoEditor handles its own UI, no top bar needed
+            PhotoEditorTopBar(
+                navigator = navigator,
+                onSave = { /* No save action - handled by floating button */ },
+                modifier = modifier
+            )
         }
         TemplateEditorScreenDestination.route -> {
             // TemplateEditor handles its own top bar, so we don't show one here
@@ -854,14 +858,6 @@ fun PhotoEditorTopBar(
         navigationIcon = {
             IconButton(onClick = { navigator.popBackStack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-            }
-        },
-        actions = {
-            IconButton(onClick = {
-                println("PhotoEditorTopBar: Save icon clicked")
-                onSave()
-            }) {
-                Icon(Icons.Filled.Save, contentDescription = "Save")
             }
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
