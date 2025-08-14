@@ -563,6 +563,7 @@ private fun UnifiedTopBar(
             PhotoEditorTopBar(
                 navigator = navigator,
                 onSave = {
+                    println("MainActivity: Save button clicked, callback = $saveCallback")
                     saveCallback?.invoke()
                 },
                 modifier = modifier
@@ -854,7 +855,10 @@ fun PhotoEditorTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onSave) {
+            IconButton(onClick = {
+                println("PhotoEditorTopBar: Save icon clicked")
+                onSave()
+            }) {
                 Icon(Icons.Filled.Save, contentDescription = "Save")
             }
         },

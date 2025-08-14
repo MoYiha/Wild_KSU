@@ -44,6 +44,7 @@ fun PhotoEditorScreen(
         // Save transform settings and background configuration
         // Preserve existing background_transparency setting instead of overriding it
         val currentTransparency = prefs.getFloat("background_transparency", 0.0f)
+        println("PhotoEditor: Saving with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
         prefs.edit()
             .putString("background_image_uri", imageUri)
             .putFloat("background_scale_x", scale)
@@ -53,6 +54,7 @@ fun PhotoEditorScreen(
             .putFloat("background_transparency", currentTransparency)
             .putString("background_fit_mode", "fit")
             .apply()
+        println("PhotoEditor: Settings saved, navigating back")
         navigator.popBackStack()
         Unit
     }
@@ -66,6 +68,7 @@ fun PhotoEditorScreen(
     CompositionLocalProvider(
         LocalPhotoEditorSave provides saveFunction,
         LocalPhotoEditorSaveCallback provides {
+            println("PhotoEditor: Save callback triggered with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
             saveFunction(scale, offsetX, offsetY, rotation)
         }
     ) {
