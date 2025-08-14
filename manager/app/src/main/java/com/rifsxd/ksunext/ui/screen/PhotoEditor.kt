@@ -97,6 +97,20 @@ fun PhotoEditor(
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    
+    // Use local mutable state for gesture handling
+    var currentScale by remember { mutableFloatStateOf(scale) }
+    var currentOffsetX by remember { mutableFloatStateOf(offsetX) }
+    var currentOffsetY by remember { mutableFloatStateOf(offsetY) }
+    var currentRotation by remember { mutableFloatStateOf(rotation) }
+    
+    // Update local state when props change
+    LaunchedEffect(scale, offsetX, offsetY, rotation) {
+        currentScale = scale
+        currentOffsetX = offsetX
+        currentOffsetY = offsetY
+        currentRotation = rotation
+    }
         // Load image with ImageRequest for consistency
         val painter = rememberAsyncImagePainter(
             model = ImageRequest.Builder(context)
@@ -117,10 +131,16 @@ fun PhotoEditor(
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, rotationChange ->
-                        val newScale = (scale * zoom).coerceIn(0.1f, 5f)
-                        val newOffsetX = (offsetX + pan.x).coerceIn(-1000f, 1000f)
-                        val newOffsetY = (offsetY + pan.y).coerceIn(-1000f, 1000f)
-                        val newRotation = (rotation + rotationChange) % 360f
+                        val newScale = (currentScale * zoom).coerceIn(0.1f, 5f)
+                        val newOffsetX = (currentOffsetX + pan.x).coerceIn(-1000f, 1000f)
+                        val newOffsetY = (currentOffsetY + pan.y).coerceIn(-1000f, 1000f)
+                        val newRotation = (currentRotation + rotationChange) % 360f
+                        
+                        // Update local state
+                        currentScale = newScale
+                        currentOffsetX = newOffsetX
+                        currentOffsetY = newOffsetY
+                        currentRotation = newRotation
                         
                         // Notify parent of transform changes
                         onTransformChange(newScale, newOffsetX, newOffsetY, newRotation)
@@ -136,11 +156,11 @@ fun PhotoEditor(
                     }
                 }
                 .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    translationX = offsetX,
-                    translationY = offsetY,
-                    rotationZ = rotation,
+                    scaleX = currentScale,
+                    scaleY = currentScale,
+                    translationX = currentOffsetX,
+                    translationY = currentOffsetY,
+                    rotationZ = currentRotation,
                     transformOrigin = TransformOrigin.Center
                 ),
             contentScale = ContentScale.Fit,
