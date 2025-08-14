@@ -6,8 +6,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
@@ -270,12 +274,13 @@ fun PhotoEditor(
         Surface(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .imePadding(),
+                .fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 16.dp,
-            tonalElevation = 3.dp
+            tonalElevation = 3.dp,
+            windowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout).only(
+                WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+            )
         ) {
             Column(
                 modifier = Modifier
