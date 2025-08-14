@@ -407,7 +407,6 @@ class MainActivity : ComponentActivity() {
                 val showBottomBar = when (currentDestination?.route) {
                     FlashScreenDestination.route -> false // Hide for FlashScreenDestination
                     ExecuteModuleActionScreenDestination.route -> false // Hide for ExecuteModuleActionScreen
-                    PhotoEditorScreenDestination.route -> false // Hide for PhotoEditorScreen
                     else -> true
                 }
 

@@ -28,7 +28,6 @@ import coil.request.ImageRequest
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.rifsxd.ksunext.ui.PhotoEditorTopBar
 
 
 
@@ -68,31 +67,22 @@ fun PhotoEditorScreen(
     var offsetY by remember { mutableFloatStateOf(0f) }
     var rotation by remember { mutableFloatStateOf(0f) }
     
-    // Use Box to fill entire screen like BackgroundImage does
-    Box(modifier = Modifier.fillMaxSize()) {
-        PhotoEditor(
-            imageUri = Uri.parse(imageUri),
-            scale = scale,
-            offsetX = offsetX,
-            offsetY = offsetY,
-            rotation = rotation,
-            onTransformChange = { newScale, newOffsetX, newOffsetY, newRotation ->
-                scale = newScale
-                offsetX = newOffsetX
-                offsetY = newOffsetY
-                rotation = newRotation
-            },
-            onSave = {
-                saveFunction(scale, offsetX, offsetY, rotation)
-            }
-        )
-        
-        // Add top bar overlay to match MainActivity structure
-        PhotoEditorTopBar(
-            navigator = navigator,
-            modifier = Modifier.align(Alignment.TopStart)
-        )
-    }
+    PhotoEditor(
+        imageUri = Uri.parse(imageUri),
+        scale = scale,
+        offsetX = offsetX,
+        offsetY = offsetY,
+        rotation = rotation,
+        onTransformChange = { newScale, newOffsetX, newOffsetY, newRotation ->
+            scale = newScale
+            offsetX = newOffsetX
+            offsetY = newOffsetY
+            rotation = newRotation
+        },
+        onSave = {
+            saveFunction(scale, offsetX, offsetY, rotation)
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
