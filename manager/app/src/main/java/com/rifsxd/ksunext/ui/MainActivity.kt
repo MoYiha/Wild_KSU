@@ -414,8 +414,7 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         // Show unified TopBar for all screens except those that should be hidden
                         val screensWithoutTopBar = listOf(
-                            ExecuteModuleActionScreenDestination.route,
-                            PhotoEditorScreenDestination.route
+                            ExecuteModuleActionScreenDestination.route
                         )
                         
                         if (currentDestination?.route !in screensWithoutTopBar) {
