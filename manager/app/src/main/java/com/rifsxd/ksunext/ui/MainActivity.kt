@@ -147,6 +147,8 @@ import java.util.*
 val LocalModuleViewModel = compositionLocalOf<ModuleViewModel> { error("ModuleViewModel not provided") }
 val LocalSuperUserViewModel = compositionLocalOf<SuperUserViewModel> { error("SuperUserViewModel not provided") }
 val LocalFlashViewModel = compositionLocalOf<FlashViewModel> { error("FlashViewModel not provided") }
+val LocalPhotoEditorSaveCallback = compositionLocalOf<(() -> Unit)?> { null }
+val LocalPhotoEditorSaveCallbackSetter = compositionLocalOf<(((() -> Unit)?) -> Unit)?> { null }
 
 // Icon type enum
 enum class IconType(val displayName: String, val icon: ImageVector) {
@@ -434,12 +436,17 @@ class MainActivity : ComponentActivity() {
                     },
                     contentWindowInsets = WindowInsets(0, 0, 0, 0)
                 ) { innerPadding ->
-                    CompositionLocalProvider(
-                        LocalSnackbarHost provides snackBarHostState,
-                        LocalModuleViewModel provides moduleViewModel,
-                        LocalSuperUserViewModel provides superUserViewModel,
-                        LocalFlashViewModel provides flashViewModel,
-                    ) {
+                    // Create a mutable state for PhotoEditor save callback
+                var photoEditorSaveCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
+                
+                CompositionLocalProvider(
+                    LocalSnackbarHost provides snackBarHostState,
+                    LocalModuleViewModel provides moduleViewModel,
+                    LocalSuperUserViewModel provides superUserViewModel,
+                    LocalFlashViewModel provides flashViewModel,
+                    LocalPhotoEditorSaveCallback provides photoEditorSaveCallback,
+                    LocalPhotoEditorSaveCallbackSetter provides { callback -> photoEditorSaveCallback = callback },
+                ) {
                         DestinationsNavHost(
                             modifier = Modifier
                                 .padding(innerPadding),
@@ -559,7 +566,7 @@ private fun UnifiedTopBar(
             )
         }
         PhotoEditorScreenDestination.route -> {
-            val saveCallback = com.rifsxd.ksunext.ui.screen.LocalPhotoEditorSaveCallback.current
+            val saveCallback = LocalPhotoEditorSaveCallback.current
             PhotoEditorTopBar(
                 navigator = navigator,
                 onSave = {

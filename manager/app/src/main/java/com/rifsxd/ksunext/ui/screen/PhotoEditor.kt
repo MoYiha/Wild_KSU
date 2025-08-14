@@ -26,9 +26,9 @@ import coil.request.ImageRequest
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.rifsxd.ksunext.ui.LocalPhotoEditorSaveCallbackSetter
 
 val LocalPhotoEditorSave = compositionLocalOf<((Float, Float, Float, Float) -> Unit)?> { null }
-val LocalPhotoEditorSaveCallback = compositionLocalOf<(() -> Unit)?> { null }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -65,12 +65,26 @@ fun PhotoEditorScreen(
     var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
     var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
     
-    CompositionLocalProvider(
-        LocalPhotoEditorSave provides saveFunction,
-        LocalPhotoEditorSaveCallback provides {
+    // Get the callback setter from MainActivity
+    val saveCallbackSetter = LocalPhotoEditorSaveCallbackSetter.current
+    
+    // Register the save callback with MainActivity
+    LaunchedEffect(scale, offsetX, offsetY, rotation) {
+        saveCallbackSetter?.invoke {
             println("PhotoEditor: Save callback triggered with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
             saveFunction(scale, offsetX, offsetY, rotation)
         }
+    }
+    
+    // Clean up callback when leaving the screen
+    DisposableEffect(Unit) {
+        onDispose {
+            saveCallbackSetter?.invoke(null)
+        }
+    }
+    
+    CompositionLocalProvider(
+        LocalPhotoEditorSave provides saveFunction
     ) {
         PhotoEditor(
             imageUri = Uri.parse(imageUri),
