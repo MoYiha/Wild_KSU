@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -74,11 +75,11 @@ fun PhotoEditor(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     
-    // Simple transform states
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
-    var rotation by remember { mutableFloatStateOf(0f) }
+    // Load saved transform states or use defaults
+    var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1f)) }
+    var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0f)) }
+    var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
+    var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
     
     // Load image with ImageRequest for consistency
     val painter = rememberAsyncImagePainter(
@@ -88,11 +89,39 @@ fun PhotoEditor(
             .build()
     )
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Edit Photo") },
+                navigationIcon = {
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            onSave(scale, offsetX, offsetY, rotation)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Save"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
         // Main image display with touch gestures
         Image(
             painter = painter,
@@ -127,22 +156,6 @@ fun PhotoEditor(
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center
         )
-        
-        // Simple checkmark button
-        FloatingActionButton(
-            onClick = {
-                onSave(scale, offsetX, offsetY, rotation)
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary
-        ) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = "Save",
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
         }
     }
 }
