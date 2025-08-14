@@ -28,6 +28,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 val LocalPhotoEditorSave = compositionLocalOf<((Float, Float, Float, Float) -> Unit)?> { null }
+val LocalPhotoEditorSaveCallback = compositionLocalOf<(() -> Unit)?> { null }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -41,13 +42,15 @@ fun PhotoEditorScreen(
     
     val saveFunction = { scale: Float, offsetX: Float, offsetY: Float, rotation: Float ->
         // Save transform settings and background configuration
+        // Preserve existing background_transparency setting instead of overriding it
+        val currentTransparency = prefs.getFloat("background_transparency", 0.0f)
         prefs.edit()
             .putString("background_image_uri", imageUri)
             .putFloat("image_scale", scale)
             .putFloat("image_offset_x", offsetX)
             .putFloat("image_offset_y", offsetY)
             .putFloat("image_rotation", rotation)
-            .putFloat("background_transparency", 1.0f)
+            .putFloat("background_transparency", currentTransparency)
             .putString("background_fit_mode", "fit")
             .apply()
         navigator.popBackStack()
@@ -55,12 +58,11 @@ fun PhotoEditorScreen(
     }
     
     CompositionLocalProvider(
-        LocalPhotoEditorSave provides saveFunction
+        LocalPhotoEditorSave provides saveFunction,
+        LocalPhotoEditorSaveCallback provides { navigator.popBackStack() }
     ) {
         PhotoEditor(
-            imageUri = Uri.parse(imageUri),
-            onDismiss = { navigator.popBackStack() },
-            onSave = { scale, offsetX, offsetY, rotation -> saveFunction(scale, offsetX, offsetY, rotation) }
+            imageUri = Uri.parse(imageUri)
         )
     }
 }
@@ -68,12 +70,11 @@ fun PhotoEditorScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoEditor(
-    imageUri: Uri?,
-    onDismiss: () -> Unit,
-    onSave: (Float, Float, Float, Float) -> Unit // scale, offsetX, offsetY, rotation
+    imageUri: Uri?
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val saveFunction = LocalPhotoEditorSave.current
     
     // Load saved transform states or use defaults
     var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1f)) }
@@ -81,41 +82,19 @@ fun PhotoEditor(
     var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
     var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
     
-    // Load image with ImageRequest for consistency
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(context)
-            .data(imageUri)
-            .crossfade(false)
-            .build()
-    )
-    
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Edit Photo") },
-                navigationIcon = {
-                    IconButton(onClick = onDismiss) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            onSave(scale, offsetX, offsetY, rotation)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Save"
-                        )
-                    }
-                }
-            )
+    // Provide save callback with current transform values
+    CompositionLocalProvider(
+        LocalPhotoEditorSaveCallback provides {
+            saveFunction?.invoke(scale, offsetX, offsetY, rotation)
         }
-    ) { paddingValues ->
+    ) {
+        // Load image with ImageRequest for consistency
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(context)
+                .data(imageUri)
+                .crossfade(false)
+                .build()
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()

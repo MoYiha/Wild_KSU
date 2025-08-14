@@ -559,8 +559,12 @@ private fun UnifiedTopBar(
             )
         }
         PhotoEditorScreenDestination.route -> {
+            val saveCallback = com.rifsxd.ksunext.ui.screen.LocalPhotoEditorSaveCallback.current
             PhotoEditorTopBar(
                 navigator = navigator,
+                onSave = {
+                    saveCallback?.invoke()
+                },
                 modifier = modifier
             )
         }
@@ -830,6 +834,7 @@ private fun SettingsTopBar(
 @Composable
 fun PhotoEditorTopBar(
     navigator: DestinationsNavigator,
+    onSave: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
@@ -846,6 +851,11 @@ fun PhotoEditorTopBar(
         navigationIcon = {
             IconButton(onClick = { navigator.popBackStack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
+        },
+        actions = {
+            IconButton(onClick = onSave) {
+                Icon(Icons.Filled.Save, contentDescription = "Save")
             }
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
