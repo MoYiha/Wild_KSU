@@ -58,7 +58,10 @@ fun PhotoEditorScreen(
     }
     
     CompositionLocalProvider(
-        LocalPhotoEditorSave provides saveFunction
+        LocalPhotoEditorSave provides saveFunction,
+        LocalPhotoEditorSaveCallback provides {
+            // This will be overridden by PhotoEditor with current transform values
+        }
     ) {
         PhotoEditor(
             imageUri = Uri.parse(imageUri)
