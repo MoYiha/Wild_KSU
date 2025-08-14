@@ -71,6 +71,10 @@ fun PhotoEditorScreen(
     ) {
         PhotoEditor(
             imageUri = Uri.parse(imageUri),
+            scale = scale,
+            offsetX = offsetX,
+            offsetY = offsetY,
+            rotation = rotation,
             onTransformChange = { newScale, newOffsetX, newOffsetY, newRotation ->
                 scale = newScale
                 offsetX = newOffsetX
@@ -85,16 +89,14 @@ fun PhotoEditorScreen(
 @Composable
 fun PhotoEditor(
     imageUri: Uri?,
+    scale: Float,
+    offsetX: Float,
+    offsetY: Float,
+    rotation: Float,
     onTransformChange: (Float, Float, Float, Float) -> Unit = { _, _, _, _ -> }
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    
-    // Load saved transform states or use defaults
-    var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1f)) }
-    var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0f)) }
-    var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
-    var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
         // Load image with ImageRequest for consistency
         val painter = rememberAsyncImagePainter(
             model = ImageRequest.Builder(context)
@@ -115,20 +117,20 @@ fun PhotoEditor(
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, rotationChange ->
-                        scale = (scale * zoom).coerceIn(0.1f, 5f)
-                        offsetX = (offsetX + pan.x).coerceIn(-1000f, 1000f)
-                        offsetY = (offsetY + pan.y).coerceIn(-1000f, 1000f)
-                        rotation = (rotation + rotationChange) % 360f
+                        val newScale = (scale * zoom).coerceIn(0.1f, 5f)
+                        val newOffsetX = (offsetX + pan.x).coerceIn(-1000f, 1000f)
+                        val newOffsetY = (offsetY + pan.y).coerceIn(-1000f, 1000f)
+                        val newRotation = (rotation + rotationChange) % 360f
                         
                         // Notify parent of transform changes
-                        onTransformChange(scale, offsetX, offsetY, rotation)
+                        onTransformChange(newScale, newOffsetX, newOffsetY, newRotation)
                         
-                        // Save to preferences
+                        // Save to preferences immediately for real-time updates
                         prefs.edit()
-                            .putFloat("background_scale_x", scale)
-                            .putFloat("background_pos_x", offsetX)
-                            .putFloat("background_pos_y", offsetY)
-                            .putFloat("background_rotation", rotation)
+                            .putFloat("background_scale_x", newScale)
+                            .putFloat("background_pos_x", newOffsetX)
+                            .putFloat("background_pos_y", newOffsetY)
+                            .putFloat("background_rotation", newRotation)
                             .apply()
                         Unit
                     }
