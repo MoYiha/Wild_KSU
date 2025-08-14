@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 
 import androidx.compose.runtime.*
@@ -71,6 +72,7 @@ fun PhotoEditorScreen(
         offsetX = offsetX,
         offsetY = offsetY,
         rotation = rotation,
+        navigator = navigator,
         onTransformChange = { newScale, newOffsetX, newOffsetY, newRotation ->
             scale = newScale
             offsetX = newOffsetX
@@ -91,6 +93,7 @@ fun PhotoEditor(
     offsetX: Float,
     offsetY: Float,
     rotation: Float,
+    navigator: DestinationsNavigator,
     onTransformChange: (Float, Float, Float, Float) -> Unit = { _, _, _, _ -> },
     onSave: () -> Unit = {}
 ) {
@@ -168,17 +171,26 @@ fun PhotoEditor(
             alignment = Alignment.Center
         )
         
-        // Save button
-        FloatingActionButton(
-            onClick = onSave,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Save,
-                contentDescription = "Save"
-            )
-        }
+        // Top bar overlay
+        TopAppBar(
+            title = { Text("Photo Editor") },
+            navigationIcon = {
+                IconButton(onClick = { navigator.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = onSave) {
+                    Icon(
+                        imageVector = Icons.Default.Save,
+                        contentDescription = "Save"
+                    )
+                }
+            },
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
