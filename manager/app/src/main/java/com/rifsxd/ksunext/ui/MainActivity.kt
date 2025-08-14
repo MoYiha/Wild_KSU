@@ -569,14 +569,7 @@ private fun UnifiedTopBar(
             )
         }
         PhotoEditorScreenDestination.route -> {
-            val saveCallback = LocalPhotoEditorSaveCallback.current
-            PhotoEditorTopBar(
-                navigator = navigator,
-                onSave = {
-                    saveCallback?.invoke()
-                },
-                modifier = modifier
-            )
+            // PhotoEditor handles its own UI, no top bar needed
         }
         TemplateEditorScreenDestination.route -> {
             // TemplateEditor handles its own top bar, so we don't show one here

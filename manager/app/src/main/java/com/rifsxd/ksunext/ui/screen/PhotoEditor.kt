@@ -12,8 +12,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
+
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +41,6 @@ fun PhotoEditorScreen(
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    var showSaveDialog by remember { mutableStateOf(false) }
     
     val saveFunction = { scale: Float, offsetX: Float, offsetY: Float, rotation: Float ->
         // Save transform settings and background configuration
@@ -69,32 +67,6 @@ fun PhotoEditorScreen(
     var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
     var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
     
-    // Save confirmation dialog
-    if (showSaveDialog) {
-        AlertDialog(
-            onDismissRequest = { showSaveDialog = false },
-            title = { Text("Save Photo") },
-            text = { Text("Are you sure you want to save this photo?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showSaveDialog = false
-                        saveFunction(scale, offsetX, offsetY, rotation)
-                    }
-                ) {
-                    Text("Save")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { showSaveDialog = false }
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-    
     PhotoEditor(
         imageUri = Uri.parse(imageUri),
         scale = scale,
@@ -107,7 +79,7 @@ fun PhotoEditorScreen(
             offsetY = newOffsetY
             rotation = newRotation
         },
-        onSave = { showSaveDialog = true }
+        onSave = { saveFunction(scale, offsetX, offsetY, rotation) }
     )
 }
 

@@ -67,10 +67,10 @@ fun BackgroundImageWrapper(
                 )
                 
                 // Load transform settings from SharedPreferences
-                val scale = prefs.getFloat("image_scale", 1f)
-                val offsetX = prefs.getFloat("image_offset_x", 0f)
-                val offsetY = prefs.getFloat("image_offset_y", 0f)
-                val rotation = prefs.getFloat("image_rotation", 0f)
+                val scale = prefs.getFloat("background_scale_x", 1f)
+                val offsetX = prefs.getFloat("background_pos_x", 0f)
+                val offsetY = prefs.getFloat("background_pos_y", 0f)
+                val rotation = prefs.getFloat("background_rotation", 0f)
                 
                 Log.d("BackgroundImage", "Transform settings: scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
                 
