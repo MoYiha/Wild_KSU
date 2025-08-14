@@ -119,7 +119,6 @@ fun PhotoEditor(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
         // Main image display with touch gestures
