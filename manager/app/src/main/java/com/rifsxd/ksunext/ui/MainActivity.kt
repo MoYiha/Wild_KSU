@@ -570,21 +570,10 @@ private fun UnifiedTopBar(
         }
         PhotoEditorScreenDestination.route -> {
             val saveCallback = LocalPhotoEditorSaveCallback.current
-            val saveCallbackSetter = LocalPhotoEditorSaveCallbackSetter.current
             PhotoEditorTopBar(
                 navigator = navigator,
                 onSave = {
-                    println("MainActivity: Save button clicked, callback = $saveCallback")
-                    // If callback is null, try to trigger save directly via the setter
-                    if (saveCallback != null) {
-                        saveCallback.invoke()
-                    } else {
-                        println("MainActivity: Callback is null, attempting direct save trigger")
-                        // Send a signal to PhotoEditor to save
-                        saveCallbackSetter?.invoke { 
-                            println("MainActivity: Direct save trigger sent")
-                        }
-                    }
+                    saveCallback?.invoke()
                 },
                 modifier = modifier
             )
