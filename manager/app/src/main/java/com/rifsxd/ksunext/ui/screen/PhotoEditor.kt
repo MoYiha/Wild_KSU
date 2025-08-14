@@ -81,7 +81,9 @@ fun PhotoEditorScreen(
     
     // Clean up callback when leaving the screen
     DisposableEffect(Unit) {
+        println("PhotoEditor: DisposableEffect created")
         onDispose {
+            println("PhotoEditor: DisposableEffect onDispose - clearing callback")
             saveCallbackSetter?.invoke(null)
         }
     }

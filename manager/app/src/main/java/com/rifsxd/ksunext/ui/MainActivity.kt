@@ -445,7 +445,10 @@ class MainActivity : ComponentActivity() {
                     LocalSuperUserViewModel provides superUserViewModel,
                     LocalFlashViewModel provides flashViewModel,
                     LocalPhotoEditorSaveCallback provides photoEditorSaveCallback,
-                    LocalPhotoEditorSaveCallbackSetter provides { callback -> photoEditorSaveCallback = callback },
+                    LocalPhotoEditorSaveCallbackSetter provides { callback -> 
+                        println("MainActivity: Setting photoEditorSaveCallback to $callback")
+                        photoEditorSaveCallback = callback 
+                    },
                 ) {
                         DestinationsNavHost(
                             modifier = Modifier
