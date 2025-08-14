@@ -455,9 +455,12 @@ class MainActivity : ComponentActivity() {
                         photoEditorSaveCallback = callback 
                     },
                 ) {
+                        val currentDestination by navController.currentBackStackEntryAsState()
+                        val isPhotoEditor = currentDestination?.destination?.route == PhotoEditorScreenDestination.route
+                        
                         DestinationsNavHost(
                             modifier = Modifier
-                                .padding(innerPadding),
+                                .let { if (isPhotoEditor) it else it.padding(innerPadding) },
                             navGraph = NavGraphs.root,
                             navController = navController,
                             defaultTransitions = object : NavHostAnimatedDestinationStyle() {

@@ -118,11 +118,11 @@ fun PhotoEditor(
                 .crossfade(false)
                 .build()
         )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         // Main image display with touch gestures
         Image(
             painter = painter,
