@@ -487,16 +487,15 @@ fun PhotoEditor(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Slider(
-                         value = brightness,
-                         onValueChange = { newBrightness ->
-                             brightness = newBrightness
-                             onColorChange(brightness, contrast, saturation, hue)
-                             val imageUriString = imageUri.toString()
-                             prefs.edit().putFloat("${imageUriString}_brightness", brightness).apply()
-                         },
-                         valueRange = 0.0f..2.0f,
-                         modifier = Modifier.fillMaxWidth()
-                     )
+                          value = brightness,
+                          onValueChange = { newBrightness ->
+                              brightness = newBrightness
+                              val imageUriString = imageUri.toString()
+                              prefs.edit().putFloat("${imageUriString}_brightness", brightness).apply()
+                          },
+                          valueRange = 0.0f..2.0f,
+                          modifier = Modifier.fillMaxWidth()
+                      )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
@@ -507,16 +506,15 @@ fun PhotoEditor(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Slider(
-                         value = contrast,
-                         onValueChange = { newContrast ->
-                             contrast = newContrast
-                             onColorChange(brightness, contrast, saturation, hue)
-                             val imageUriString = imageUri.toString()
-                             prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
-                         },
-                         valueRange = 0.0f..2.0f,
-                         modifier = Modifier.fillMaxWidth()
-                     )
+                          value = contrast,
+                          onValueChange = { newContrast ->
+                              contrast = newContrast
+                              val imageUriString = imageUri.toString()
+                              prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
+                          },
+                          valueRange = 0.0f..2.0f,
+                          modifier = Modifier.fillMaxWidth()
+                      )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
@@ -527,16 +525,15 @@ fun PhotoEditor(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Slider(
-                         value = saturation,
-                         onValueChange = { newSaturation ->
-                             saturation = newSaturation
-                             onColorChange(brightness, contrast, saturation, hue)
-                             val imageUriString = imageUri.toString()
-                             prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
-                         },
-                         valueRange = 0.0f..2.0f,
-                         modifier = Modifier.fillMaxWidth()
-                     )
+                          value = saturation,
+                          onValueChange = { newSaturation ->
+                              saturation = newSaturation
+                              val imageUriString = imageUri.toString()
+                              prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
+                          },
+                          valueRange = 0.0f..2.0f,
+                          modifier = Modifier.fillMaxWidth()
+                      )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
@@ -547,16 +544,15 @@ fun PhotoEditor(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Slider(
-                         value = hue,
-                         onValueChange = { newHue ->
-                             hue = newHue
-                             onColorChange(brightness, contrast, saturation, hue)
-                             val imageUriString = imageUri.toString()
-                             prefs.edit().putFloat("${imageUriString}_hue", hue).apply()
-                         },
-                         valueRange = 0f..360f,
-                         modifier = Modifier.fillMaxWidth()
-                     )
+                          value = hue,
+                          onValueChange = { newHue ->
+                              hue = newHue
+                              val imageUriString = imageUri.toString()
+                              prefs.edit().putFloat("${imageUriString}_hue", hue).apply()
+                          },
+                          valueRange = 0f..360f,
+                          modifier = Modifier.fillMaxWidth()
+                      )
                 }
             }
         }
@@ -642,7 +638,6 @@ fun PhotoEditor(
                              
                              // Update transformations
                              onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                             onColorChange(brightness, contrast, saturation, hue)
                              
                              // Clear preferences
                              val imageUriString = imageUri.toString()
