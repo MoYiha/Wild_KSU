@@ -371,7 +371,7 @@ fun PhotoEditor(
                     )
                 )
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 120.dp),
-            color = MaterialTheme.colorScheme.surface,
+            color = MaterialTheme.colorScheme.surfaceContainer,
             tonalElevation = 3.dp,
             shape = RoundedCornerShape(16.dp)
         ) {
