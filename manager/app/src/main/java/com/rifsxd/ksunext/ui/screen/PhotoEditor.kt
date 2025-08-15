@@ -593,7 +593,7 @@ fun PhotoEditor(
                                 val imageUriString = imageUri.toString()
                                 prefs.edit().putFloat("${imageUriString}_brightness", brightness).apply()
                             },
-                            valueRange = 0.0f..2.0f,
+                            valueRange = 0.5f..1.5f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         
@@ -610,7 +610,7 @@ fun PhotoEditor(
                                 val imageUriString = imageUri.toString()
                                 prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
                             },
-                            valueRange = 0.0f..2.0f,
+                            valueRange = 0.5f..1.5f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         
@@ -627,7 +627,7 @@ fun PhotoEditor(
                                 val imageUriString = imageUri.toString()
                                 prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
                             },
-                            valueRange = 0.0f..2.0f,
+                            valueRange = 0.5f..1.5f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         
