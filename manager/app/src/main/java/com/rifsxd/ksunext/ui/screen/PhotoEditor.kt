@@ -322,7 +322,7 @@ fun PhotoEditor(
                             WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
                         )
                     )
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 tonalElevation = 3.dp,
                 shape = RoundedCornerShape(16.dp)
@@ -336,8 +336,8 @@ fun PhotoEditor(
                 // Inline Crop Menu
                 AnimatedVisibility(
                     visible = showCropMenu,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
+                    enter = fadeIn(animationSpec = tween(200)) + scaleIn(animationSpec = tween(200)),
+                    exit = fadeOut(animationSpec = tween(150)) + scaleOut(animationSpec = tween(150))
                 ) {
                     Column(
                         modifier = Modifier
@@ -433,8 +433,8 @@ fun PhotoEditor(
                 // Inline Color Menu
                 AnimatedVisibility(
                     visible = showColorMenu,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
+                    enter = fadeIn(animationSpec = tween(200)) + scaleIn(animationSpec = tween(200)),
+                    exit = fadeOut(animationSpec = tween(150)) + scaleOut(animationSpec = tween(150))
                 ) {
                     Column(
                         modifier = Modifier
@@ -527,8 +527,12 @@ fun PhotoEditor(
                      // Crop button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
-                             showColorMenu = false
-                             showCropMenu = !showCropMenu
+                             if (showCropMenu) {
+                                 showCropMenu = false
+                             } else {
+                                 showColorMenu = false
+                                 showCropMenu = true
+                             }
                          },
                          modifier = Modifier
                              .size(56.dp)
@@ -550,8 +554,12 @@ fun PhotoEditor(
                      // Color button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
-                             showCropMenu = false
-                             showColorMenu = !showColorMenu
+                             if (showColorMenu) {
+                                 showColorMenu = false
+                             } else {
+                                 showCropMenu = false
+                                 showColorMenu = true
+                             }
                          },
                          modifier = Modifier
                              .size(56.dp)
