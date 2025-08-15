@@ -29,6 +29,8 @@ import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.*
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -235,16 +237,19 @@ fun PhotoEditor(
             alignment = Alignment.Center
         )
         
-        // Advanced controls panel (when enabled)
+        // Advanced controls panel (when enabled) - positioned higher to avoid overlap
         if (showAdvancedControls) {
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(bottom = 200.dp)
+                    .padding(bottom = 240.dp)
                     .padding(horizontal = 16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 8.dp
                 )
             ) {
                 Column(
@@ -273,73 +278,6 @@ fun PhotoEditor(
                             onTransformChange(newScale, currentOffsetX, currentOffsetY, currentRotation)
                         },
                         valueRange = 0.1f..5f
-                    )
-                }
-            }
-        }
-        
-        // Color controls panel (when enabled)
-         if (showColorControls) {
-             Card(
-                 modifier = Modifier
-                     .align(Alignment.BottomCenter)
-                     .fillMaxWidth()
-                     .padding(bottom = 200.dp)
-                     .padding(horizontal = 16.dp),
-                 colors = CardDefaults.cardColors(
-                     containerColor = MaterialTheme.colorScheme.surfaceContainer
-                 )
-             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Brightness slider
-                    Text("Brightness: ${brightness.toInt()}")
-                    Slider(
-                        value = brightness,
-                        onValueChange = { 
-                            brightness = it
-                            val imageUriString = imageUri.toString()
-                            prefs.edit().putFloat("${imageUriString}_brightness", it).apply()
-                        },
-                        valueRange = -100f..100f
-                    )
-                    
-                    // Contrast slider
-                    Text("Contrast: ${contrast.toInt()}")
-                    Slider(
-                        value = contrast,
-                        onValueChange = { 
-                            contrast = it
-                            val imageUriString = imageUri.toString()
-                            prefs.edit().putFloat("${imageUriString}_contrast", it).apply()
-                        },
-                        valueRange = -100f..100f
-                    )
-                    
-                    // Saturation slider
-                    Text("Saturation: ${saturation.toInt()}")
-                    Slider(
-                        value = saturation,
-                        onValueChange = { 
-                            saturation = it
-                            val imageUriString = imageUri.toString()
-                            prefs.edit().putFloat("${imageUriString}_saturation", it).apply()
-                        },
-                        valueRange = -100f..100f
-                    )
-                    
-                    // Hue slider
-                    Text("Hue: ${hue.toInt()}°")
-                    Slider(
-                        value = hue,
-                        onValueChange = { 
-                            hue = it
-                            val imageUriString = imageUri.toString()
-                            prefs.edit().putFloat("${imageUriString}_hue", it).apply()
-                        },
-                        valueRange = -100f..100f
                     )
                 }
             }
@@ -544,6 +482,145 @@ fun PhotoEditor(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Confirm")
+                    }
+                }
+            }
+        }
+        
+        // Color controls modal bottom sheet <mcreference link="https://developer.android.com/develop/ui/compose/components/bottom-sheets" index="2">2</mcreference>
+        if (showColorControls) {
+            ModalBottomSheet(
+                onDismissRequest = { showColorControls = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                tonalElevation = 8.dp,
+                dragHandle = { BottomSheetDefaults.DragHandle() },
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    // Header
+                    Text(
+                        text = "Color Adjustments",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    
+                    // Brightness slider
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Brightness",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = "${brightness.toInt()}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Slider(
+                            value = brightness,
+                            onValueChange = { 
+                                brightness = it
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_brightness", it).apply()
+                            },
+                            valueRange = -100f..100f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    
+                    // Contrast slider
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Contrast",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = "${contrast.toInt()}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Slider(
+                            value = contrast,
+                            onValueChange = { 
+                                contrast = it
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_contrast", it).apply()
+                            },
+                            valueRange = -100f..100f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    
+                    // Saturation slider
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Saturation",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = "${saturation.toInt()}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Slider(
+                            value = saturation,
+                            onValueChange = { 
+                                saturation = it
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_saturation", it).apply()
+                            },
+                            valueRange = -100f..100f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    
+                    // Hue slider
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Hue",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = "${hue.toInt()}°",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Slider(
+                            value = hue,
+                            onValueChange = { 
+                                hue = it
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_hue", it).apply()
+                            },
+                            valueRange = -100f..100f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
