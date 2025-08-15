@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.WindowInsets
@@ -25,6 +26,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.ui.unit.IntOffset
+import kotlin.math.roundToInt
 import androidx.compose.material.icons.filled.RotateLeft
 import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material.icons.filled.ZoomIn
@@ -214,6 +220,14 @@ fun PhotoEditor(
     // Additional states for advanced controls
     var showCropMenu by remember { mutableStateOf(false) }
     var showColorMenu by remember { mutableStateOf(false) }
+    var cropMenuOffsetX by remember { mutableStateOf(0f) }
+    var cropMenuOffsetY by remember { mutableStateOf(0f) }
+    var colorMenuOffsetX by remember { mutableStateOf(0f) }
+    var colorMenuOffsetY by remember { mutableStateOf(0f) }
+    var cropMenuWidth by remember { mutableStateOf(350.dp) }
+    var cropMenuHeight by remember { mutableStateOf(400.dp) }
+    var colorMenuWidth by remember { mutableStateOf(350.dp) }
+    var colorMenuHeight by remember { mutableStateOf(400.dp) }
     var flipHorizontal by remember { mutableStateOf(false) }
     var flipVertical by remember { mutableStateOf(false) }
     var brightness by remember { mutableFloatStateOf(0f) }
@@ -320,8 +334,17 @@ fun PhotoEditor(
             Card(
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .offset { IntOffset(cropMenuOffsetX.roundToInt(), cropMenuOffsetY.roundToInt()) }
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            cropMenuOffsetX += dragAmount.x
+                            cropMenuOffsetY += dragAmount.y
+                        }
+                    }
                     .padding(32.dp)
-                    .widthIn(min = 280.dp, max = 350.dp),
+                    .width(cropMenuWidth)
+                    .height(cropMenuHeight),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
                         alpha = 0.95f
@@ -345,14 +368,29 @@ fun PhotoEditor(
                         )
                         IconButton(
                             onClick = { showCropMenu = false },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(40.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Close",
-                                modifier = Modifier.size(20.dp)
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
+                        // Add a resize handle
+                        Icon(
+                            imageVector = Icons.Default.AspectRatio,
+                            contentDescription = "Resize",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .pointerInput(Unit) {
+                                    detectDragGestures { change, dragAmount ->
+                                        change.consume()
+                                        cropMenuWidth += dragAmount.x.toDp()
+                                        cropMenuHeight += dragAmount.y.toDp()
+                                    }
+                                }
+                        )
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -495,8 +533,17 @@ fun PhotoEditor(
             Card(
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .offset { IntOffset(colorMenuOffsetX.roundToInt(), colorMenuOffsetY.roundToInt()) }
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            colorMenuOffsetX += dragAmount.x
+                            colorMenuOffsetY += dragAmount.y
+                        }
+                    }
                     .padding(32.dp)
-                    .widthIn(min = 280.dp, max = 350.dp),
+                    .width(colorMenuWidth)
+                    .height(colorMenuHeight),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
                         alpha = 0.95f
@@ -520,14 +567,29 @@ fun PhotoEditor(
                         )
                         IconButton(
                             onClick = { showColorMenu = false },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(40.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Close",
-                                modifier = Modifier.size(20.dp)
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
+                        // Add a resize handle
+                        Icon(
+                            imageVector = Icons.Default.AspectRatio,
+                            contentDescription = "Resize",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .pointerInput(Unit) {
+                                    detectDragGestures { change, dragAmount ->
+                                        change.consume()
+                                        colorMenuWidth += dragAmount.x.toDp()
+                                        colorMenuHeight += dragAmount.y.toDp()
+                                    }
+                                }
+                        )
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
