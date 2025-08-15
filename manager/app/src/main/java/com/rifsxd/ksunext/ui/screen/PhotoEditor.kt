@@ -300,27 +300,9 @@ fun PhotoEditor(
             alignment = Alignment.Center
         )
         
-        // Crop menu overlay
-        if (showCropMenu) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .clickable { showCropMenu = false }
-            )
-        }
+        // Removed full-screen overlays to keep photo visible
         
-        // Color menu overlay
-        if (showColorMenu) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .clickable { showColorMenu = false }
-            )
-        }
-        
-        // Crop menu popup - positioned above the control bar with Material 3 Expressive animation
+        // Crop menu popup - positioned as floating overlay panel
         AnimatedVisibility(
             visible = showCropMenu,
             enter = scaleIn(
@@ -328,34 +310,52 @@ fun PhotoEditor(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessMedium
                 ),
-                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.25f, 1f)
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.5f)
             ) + fadeIn(animationSpec = tween(300)),
             exit = scaleOut(
                 animationSpec = tween(200),
-                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.25f, 1f)
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.5f)
             ) + fadeOut(animationSpec = tween(200))
         ) {
             Card(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 32.dp, bottom = 80.dp)
-                    .widthIn(min = 250.dp, max = 320.dp),
+                    .align(Alignment.Center)
+                    .padding(32.dp)
+                    .widthIn(min = 280.dp, max = 350.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
-                        alpha = 0.98f
+                        alpha = 0.95f
                     )
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                shape = RoundedCornerShape(20.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = "Crop Tools",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
+                    // Header with title and close button
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Crop Tools",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        IconButton(
+                            onClick = { showCropMenu = false },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
                     
                     // Rotation controls
                     Text(
@@ -477,7 +477,7 @@ fun PhotoEditor(
         }
         }
         
-        // Color menu popup - positioned above the control bar with Material 3 Expressive animation
+        // Color menu popup - positioned as floating overlay panel
         AnimatedVisibility(
             visible = showColorMenu,
             enter = scaleIn(
@@ -485,34 +485,52 @@ fun PhotoEditor(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessMedium
                 ),
-                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 1f)
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.5f)
             ) + fadeIn(animationSpec = tween(300)),
             exit = scaleOut(
                 animationSpec = tween(200),
-                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 1f)
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.5f)
             ) + fadeOut(animationSpec = tween(200))
         ) {
             Card(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(start = 16.dp, bottom = 80.dp)
-                    .widthIn(min = 250.dp, max = 320.dp),
+                    .align(Alignment.Center)
+                    .padding(32.dp)
+                    .widthIn(min = 280.dp, max = 350.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
-                        alpha = 0.98f
+                        alpha = 0.95f
                     )
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-                shape = RoundedCornerShape(20.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = "Color Adjustments",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
+                    // Header with title and close button
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Color Adjustments",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        IconButton(
+                            onClick = { showColorMenu = false },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
                     
                     // Brightness control
                     Text(
@@ -601,7 +619,7 @@ fun PhotoEditor(
                             WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
                         )
                     )
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 120.dp),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 tonalElevation = 3.dp,
                 shape = RoundedCornerShape(16.dp)
