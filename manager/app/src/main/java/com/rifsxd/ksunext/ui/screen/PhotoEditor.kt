@@ -276,6 +276,9 @@ fun PhotoEditor(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .windowInsetsPadding(
+                    WindowInsets.systemBars.only(WindowInsetsSides.Bottom)
+                )
                 .padding(16.dp),
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 16.dp,
