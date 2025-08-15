@@ -333,6 +333,191 @@ fun PhotoEditor(
                     .padding(top = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Inline Crop Menu
+                AnimatedVisibility(
+                    visible = showCropMenu,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ) {
+                        // Header
+                        Text(
+                            text = "Crop Tools",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        // Rotation controls
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    currentRotation = (currentRotation - 90f) % 360f
+                                    onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                                    prefs.edit().putFloat("background_rotation", currentRotation).apply()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.RotateLeft,
+                                    contentDescription = "Rotate Left"
+                                )
+                            }
+                            
+                            IconButton(
+                                onClick = {
+                                    currentRotation = (currentRotation + 90f) % 360f
+                                    onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                                    prefs.edit().putFloat("background_rotation", currentRotation).apply()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.RotateRight,
+                                    contentDescription = "Rotate Right"
+                                )
+                            }
+                            
+                            IconButton(
+                                onClick = { 
+                                    flipHorizontal = !flipHorizontal
+                                    val imageUriString = imageUri.toString()
+                                    prefs.edit().putBoolean("${imageUriString}_flip_horizontal", flipHorizontal).apply()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.SwapHoriz,
+                                    contentDescription = "Flip Horizontal",
+                                    tint = if (flipHorizontal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            
+                            IconButton(
+                                onClick = { 
+                                    flipVertical = !flipVertical
+                                    val imageUriString = imageUri.toString()
+                                    prefs.edit().putBoolean("${imageUriString}_flip_vertical", flipVertical).apply()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.SwapVert,
+                                    contentDescription = "Flip Vertical",
+                                    tint = if (flipVertical) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+                        
+                        // Scale control
+                        Text(
+                            text = "Scale: ${String.format("%.1f", currentScale)}x",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Slider(
+                            value = currentScale,
+                            onValueChange = { newScale ->
+                                currentScale = newScale
+                                onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                                prefs.edit().putFloat("background_scale", currentScale).apply()
+                            },
+                            valueRange = 0.1f..3.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                
+                // Inline Color Menu
+                AnimatedVisibility(
+                    visible = showColorMenu,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ) {
+                        // Header
+                        Text(
+                            text = "Color Adjustments",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        // Brightness control
+                        Text(
+                            text = "Brightness: ${String.format("%.1f", brightness)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Slider(
+                            value = brightness,
+                            onValueChange = { newBrightness ->
+                                brightness = newBrightness
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_brightness", brightness).apply()
+                            },
+                            valueRange = 0.0f..2.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        // Contrast control
+                        Text(
+                            text = "Contrast: ${String.format("%.1f", contrast)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Slider(
+                            value = contrast,
+                            onValueChange = { newContrast ->
+                                contrast = newContrast
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
+                            },
+                            valueRange = 0.0f..2.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        // Saturation control
+                        Text(
+                            text = "Saturation: ${String.format("%.1f", saturation)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Slider(
+                            value = saturation,
+                            onValueChange = { newSaturation ->
+                                saturation = newSaturation
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
+                            },
+                            valueRange = 0.0f..2.0f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        // Hue control
+                        Text(
+                            text = "Hue: ${String.format("%.0f", hue)}°",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Slider(
+                            value = hue,
+                            onValueChange = { newHue ->
+                                hue = newHue
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putFloat("${imageUriString}_hue", hue).apply()
+                            },
+                            valueRange = 0f..360f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                
                 // Control bar with 4 buttons
                  Row(
                      modifier = Modifier.fillMaxWidth(),
@@ -451,221 +636,6 @@ fun PhotoEditor(
                              contentDescription = "Confirm",
                              tint = MaterialTheme.colorScheme.onPrimary,
                              modifier = Modifier.size(24.dp)
-                         )
-                     }
-                 }
-                 
-                 // Inline Crop Menu
-                 AnimatedVisibility(
-                     visible = showCropMenu,
-                     enter = fadeIn() + scaleIn(),
-                     exit = fadeOut() + scaleOut()
-                 ) {
-                     Column(
-                         modifier = Modifier
-                             .fillMaxWidth()
-                             .padding(top = 8.dp)
-                     ) {
-                         // Header with close button
-                         Row(
-                             modifier = Modifier.fillMaxWidth(),
-                             horizontalArrangement = Arrangement.SpaceBetween,
-                             verticalAlignment = Alignment.CenterVertically
-                         ) {
-                             Text(
-                                 text = "Crop Tools",
-                                 style = MaterialTheme.typography.titleMedium
-                             )
-                             IconButton(
-                                 onClick = { showCropMenu = false },
-                                 modifier = Modifier.size(32.dp)
-                             ) {
-                                 Icon(
-                                     imageVector = Icons.Default.Close,
-                                     contentDescription = "Close",
-                                     tint = MaterialTheme.colorScheme.onSurface
-                                 )
-                             }
-                         }
-                         
-                         // Rotation controls
-                         Row(
-                             modifier = Modifier.fillMaxWidth(),
-                             horizontalArrangement = Arrangement.SpaceEvenly
-                         ) {
-                             IconButton(
-                                 onClick = {
-                                     currentRotation = (currentRotation - 90f) % 360f
-                                     onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                                     prefs.edit().putFloat("background_rotation", currentRotation).apply()
-                                 }
-                             ) {
-                                 Icon(
-                                     imageVector = Icons.Default.RotateLeft,
-                                     contentDescription = "Rotate Left"
-                                 )
-                             }
-                             
-                             IconButton(
-                                 onClick = {
-                                     currentRotation = (currentRotation + 90f) % 360f
-                                     onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                                     prefs.edit().putFloat("background_rotation", currentRotation).apply()
-                                 }
-                             ) {
-                                 Icon(
-                                     imageVector = Icons.Default.RotateRight,
-                                     contentDescription = "Rotate Right"
-                                 )
-                             }
-                             
-                             IconButton(
-                                 onClick = { 
-                                     flipHorizontal = !flipHorizontal
-                                     val imageUriString = imageUri.toString()
-                                     prefs.edit().putBoolean("${imageUriString}_flip_horizontal", flipHorizontal).apply()
-                                 }
-                             ) {
-                                 Icon(
-                                     imageVector = Icons.Default.SwapHoriz,
-                                     contentDescription = "Flip Horizontal",
-                                     tint = if (flipHorizontal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                                 )
-                             }
-                             
-                             IconButton(
-                                 onClick = { 
-                                     flipVertical = !flipVertical
-                                     val imageUriString = imageUri.toString()
-                                     prefs.edit().putBoolean("${imageUriString}_flip_vertical", flipVertical).apply()
-                                 }
-                             ) {
-                                 Icon(
-                                     imageVector = Icons.Default.SwapVert,
-                                     contentDescription = "Flip Vertical",
-                                     tint = if (flipVertical) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                                 )
-                             }
-                         }
-                         
-                         // Scale control
-                         Text(
-                             text = "Scale: ${String.format("%.1f", currentScale)}x",
-                             style = MaterialTheme.typography.bodyMedium,
-                             modifier = Modifier.padding(bottom = 8.dp)
-                         )
-                         Slider(
-                             value = currentScale,
-                             onValueChange = { newScale ->
-                                 currentScale = newScale
-                                 onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                                 prefs.edit().putFloat("background_scale", currentScale).apply()
-                             },
-                             valueRange = 0.1f..3.0f,
-                             modifier = Modifier.fillMaxWidth()
-                         )
-                     }
-                 }
-                 
-                 // Inline Color Menu
-                 AnimatedVisibility(
-                     visible = showColorMenu,
-                     enter = fadeIn() + scaleIn(),
-                     exit = fadeOut() + scaleOut()
-                 ) {
-                     Column(
-                         modifier = Modifier
-                             .fillMaxWidth()
-                             .padding(top = 8.dp)
-                     ) {
-                         // Header with close button
-                         Row(
-                             modifier = Modifier.fillMaxWidth(),
-                             horizontalArrangement = Arrangement.SpaceBetween,
-                             verticalAlignment = Alignment.CenterVertically
-                         ) {
-                             Text(
-                                 text = "Color Adjustments",
-                                 style = MaterialTheme.typography.titleMedium
-                             )
-                             IconButton(
-                                 onClick = { showColorMenu = false },
-                                 modifier = Modifier.size(32.dp)
-                             ) {
-                                 Icon(
-                                     imageVector = Icons.Default.Close,
-                                     contentDescription = "Close",
-                                     tint = MaterialTheme.colorScheme.onSurface
-                                 )
-                             }
-                         }
-                         
-                         // Brightness control
-                         Text(
-                             text = "Brightness: ${String.format("%.1f", brightness)}",
-                             style = MaterialTheme.typography.bodyMedium,
-                             modifier = Modifier.padding(bottom = 4.dp)
-                         )
-                         Slider(
-                             value = brightness,
-                             onValueChange = { newBrightness ->
-                                 brightness = newBrightness
-                                 val imageUriString = imageUri.toString()
-                                 prefs.edit().putFloat("${imageUriString}_brightness", brightness).apply()
-                             },
-                             valueRange = 0.0f..2.0f,
-                             modifier = Modifier.fillMaxWidth()
-                         )
-                         
-                         // Contrast control
-                         Text(
-                             text = "Contrast: ${String.format("%.1f", contrast)}",
-                             style = MaterialTheme.typography.bodyMedium,
-                             modifier = Modifier.padding(bottom = 4.dp)
-                         )
-                         Slider(
-                             value = contrast,
-                             onValueChange = { newContrast ->
-                                 contrast = newContrast
-                                 val imageUriString = imageUri.toString()
-                                 prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
-                             },
-                             valueRange = 0.0f..2.0f,
-                             modifier = Modifier.fillMaxWidth()
-                         )
-                         
-                         // Saturation control
-                         Text(
-                             text = "Saturation: ${String.format("%.1f", saturation)}",
-                             style = MaterialTheme.typography.bodyMedium,
-                             modifier = Modifier.padding(bottom = 4.dp)
-                         )
-                         Slider(
-                             value = saturation,
-                             onValueChange = { newSaturation ->
-                                 saturation = newSaturation
-                                 val imageUriString = imageUri.toString()
-                                 prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
-                             },
-                             valueRange = 0.0f..2.0f,
-                             modifier = Modifier.fillMaxWidth()
-                         )
-                         
-                         // Hue control
-                         Text(
-                             text = "Hue: ${String.format("%.0f", hue)}°",
-                             style = MaterialTheme.typography.bodyMedium,
-                             modifier = Modifier.padding(bottom = 4.dp)
-                         )
-                         Slider(
-                             value = hue,
-                             onValueChange = { newHue ->
-                                 hue = newHue
-                                 val imageUriString = imageUri.toString()
-                                 prefs.edit().putFloat("${imageUriString}_hue", hue).apply()
-                             },
-                             valueRange = 0f..360f,
-                             modifier = Modifier.fillMaxWidth()
                          )
                      }
                  }
