@@ -66,13 +66,14 @@ fun PhotoEditorScreen(
         // Preserve existing background_transparency setting instead of overriding it
         val currentTransparency = prefs.getFloat("background_transparency", 0.0f)
         
-        // Get current flip and color states from preferences
-        val flipHorizontal = prefs.getBoolean("${imageUri}_flip_horizontal", false)
-        val flipVertical = prefs.getBoolean("${imageUri}_flip_vertical", false)
-        val brightness = prefs.getFloat("${imageUri}_brightness", 0f)
-        val contrast = prefs.getFloat("${imageUri}_contrast", 0f)
-        val saturation = prefs.getFloat("${imageUri}_saturation", 0f)
-        val hue = prefs.getFloat("${imageUri}_hue", 0f)
+        // Get current flip and color states from image-specific preferences
+        val imageUriString = imageUri.toString()
+        val flipHorizontal = prefs.getBoolean("${imageUriString}_flip_horizontal", false)
+        val flipVertical = prefs.getBoolean("${imageUriString}_flip_vertical", false)
+        val brightness = prefs.getFloat("${imageUriString}_brightness", 0f)
+        val contrast = prefs.getFloat("${imageUriString}_contrast", 0f)
+        val saturation = prefs.getFloat("${imageUriString}_saturation", 0f)
+        val hue = prefs.getFloat("${imageUriString}_hue", 0f)
         
         println("PhotoEditor: Saving with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
         println("PhotoEditor: Flip states - horizontal=$flipHorizontal, vertical=$flipVertical")
