@@ -79,6 +79,14 @@ fun PhotoEditorScreen(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     
+    // Save the current background image URI as previous before editing
+    LaunchedEffect(imageUri) {
+        val currentUri = prefs.getString("background_image_uri", "")
+        if (currentUri?.isNotEmpty() == true && currentUri != imageUri) {
+            prefs.edit().putString("previous_background_image_uri", currentUri).apply()
+        }
+    }
+    
     val saveFunction = { scale: Float, offsetX: Float, offsetY: Float, rotation: Float ->
         // Save transform settings and background configuration
         // Preserve existing background_transparency setting instead of overriding it
@@ -88,9 +96,9 @@ fun PhotoEditorScreen(
         val imageUriString = imageUri.toString()
         val flipHorizontal = prefs.getBoolean("${imageUriString}_flip_horizontal", false)
         val flipVertical = prefs.getBoolean("${imageUriString}_flip_vertical", false)
-        val brightness = prefs.getFloat("${imageUriString}_brightness", 0f)
-        val contrast = prefs.getFloat("${imageUriString}_contrast", 0f)
-        val saturation = prefs.getFloat("${imageUriString}_saturation", 0f)
+        val brightness = prefs.getFloat("${imageUriString}_brightness", 1.0f)
+        val contrast = prefs.getFloat("${imageUriString}_contrast", 1.0f)
+        val saturation = prefs.getFloat("${imageUriString}_saturation", 1.0f)
         val hue = prefs.getFloat("${imageUriString}_hue", 0f)
         
         println("PhotoEditor: Saving with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
@@ -138,9 +146,9 @@ fun PhotoEditorScreen(
             // Also load flip and color states from main background settings and copy to image-specific keys
             val flipHorizontal = prefs.getBoolean("background_flip_horizontal", false)
             val flipVertical = prefs.getBoolean("background_flip_vertical", false)
-            val brightness = prefs.getFloat("background_brightness", 0f)
-            val contrast = prefs.getFloat("background_contrast", 0f)
-            val saturation = prefs.getFloat("background_saturation", 0f)
+            val brightness = prefs.getFloat("background_brightness", 1.0f)
+            val contrast = prefs.getFloat("background_contrast", 1.0f)
+            val saturation = prefs.getFloat("background_saturation", 1.0f)
             val hue = prefs.getFloat("background_hue", 0f)
             
             // Copy to image-specific keys for the PhotoEditor to use
@@ -167,9 +175,9 @@ fun PhotoEditorScreen(
             prefs.edit()
                 .putBoolean("${imageUri}_flip_horizontal", false)
                 .putBoolean("${imageUri}_flip_vertical", false)
-                .putFloat("${imageUri}_brightness", 0f)
-                .putFloat("${imageUri}_contrast", 0f)
-                .putFloat("${imageUri}_saturation", 0f)
+                .putFloat("${imageUri}_brightness", 1.0f)
+                .putFloat("${imageUri}_contrast", 1.0f)
+                .putFloat("${imageUri}_saturation", 1.0f)
                 .putFloat("${imageUri}_hue", 0f)
                 .apply()
             
@@ -193,6 +201,19 @@ fun PhotoEditorScreen(
             saveFunction(scale, offsetX, offsetY, rotation)
         },
         onCancel = {
+            // Restore previous image selection by clearing current selection
+            val previousUri = prefs.getString("previous_background_image_uri", "")
+            if (previousUri?.isNotEmpty() == true) {
+                prefs.edit()
+                    .putString("background_image_uri", previousUri)
+                    .remove("previous_background_image_uri")
+                    .apply()
+            } else {
+                // If no previous image, clear current selection
+                prefs.edit()
+                    .remove("background_image_uri")
+                    .apply()
+            }
             navigator.popBackStack()
         }
     )
@@ -224,18 +245,18 @@ fun PhotoEditor(
     var showColorMenu by remember { mutableStateOf(false) }
     var flipHorizontal by remember { mutableStateOf(false) }
     var flipVertical by remember { mutableStateOf(false) }
-    var brightness by remember { mutableFloatStateOf(0f) }
-    var contrast by remember { mutableFloatStateOf(0f) }
-    var saturation by remember { mutableFloatStateOf(0f) }
+    var brightness by remember { mutableFloatStateOf(1.0f) }
+    var contrast by remember { mutableFloatStateOf(1.0f) }
+    var saturation by remember { mutableFloatStateOf(1.0f) }
     var hue by remember { mutableFloatStateOf(0f) }
     var freeFormEditing by remember { mutableStateOf(false) }
     
     // Load existing color settings for this specific image
     LaunchedEffect(imageUri) {
         val imageUriString = imageUri.toString()
-        brightness = prefs.getFloat("${imageUriString}_brightness", 0f)
-        contrast = prefs.getFloat("${imageUriString}_contrast", 0f)
-        saturation = prefs.getFloat("${imageUriString}_saturation", 0f)
+        brightness = prefs.getFloat("${imageUriString}_brightness", 1.0f)
+        contrast = prefs.getFloat("${imageUriString}_contrast", 1.0f)
+        saturation = prefs.getFloat("${imageUriString}_saturation", 1.0f)
         hue = prefs.getFloat("${imageUriString}_hue", 0f)
         flipHorizontal = prefs.getBoolean("${imageUriString}_flip_horizontal", false)
         flipVertical = prefs.getBoolean("${imageUriString}_flip_vertical", false)
@@ -267,15 +288,15 @@ fun PhotoEditor(
             contentDescription = "Photo to edit",
             colorFilter = ColorFilter.colorMatrix(
                 ColorMatrix().apply {
-                    // Apply brightness
+                    // Apply brightness (1.0 = normal, 0.0 = black, 2.0 = very bright)
                     val brightnessMatrix = ColorMatrix(floatArrayOf(
-                        1f, 0f, 0f, 0f, brightness * 255f,
-                        0f, 1f, 0f, 0f, brightness * 255f,
-                        0f, 0f, 1f, 0f, brightness * 255f,
+                        1f, 0f, 0f, 0f, (brightness - 1f) * 255f,
+                        0f, 1f, 0f, 0f, (brightness - 1f) * 255f,
+                        0f, 0f, 1f, 0f, (brightness - 1f) * 255f,
                         0f, 0f, 0f, 1f, 0f
                     ))
                     
-                    // Apply contrast
+                    // Apply contrast (1.0 = normal, 0.0 = gray, 2.0 = high contrast)
                     val contrastMatrix = ColorMatrix(floatArrayOf(
                         contrast, 0f, 0f, 0f, 128f * (1f - contrast),
                         0f, contrast, 0f, 0f, 128f * (1f - contrast),
@@ -517,7 +538,7 @@ fun PhotoEditor(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Free Edit Mode",
+                                text = "Free Edit Mode: ${if (freeFormEditing) "Enabled" else "Disabled"}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Switch(
@@ -631,12 +652,8 @@ fun PhotoEditor(
                      // Crop button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
-                             if (showCropMenu) {
-                                 showCropMenu = false
-                             } else {
-                                 showColorMenu = false
-                                 showCropMenu = true
-                             }
+                             showColorMenu = false
+                             showCropMenu = !showCropMenu
                          },
                          modifier = Modifier
                              .size(56.dp)
@@ -658,12 +675,8 @@ fun PhotoEditor(
                      // Color button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
-                             if (showColorMenu) {
-                                 showColorMenu = false
-                             } else {
-                                 showCropMenu = false
-                                 showColorMenu = true
-                             }
+                             showCropMenu = false
+                             showColorMenu = !showColorMenu
                          },
                          modifier = Modifier
                              .size(56.dp)
