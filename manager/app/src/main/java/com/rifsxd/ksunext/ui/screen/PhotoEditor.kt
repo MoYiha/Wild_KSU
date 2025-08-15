@@ -288,33 +288,40 @@ fun PhotoEditor(
             contentDescription = "Photo to edit",
             colorFilter = ColorFilter.colorMatrix(
                 ColorMatrix().apply {
+                    // Start with identity matrix
+                    reset()
+                    
                     // Apply brightness (1.0 = normal, 0.0 = black, 2.0 = very bright)
-                    val brightnessMatrix = ColorMatrix(floatArrayOf(
-                        1f, 0f, 0f, 0f, (brightness - 1f) * 255f,
-                        0f, 1f, 0f, 0f, (brightness - 1f) * 255f,
-                        0f, 0f, 1f, 0f, (brightness - 1f) * 255f,
-                        0f, 0f, 0f, 1f, 0f
-                    ))
-                    
-                    // Apply contrast (1.0 = normal, 0.0 = gray, 2.0 = high contrast)
-                    val contrastMatrix = ColorMatrix(floatArrayOf(
-                        contrast, 0f, 0f, 0f, 128f * (1f - contrast),
-                        0f, contrast, 0f, 0f, 128f * (1f - contrast),
-                        0f, 0f, contrast, 0f, 128f * (1f - contrast),
-                        0f, 0f, 0f, 1f, 0f
-                    ))
-                    
-                    // Apply saturation
-                    val saturationMatrix = ColorMatrix().apply {
-                        setToSaturation(saturation)
+                    if (brightness != 1.0f) {
+                        val brightnessMatrix = ColorMatrix(floatArrayOf(
+                            1f, 0f, 0f, 0f, (brightness - 1f) * 255f,
+                            0f, 1f, 0f, 0f, (brightness - 1f) * 255f,
+                            0f, 0f, 1f, 0f, (brightness - 1f) * 255f,
+                            0f, 0f, 0f, 1f, 0f
+                        ))
+                        this.timesAssign(brightnessMatrix)
                     }
                     
-                    // Combine all matrices
-                    this.timesAssign(brightnessMatrix)
-                    this.timesAssign(contrastMatrix)
-                    this.timesAssign(saturationMatrix)
+                    // Apply contrast (1.0 = normal, 0.0 = gray, 2.0 = high contrast)
+                    if (contrast != 1.0f) {
+                        val contrastMatrix = ColorMatrix(floatArrayOf(
+                            contrast, 0f, 0f, 0f, 128f * (1f - contrast),
+                            0f, contrast, 0f, 0f, 128f * (1f - contrast),
+                            0f, 0f, contrast, 0f, 128f * (1f - contrast),
+                            0f, 0f, 0f, 1f, 0f
+                        ))
+                        this.timesAssign(contrastMatrix)
+                    }
                     
-                    // Apply hue rotation
+                    // Apply saturation (1.0 = normal)
+                    if (saturation != 1.0f) {
+                        val saturationMatrix = ColorMatrix().apply {
+                            setToSaturation(saturation)
+                        }
+                        this.timesAssign(saturationMatrix)
+                    }
+                    
+                    // Apply hue rotation (0.0 = normal)
                     if (hue != 0f) {
                         val hueMatrix = ColorMatrix()
                         hueMatrix.setToRotateRed(hue)
