@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Transform
+import androidx.compose.material.icons.filled.Crop
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.*
@@ -203,8 +204,8 @@ fun PhotoEditor(
     var currentRotation by remember { mutableFloatStateOf(rotation) }
     
     // Additional states for advanced controls
-    var selectedTab by remember { mutableStateOf(0) } // 0: Transform, 1: Color, 2: Advanced
-    var showTabMenu by remember { mutableStateOf(false) }
+    var showCropMenu by remember { mutableStateOf(false) }
+    var showColorMenu by remember { mutableStateOf(false) }
     var flipHorizontal by remember { mutableStateOf(false) }
     var flipVertical by remember { mutableStateOf(false) }
     var brightness by remember { mutableFloatStateOf(0f) }
@@ -291,119 +292,271 @@ fun PhotoEditor(
             alignment = Alignment.Center
         )
         
-        // Tab menu dropdown from top
-        if (showTabMenu) {
+        // Crop menu overlay
+        if (showCropMenu) {
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .clickable { showCropMenu = false }
+            )
+        }
+        
+        // Color menu overlay
+        if (showColorMenu) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .clickable { showColorMenu = false }
+            )
+        }
+        
+        // Crop menu popup
+        if (showCropMenu) {
+            Card(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 16.dp)
+                    .widthIn(min = 200.dp, max = 300.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
+                        alpha = 0.95f
+                    )
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                shape = RoundedCornerShape(16.dp)
             ) {
-                // Overlay to close menu
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.3f))
-                        .clickable { showTabMenu = false }
-                )
-                
-                // Tab menu card
-                Card(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 80.dp)
-                        .padding(horizontal = 32.dp)
-                        .fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                    shape = RoundedCornerShape(16.dp)
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
+                    Text(
+                        text = "Crop Tools",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    
+                    // Rotation controls
+                    Text(
+                        text = "Rotation",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Text(
-                            text = "Select Tool",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-                        
-                        // Transform tab option
-                        Row(
+                        IconButton(
+                            onClick = {
+                                currentRotation = (currentRotation - 90f) % 360f
+                                onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                                prefs.edit().putFloat("background_rotation", currentRotation).apply()
+                            },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    selectedTab = 0
-                                    showTabMenu = false
-                                }
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
                         ) {
                             Icon(
-                                 imageVector = Icons.Default.Transform,
-                                 contentDescription = null,
-                                 tint = if (selectedTab == 0) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.onSurfaceVariant
-                             )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = "Transform",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = if (selectedTab == 0) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.onSurface
+                                imageVector = Icons.Default.RotateLeft,
+                                contentDescription = "Rotate Left"
                             )
                         }
                         
-                        // Color tab option
-                        Row(
+                        IconButton(
+                            onClick = {
+                                currentRotation = (currentRotation + 90f) % 360f
+                                onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                                prefs.edit().putFloat("background_rotation", currentRotation).apply()
+                            },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    selectedTab = 1
-                                    showTabMenu = false
-                                }
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Palette,
-                                contentDescription = null,
-                                tint = if (selectedTab == 1) MaterialTheme.colorScheme.primary
-                                       else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = "Color",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = if (selectedTab == 1) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        
-                        // Advanced tab option
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    selectedTab = 2
-                                    showTabMenu = false
-                                }
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Tune,
-                                contentDescription = null,
-                                tint = if (selectedTab == 2) MaterialTheme.colorScheme.primary
-                                       else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = "Advanced",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = if (selectedTab == 2) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.onSurface
+                                imageVector = Icons.Default.RotateRight,
+                                contentDescription = "Rotate Right"
                             )
                         }
                     }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Flip controls
+                    Text(
+                        text = "Flip",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        IconButton(
+                            onClick = { 
+                                flipHorizontal = !flipHorizontal
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putBoolean("${imageUriString}_flip_horizontal", flipHorizontal).apply()
+                            },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    if (flipHorizontal) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SwapHoriz,
+                                contentDescription = "Flip Horizontal",
+                                tint = if (flipHorizontal) MaterialTheme.colorScheme.onPrimary
+                                       else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        
+                        IconButton(
+                            onClick = { 
+                                flipVertical = !flipVertical
+                                val imageUriString = imageUri.toString()
+                                prefs.edit().putBoolean("${imageUriString}_flip_vertical", flipVertical).apply()
+                            },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    if (flipVertical) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SwapVert,
+                                contentDescription = "Flip Vertical",
+                                tint = if (flipVertical) MaterialTheme.colorScheme.onPrimary
+                                       else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Scale control
+                    Text(
+                        text = "Scale: ${String.format("%.1f", currentScale)}x",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Slider(
+                        value = currentScale,
+                        onValueChange = { newScale ->
+                            currentScale = newScale
+                            onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                            prefs.edit().putFloat("background_scale", currentScale).apply()
+                        },
+                        valueRange = 0.1f..3.0f,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+        
+        // Color menu popup
+        if (showColorMenu) {
+            Card(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 16.dp)
+                    .widthIn(min = 200.dp, max = 300.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
+                        alpha = 0.95f
+                    )
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Color Adjustments",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    
+                    // Brightness control
+                    Text(
+                        text = "Brightness: ${String.format("%.1f", brightness)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Slider(
+                         value = brightness,
+                         onValueChange = { newBrightness ->
+                             brightness = newBrightness
+                             onColorChange(brightness, contrast, saturation, hue)
+                             val imageUriString = imageUri.toString()
+                             prefs.edit().putFloat("${imageUriString}_brightness", brightness).apply()
+                         },
+                         valueRange = 0.0f..2.0f,
+                         modifier = Modifier.fillMaxWidth()
+                     )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Contrast control
+                    Text(
+                        text = "Contrast: ${String.format("%.1f", contrast)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Slider(
+                         value = contrast,
+                         onValueChange = { newContrast ->
+                             contrast = newContrast
+                             onColorChange(brightness, contrast, saturation, hue)
+                             val imageUriString = imageUri.toString()
+                             prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
+                         },
+                         valueRange = 0.0f..2.0f,
+                         modifier = Modifier.fillMaxWidth()
+                     )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Saturation control
+                    Text(
+                        text = "Saturation: ${String.format("%.1f", saturation)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Slider(
+                         value = saturation,
+                         onValueChange = { newSaturation ->
+                             saturation = newSaturation
+                             onColorChange(brightness, contrast, saturation, hue)
+                             val imageUriString = imageUri.toString()
+                             prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
+                         },
+                         valueRange = 0.0f..2.0f,
+                         modifier = Modifier.fillMaxWidth()
+                     )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Hue control
+                    Text(
+                        text = "Hue: ${String.format("%.0f", hue)}°",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Slider(
+                         value = hue,
+                         onValueChange = { newHue ->
+                             hue = newHue
+                             onColorChange(brightness, contrast, saturation, hue)
+                             val imageUriString = imageUri.toString()
+                             prefs.edit().putFloat("${imageUriString}_hue", hue).apply()
+                         },
+                         valueRange = 0f..360f,
+                         modifier = Modifier.fillMaxWidth()
+                     )
                 }
             }
         }
@@ -429,361 +582,106 @@ fun PhotoEditor(
                     .padding(top = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Tab content based on selected tab
-                when (selectedTab) {
-                    0 -> { // Transform tab
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            // Rotation controls
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        currentRotation = (currentRotation - 90f) % 360f
-                                        onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                                        prefs.edit().putFloat("background_rotation", currentRotation).apply()
-                                    },
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.RotateLeft,
-                                        contentDescription = "Rotate Left"
-                                    )
-                                }
-                                
-                                IconButton(
-                                    onClick = {
-                                        currentRotation = (currentRotation + 90f) % 360f
-                                        onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                                        prefs.edit().putFloat("background_rotation", currentRotation).apply()
-                                    },
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.RotateRight,
-                                        contentDescription = "Rotate Right"
-                                    )
-                                }
-                            }
-                            
-                            // Flip controls
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                IconButton(
-                                    onClick = { 
-                                        flipHorizontal = !flipHorizontal
-                                        val imageUriString = imageUri.toString()
-                                        prefs.edit().putBoolean("${imageUriString}_flip_horizontal", flipHorizontal).apply()
-                                    },
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(
-                                            if (flipHorizontal) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.surfaceVariant
-                                        )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.SwapHoriz,
-                                        contentDescription = "Flip Horizontal",
-                                        tint = if (flipHorizontal) MaterialTheme.colorScheme.onPrimary
-                                               else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                
-                                IconButton(
-                                    onClick = { 
-                                        flipVertical = !flipVertical
-                                        val imageUriString = imageUri.toString()
-                                        prefs.edit().putBoolean("${imageUriString}_flip_vertical", flipVertical).apply()
-                                    },
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(
-                                            if (flipVertical) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.surfaceVariant
-                                        )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.SwapVert,
-                                        contentDescription = "Flip Vertical",
-                                        tint = if (flipVertical) MaterialTheme.colorScheme.onPrimary
-                                               else MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                            
-                            // Free-form editing toggle
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Free-form Editing",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                                Switch(
-                                    checked = freeFormEditing,
-                                    onCheckedChange = { freeFormEditing = it }
-                                )
-                            }
-                            
-                            // Scale slider
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "Scale",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "${(currentScale * 100).toInt()}%",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Slider(
-                                    value = currentScale,
-                                    onValueChange = { newScale ->
-                                        currentScale = newScale
-                                        onTransformChange(newScale, currentOffsetX, currentOffsetY, currentRotation)
-                                    },
-                                    valueRange = 0.1f..5f,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    }
-                    1 -> { // Color tab
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            // Brightness slider
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "Brightness",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "${brightness.toInt()}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Slider(
-                                    value = brightness,
-                                    onValueChange = { 
-                                        brightness = it
-                                        val imageUriString = imageUri.toString()
-                                        prefs.edit().putFloat("${imageUriString}_brightness", it).apply()
-                                    },
-                                    valueRange = -100f..100f,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            
-                            // Contrast slider
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "Contrast",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "${contrast.toInt()}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Slider(
-                                    value = contrast,
-                                    onValueChange = { 
-                                        contrast = it
-                                        val imageUriString = imageUri.toString()
-                                        prefs.edit().putFloat("${imageUriString}_contrast", it).apply()
-                                    },
-                                    valueRange = -100f..100f,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            
-                            // Saturation slider
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "Saturation",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "${saturation.toInt()}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Slider(
-                                    value = saturation,
-                                    onValueChange = { 
-                                        saturation = it
-                                        val imageUriString = imageUri.toString()
-                                        prefs.edit().putFloat("${imageUriString}_saturation", it).apply()
-                                    },
-                                    valueRange = -100f..100f,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            
-                            // Hue slider
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Text(
-                                        text = "Hue",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "${hue.toInt()}°",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Slider(
-                                    value = hue,
-                                    onValueChange = { 
-                                        hue = it
-                                        val imageUriString = imageUri.toString()
-                                        prefs.edit().putFloat("${imageUriString}_hue", it).apply()
-                                    },
-                                    valueRange = -100f..100f,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    }
-                    2 -> { // Advanced tab
-                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            // Reset button
-                            Button(
-                                onClick = {
-                                    currentScale = 1f
-                                    currentOffsetX = 0f
-                                    currentOffsetY = 0f
-                                    currentRotation = 0f
-                                    flipHorizontal = false
-                                    flipVertical = false
-                                    brightness = 0f
-                                    contrast = 0f
-                                    saturation = 0f
-                                    hue = 0f
-                                    freeFormEditing = false
-                                    onTransformChange(1f, 0f, 0f, 0f)
-                                    
-                                    val imageUriString = imageUri.toString()
-                                    prefs.edit()
-                                        .putFloat("${imageUriString}_brightness", 0f)
-                                        .putFloat("${imageUriString}_contrast", 0f)
-                                        .putFloat("${imageUriString}_saturation", 0f)
-                                        .putFloat("${imageUriString}_hue", 0f)
-                                        .putBoolean("${imageUriString}_flip_horizontal", false)
-                                        .putBoolean("${imageUriString}_flip_vertical", false)
-                                        .apply()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Reset All"
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Reset All Settings")
-                            }
-                        }
-                    }
-                }
-                
-                // Control bar with tabs and confirm button
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Tab selector button
-                    IconButton(
-                        onClick = { showTabMenu = !showTabMenu },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Icon(
-                            imageVector = when(selectedTab) {
-                                0 -> Icons.Default.Tune
-                                1 -> Icons.Default.Palette
-                                else -> Icons.Default.Tune
-                            },
-                            contentDescription = "Select Tool"
-                        )
-                    }
-                    
-                    // Tab indicator text
-                    Text(
-                        text = when(selectedTab) {
-                            0 -> "Transform"
-                            1 -> "Color"
-                            else -> "Advanced"
-                        },
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f).padding(horizontal = 16.dp)
-                    )
-                    
-                    // Cancel button
-                    IconButton(
-                        onClick = onCancel,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Cancel"
-                        )
-                    }
-                    
-                    // Confirm button
-                    IconButton(
-                        onClick = onSave,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Confirm",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                }
+                // Control bar with 4 buttons
+                 Row(
+                     modifier = Modifier.fillMaxWidth(),
+                     horizontalArrangement = Arrangement.SpaceEvenly,
+                     verticalAlignment = Alignment.CenterVertically
+                 ) {
+                     // Crop button
+                     IconButton(
+                         onClick = { showCropMenu = !showCropMenu },
+                         modifier = Modifier
+                             .clip(RoundedCornerShape(12.dp))
+                             .background(
+                                 if (showCropMenu) MaterialTheme.colorScheme.primary
+                                 else MaterialTheme.colorScheme.surfaceVariant
+                             )
+                     ) {
+                         Icon(
+                             imageVector = Icons.Filled.Crop,
+                             contentDescription = "Crop Tools",
+                             tint = if (showCropMenu) MaterialTheme.colorScheme.onPrimary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                         )
+                     }
+                     
+                     // Color button
+                     IconButton(
+                         onClick = { showColorMenu = !showColorMenu },
+                         modifier = Modifier
+                             .clip(RoundedCornerShape(12.dp))
+                             .background(
+                                 if (showColorMenu) MaterialTheme.colorScheme.primary
+                                 else MaterialTheme.colorScheme.surfaceVariant
+                             )
+                     ) {
+                         Icon(
+                             imageVector = Icons.Default.Palette,
+                             contentDescription = "Color Adjustments",
+                             tint = if (showColorMenu) MaterialTheme.colorScheme.onPrimary
+                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                         )
+                     }
+                     
+                     // Reset button
+                     IconButton(
+                         onClick = {
+                             // Reset all settings
+                             currentScale = 1.0f
+                             currentOffsetX = 0f
+                             currentOffsetY = 0f
+                             currentRotation = 0f
+                             brightness = 1.0f
+                             contrast = 1.0f
+                             saturation = 1.0f
+                             hue = 0f
+                             flipHorizontal = false
+                             flipVertical = false
+                             freeFormEditing = false
+                             
+                             // Update transformations
+                             onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                             onColorChange(brightness, contrast, saturation, hue)
+                             
+                             // Clear preferences
+                             val imageUriString = imageUri.toString()
+                             prefs.edit()
+                                 .remove("background_scale")
+                                 .remove("background_rotation")
+                                 .remove("${imageUriString}_brightness")
+                                 .remove("${imageUriString}_contrast")
+                                 .remove("${imageUriString}_saturation")
+                                 .remove("${imageUriString}_hue")
+                                 .remove("${imageUriString}_flip_horizontal")
+                                 .remove("${imageUriString}_flip_vertical")
+                                 .apply()
+                         },
+                         modifier = Modifier
+                             .clip(RoundedCornerShape(12.dp))
+                             .background(MaterialTheme.colorScheme.surfaceVariant)
+                     ) {
+                         Icon(
+                             imageVector = Icons.Default.Refresh,
+                             contentDescription = "Reset All",
+                             tint = MaterialTheme.colorScheme.onSurfaceVariant
+                         )
+                     }
+                     
+                     // Confirm button
+                     IconButton(
+                         onClick = onSave,
+                         modifier = Modifier
+                             .clip(RoundedCornerShape(12.dp))
+                             .background(MaterialTheme.colorScheme.primary)
+                     ) {
+                         Icon(
+                             imageVector = Icons.Default.Check,
+                             contentDescription = "Confirm",
+                             tint = MaterialTheme.colorScheme.onPrimary
+                         )
+                     }
+                 }
             }
         }
         
