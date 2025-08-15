@@ -46,6 +46,8 @@ import androidx.compose.material.icons.filled.Transform
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.material3.*
 
 import androidx.compose.runtime.*
@@ -263,33 +265,71 @@ fun PhotoEditor(
         Image(
             painter = painter,
             contentDescription = "Photo to edit",
+            colorFilter = ColorFilter.colorMatrix(
+                ColorMatrix().apply {
+                    // Apply brightness
+                    val brightnessMatrix = ColorMatrix(floatArrayOf(
+                        1f, 0f, 0f, 0f, brightness * 255f,
+                        0f, 1f, 0f, 0f, brightness * 255f,
+                        0f, 0f, 1f, 0f, brightness * 255f,
+                        0f, 0f, 0f, 1f, 0f
+                    ))
+                    
+                    // Apply contrast
+                    val contrastMatrix = ColorMatrix(floatArrayOf(
+                        contrast, 0f, 0f, 0f, 128f * (1f - contrast),
+                        0f, contrast, 0f, 0f, 128f * (1f - contrast),
+                        0f, 0f, contrast, 0f, 128f * (1f - contrast),
+                        0f, 0f, 0f, 1f, 0f
+                    ))
+                    
+                    // Apply saturation
+                    val saturationMatrix = ColorMatrix().apply {
+                        setToSaturation(saturation)
+                    }
+                    
+                    // Combine all matrices
+                    this.timesAssign(brightnessMatrix)
+                    this.timesAssign(contrastMatrix)
+                    this.timesAssign(saturationMatrix)
+                    
+                    // Apply hue rotation
+                    if (hue != 0f) {
+                        val hueMatrix = ColorMatrix()
+                        hueMatrix.setToRotateRed(hue)
+                        this.timesAssign(hueMatrix)
+                    }
+                }
+            ),
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, rotationChange ->
-                        val newScale = (currentScale * zoom).coerceIn(0.1f, 5f)
-                        val newOffsetX = (currentOffsetX + pan.x).coerceIn(-1000f, 1000f)
-                        val newOffsetY = (currentOffsetY + pan.y).coerceIn(-1000f, 1000f)
-                        val newRotation = (currentRotation + rotationChange) % 360f
-                        
-                        // Update local state
-                        currentScale = newScale
-                        currentOffsetX = newOffsetX
-                        currentOffsetY = newOffsetY
-                        currentRotation = newRotation
-                        
-                        // Notify parent of transform changes
-                        onTransformChange(newScale, newOffsetX, newOffsetY, newRotation)
-                        
-                        // Save to preferences immediately for real-time updates
-                        println("PhotoEditor: Gesture update - scale=$newScale, offsetX=$newOffsetX, offsetY=$newOffsetY, rotation=$newRotation")
-                        prefs.edit()
-                            .putFloat("background_scale_x", newScale)
-                            .putFloat("background_pos_x", newOffsetX)
-                            .putFloat("background_pos_y", newOffsetY)
-                            .putFloat("background_rotation", newRotation)
-                            .apply()
-                        Unit
+                .pointerInput(freeFormEditing) {
+                    if (!freeFormEditing) {
+                        detectTransformGestures { _, pan, zoom, rotationChange ->
+                            val newScale = (currentScale * zoom).coerceIn(0.1f, 5f)
+                            val newOffsetX = (currentOffsetX + pan.x).coerceIn(-1000f, 1000f)
+                            val newOffsetY = (currentOffsetY + pan.y).coerceIn(-1000f, 1000f)
+                            val newRotation = (currentRotation + rotationChange) % 360f
+                            
+                            // Update local state
+                            currentScale = newScale
+                            currentOffsetX = newOffsetX
+                            currentOffsetY = newOffsetY
+                            currentRotation = newRotation
+                            
+                            // Notify parent of transform changes
+                            onTransformChange(newScale, newOffsetX, newOffsetY, newRotation)
+                            
+                            // Save to preferences immediately for real-time updates
+                            println("PhotoEditor: Gesture update - scale=$newScale, offsetX=$newOffsetX, offsetY=$newOffsetY, rotation=$newRotation")
+                            prefs.edit()
+                                .putFloat("background_scale_x", newScale)
+                                .putFloat("background_pos_x", newOffsetX)
+                                .putFloat("background_pos_y", newOffsetY)
+                                .putFloat("background_rotation", newRotation)
+                                .apply()
+                            Unit
+                        }
                     }
                 }
                 .graphicsLayer(
@@ -298,8 +338,7 @@ fun PhotoEditor(
                     translationX = currentOffsetX,
                     translationY = currentOffsetY,
                     rotationZ = currentRotation,
-                    transformOrigin = TransformOrigin.Center,
-                    alpha = (1f + (brightness / 200f)).coerceIn(0f, 1f)
+                    transformOrigin = TransformOrigin.Center
                 ),
 
             contentScale = ContentScale.Fit,
@@ -426,6 +465,71 @@ fun PhotoEditor(
                             },
                             valueRange = 0.1f..3.0f,
                             modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        // Position controls
+                        Text(
+                            text = "Position Controls",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(bottom = 8.dp, top = 16.dp)
+                        )
+                        
+                        // Horizontal position
+                        Text(
+                            text = "Left/Right: ${String.format("%.0f", currentOffsetX)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Slider(
+                            value = currentOffsetX,
+                            onValueChange = { newOffsetX ->
+                                currentOffsetX = newOffsetX
+                                onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                                prefs.edit().putFloat("background_pos_x", currentOffsetX).apply()
+                            },
+                            valueRange = -1000f..1000f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        // Vertical position
+                        Text(
+                            text = "Up/Down: ${String.format("%.0f", currentOffsetY)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                        Slider(
+                            value = currentOffsetY,
+                            onValueChange = { newOffsetY ->
+                                currentOffsetY = newOffsetY
+                                onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                                prefs.edit().putFloat("background_pos_y", currentOffsetY).apply()
+                            },
+                            valueRange = -1000f..1000f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        // Free edit toggle
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Free Edit Mode",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Switch(
+                                checked = freeFormEditing,
+                                onCheckedChange = { freeFormEditing = it }
+                            )
+                        }
+                        Text(
+                            text = "When enabled, disables touch gestures for precise slider control",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
                 }
