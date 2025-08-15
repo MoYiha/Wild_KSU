@@ -322,7 +322,7 @@ fun PhotoEditor(
                             WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
                         )
                     )
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 120.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 tonalElevation = 3.dp,
                 shape = RoundedCornerShape(16.dp)
@@ -527,8 +527,8 @@ fun PhotoEditor(
                      // Crop button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
+                             showColorMenu = false
                              showCropMenu = !showCropMenu
-                             if (showCropMenu) showColorMenu = false
                          },
                          modifier = Modifier
                              .size(56.dp)
@@ -550,8 +550,8 @@ fun PhotoEditor(
                      // Color button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
+                             showCropMenu = false
                              showColorMenu = !showColorMenu
-                             if (showColorMenu) showCropMenu = false
                          },
                          modifier = Modifier
                              .size(56.dp)
