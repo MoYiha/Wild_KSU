@@ -1,5 +1,6 @@
 package com.rifsxd.ksunext.ui.screen
 
+import android.content.SharedPreferences
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -230,7 +231,17 @@ fun HomeSettingsScreen(
     // Get current order from preferences
     var itemOrder by remember {
         val savedOrder = prefs.getString("info_card_items_order", "")
-        val defaultOrder = infoCardItems.map { it.key }
+        val defaultOrder = listOf(
+            "info_card_show_manager_version",
+            "info_card_show_hook_mode",
+            "info_card_show_mount_system",
+            "info_card_show_susfs_status",
+            "info_card_show_zygisk_status",
+            "info_card_show_kernel_version",
+            "info_card_show_android_version",
+            "info_card_show_abi",
+            "info_card_show_selinux_status"
+        )
         val currentOrder = if (savedOrder.isNullOrEmpty()) {
             defaultOrder
         } else {
@@ -248,6 +259,40 @@ fun HomeSettingsScreen(
     // Save order when it changes
     LaunchedEffect(itemOrder) {
         prefs.edit().putString("info_card_items_order", itemOrder.joinToString(",")).apply()
+    }
+    
+    // Listen for external preference changes and update itemOrder
+    LaunchedEffect(Unit) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == "info_card_items_order") {
+                val newSavedOrder = prefs.getString("info_card_items_order", "")
+                val defaultOrder = listOf(
+                    "info_card_show_manager_version",
+                    "info_card_show_hook_mode",
+                    "info_card_show_mount_system",
+                    "info_card_show_susfs_status",
+                    "info_card_show_zygisk_status",
+                    "info_card_show_kernel_version",
+                    "info_card_show_android_version",
+                    "info_card_show_abi",
+                    "info_card_show_selinux_status"
+                )
+                val newOrder = if (newSavedOrder.isNullOrEmpty()) {
+                    defaultOrder
+                } else {
+                    val saved = newSavedOrder.split(",")
+                    val result = saved.filter { key -> defaultOrder.contains(key) }.toMutableList()
+                    defaultOrder.forEach { key ->
+                        if (!result.contains(key)) result.add(key)
+                    }
+                    result
+                }
+                if (newOrder != itemOrder) {
+                    itemOrder = newOrder
+                }
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
     }
 
     // Icon Selection with OFF option
