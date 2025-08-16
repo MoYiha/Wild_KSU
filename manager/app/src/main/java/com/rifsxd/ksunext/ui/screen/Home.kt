@@ -803,87 +803,29 @@ private fun InfoCard(autoExpand: Boolean = false) {
             }
 
             Column {
-                // Define which items are considered "expanded" (shown only when expanded)
-                val expandedItems = setOf(
-                    "info_card_show_kernel_version",
-                    "info_card_show_android_version",
-                    "info_card_show_abi",
-                    "info_card_show_selinux_status"
-                )
-                
-                // Render all items in the saved order, respecting expanded state
+                // Render all items in the saved order - all items are always shown
                 var isFirstItem = true
-                var hasExpandableItems = false
-                var renderedExpandableCount = 0
                 
                 itemOrder.forEach { itemKey ->
-                    val isExpandedItem = itemKey in expandedItems
-                    val shouldShow = if (isExpandedItem) {
-                        expanded || alwaysExpanded
-                    } else {
-                        true
+                    val wasFirstItem = isFirstItem
+                    RenderInfoCardItem(itemKey, wasFirstItem)
+                    
+                    // Check if the item was actually rendered
+                    val itemWasRendered = when (itemKey) {
+                        "info_card_show_manager_version" -> showManagerVersion
+                        "info_card_show_hook_mode" -> showHookMode && ksuVersion != null && Natives.version >= Natives.MINIMAL_SUPPORTED_HOOK_MODE
+                        "info_card_show_mount_system" -> showMountSystem && ksuVersion != null
+                        "info_card_show_susfs_status" -> showSusfsStatus && ksuVersion != null && getSuSFS() == "Supported"
+                        "info_card_show_zygisk_status" -> showZygiskStatus && ksuVersion != null && Natives.isZygiskEnabled()
+                        "info_card_show_kernel_version" -> showKernelVersion
+                        "info_card_show_android_version" -> showAndroidVersion
+                        "info_card_show_abi" -> showAbi
+                        "info_card_show_selinux_status" -> showSelinuxStatus
+                        else -> false
                     }
                     
-                    if (shouldShow) {
-                        val wasFirstItem = isFirstItem
-                        RenderInfoCardItem(itemKey, wasFirstItem)
-                        
-                        // Check if the item was actually rendered
-                        val itemWasRendered = when (itemKey) {
-                            "info_card_show_manager_version" -> showManagerVersion
-                            "info_card_show_hook_mode" -> showHookMode && ksuVersion != null && Natives.version >= Natives.MINIMAL_SUPPORTED_HOOK_MODE
-                            "info_card_show_mount_system" -> showMountSystem && ksuVersion != null
-                            "info_card_show_susfs_status" -> showSusfsStatus && ksuVersion != null && getSuSFS() == "Supported"
-                            "info_card_show_zygisk_status" -> showZygiskStatus && ksuVersion != null && Natives.isZygiskEnabled()
-                            "info_card_show_kernel_version" -> showKernelVersion
-                            "info_card_show_android_version" -> showAndroidVersion
-                            "info_card_show_abi" -> showAbi
-                            "info_card_show_selinux_status" -> showSelinuxStatus
-                            else -> false
-                        }
-                        
-                        if (itemWasRendered) {
-                            if (isFirstItem) {
-                                isFirstItem = false
-                            }
-                            if (isExpandedItem) {
-                                renderedExpandableCount++
-                            }
-                        }
-                    }
-                    
-                    // Check if this item could be expandable (even if not currently shown)
-                    if (isExpandedItem) {
-                        val couldBeRendered = when (itemKey) {
-                            "info_card_show_kernel_version" -> showKernelVersion
-                            "info_card_show_android_version" -> showAndroidVersion
-                            "info_card_show_abi" -> showAbi
-                            "info_card_show_selinux_status" -> showSelinuxStatus
-                            else -> false
-                        }
-                        if (couldBeRendered) {
-                            hasExpandableItems = true
-                        }
-                    }
-                }
-
-                // Show expand button if there are expandable items and we're not expanded
-                if (!expanded && !alwaysExpanded && hasExpandableItems) {
-                    Spacer(Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        IconButton(
-                            onClick = { expanded = true },
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.KeyboardArrowDown,
-                                contentDescription = "Show more"
-                            )
-                        }
+                    if (itemWasRendered && isFirstItem) {
+                        isFirstItem = false
                     }
                 }
             }
