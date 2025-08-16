@@ -242,8 +242,7 @@ fun PhotoEditor(
     
     // Additional states for advanced controls
     var activeMenu by remember { mutableStateOf<String?>(null) }
-    val showCropMenu = activeMenu == "crop"
-    val showColorMenu = activeMenu == "color"
+
     var flipHorizontal by remember { mutableStateOf(false) }
     var flipVertical by remember { mutableStateOf(false) }
     var brightness by remember { mutableFloatStateOf(1.0f) }
@@ -403,7 +402,7 @@ fun PhotoEditor(
             ) {
                 // Inline Crop Menu
                 AnimatedVisibility(
-                    visible = showCropMenu,
+                    visible = activeMenu == "crop",
                     enter = fadeIn(animationSpec = tween(200)) + scaleIn(animationSpec = tween(200)),
                     exit = fadeOut(animationSpec = tween(150)) + scaleOut(animationSpec = tween(150))
                 ) {
@@ -565,7 +564,7 @@ fun PhotoEditor(
                 
                 // Inline Color Menu
                 AnimatedVisibility(
-                    visible = showColorMenu,
+                    visible = activeMenu == "color",
                     enter = fadeIn(animationSpec = tween(200)) + scaleIn(animationSpec = tween(200)),
                     exit = fadeOut(animationSpec = tween(150)) + scaleOut(animationSpec = tween(150))
                 ) {
@@ -666,14 +665,14 @@ fun PhotoEditor(
                              .size(56.dp)
                              .clip(RoundedCornerShape(16.dp))
                              .background(
-                                 if (showCropMenu) MaterialTheme.colorScheme.primary
+                                 if (activeMenu == "crop") MaterialTheme.colorScheme.primary
                                  else MaterialTheme.colorScheme.surfaceVariant
                              )
                      ) {
                          Icon(
                              imageVector = Icons.Filled.Crop,
                              contentDescription = "Crop Tools",
-                             tint = if (showCropMenu) MaterialTheme.colorScheme.onPrimary
+                             tint = if (activeMenu == "crop") MaterialTheme.colorScheme.onPrimary
                                     else MaterialTheme.colorScheme.onSurfaceVariant,
                              modifier = Modifier.size(24.dp)
                          )
@@ -688,14 +687,14 @@ fun PhotoEditor(
                              .size(56.dp)
                              .clip(RoundedCornerShape(16.dp))
                              .background(
-                                 if (showColorMenu) MaterialTheme.colorScheme.primary
+                                 if (activeMenu == "color") MaterialTheme.colorScheme.primary
                                  else MaterialTheme.colorScheme.surfaceVariant
                              )
                      ) {
                          Icon(
                              imageVector = Icons.Default.Palette,
                              contentDescription = "Color Adjustments",
-                             tint = if (showColorMenu) MaterialTheme.colorScheme.onPrimary
+                             tint = if (activeMenu == "color") MaterialTheme.colorScheme.onPrimary
                                     else MaterialTheme.colorScheme.onSurfaceVariant,
                              modifier = Modifier.size(24.dp)
                          )
