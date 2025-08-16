@@ -21,7 +21,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.with
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Refresh
@@ -399,14 +400,14 @@ fun PhotoEditor(
                     .padding(top = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Single Menu Container with Crossfade
+                // Single Menu Container with AnimatedContent
                 if (activeMenu != "none") {
-                    Crossfade(
+                    AnimatedContent(
                         targetState = activeMenu,
-                        animationSpec = tween(
-                            durationMillis = 300,
-                            easing = FastOutSlowInEasing
-                        )
+                        transitionSpec = {
+                            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) with
+                            fadeOut(animationSpec = tween(150))
+                        }
                     ) { menu ->
                         when (menu) {
                             "crop" -> {
