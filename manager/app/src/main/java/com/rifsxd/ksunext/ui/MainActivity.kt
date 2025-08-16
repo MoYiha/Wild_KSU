@@ -134,6 +134,7 @@ import com.rifsxd.ksunext.ui.util.install
 import com.rifsxd.ksunext.ui.util.isSuCompatDisabled
 import com.rifsxd.ksunext.ui.util.reboot
 import com.rifsxd.ksunext.ui.util.ImageStorageUtils
+import com.rifsxd.ksunext.ui.util.readMountSystemFile
 
 import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
@@ -227,7 +228,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val isManager = Natives.becomeManager(ksuApp.packageName)
-        if (isManager) install()
+        if (isManager) {
+            install()
+            
+            // Synchronize overlay FS preference with actual system state
+            val prefs = getSharedPreferences("settings", Context.MODE_PRIVATE)
+            val actualOverlayFsState = readMountSystemFile()
+            val preferenceOverlayFsState = prefs.getBoolean("use_overlay_fs", false)
+            
+            // If there's a mismatch, update the preference to match the actual state
+            if (actualOverlayFsState != preferenceOverlayFsState) {
+                prefs.edit().putBoolean("use_overlay_fs", actualOverlayFsState).apply()
+            }
+        }
 
         val zipUri: Uri? = when (intent?.action) {
             Intent.ACTION_VIEW, Intent.ACTION_SEND -> {
