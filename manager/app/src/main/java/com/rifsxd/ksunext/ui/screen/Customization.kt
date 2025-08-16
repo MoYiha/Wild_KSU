@@ -3,6 +3,7 @@ package com.rifsxd.ksunext.ui.screen
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,7 +57,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
-
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
@@ -634,6 +635,25 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             }
             var currentDpi by rememberSaveable { 
                 mutableIntStateOf(savedDpi)
+            }
+            
+            // Listen for preference changes to update DPI slider when reset button is pressed
+            DisposableEffect(Unit) {
+                val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                    if (key == "app_dpi") {
+                        val newDpi = if (prefs.contains("app_dpi")) {
+                            prefs.getInt("app_dpi", systemDpi)
+                        } else {
+                            systemDpi
+                        }
+                        savedDpi = newDpi
+                        currentDpi = newDpi
+                    }
+                }
+                prefs.registerOnSharedPreferenceChangeListener(listener)
+                onDispose {
+                    prefs.unregisterOnSharedPreferenceChangeListener(listener)
+                }
             }
             
             ListItem(

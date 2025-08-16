@@ -720,7 +720,7 @@ fun PhotoEditor(
                              hue = 0f
                              flipHorizontal = false
                              flipVertical = false
-                             freeFormEditing = false
+                             freeFormEditing = true
                              
                              // Update transformations
                              onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
