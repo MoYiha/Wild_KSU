@@ -843,8 +843,8 @@ private fun InfoCard(autoExpand: Boolean = false) {
                     }
                 }
                 
-                // Show expand button if there are more items and we're not expanded
-                if (!expanded && !alwaysExpanded && hasMoreItems) {
+                // Show expand button only when collapsed, not alwaysExpanded, and there are 5+ enabled options
+                if (!expanded && !alwaysExpanded && enabledOptionsCount >= 5) {
                     Spacer(Modifier.height(16.dp))
                     Row(
                         modifier = Modifier
@@ -858,26 +858,6 @@ private fun InfoCard(autoExpand: Boolean = false) {
                             Icon(
                                 imageVector = Icons.Filled.KeyboardArrowDown,
                                 contentDescription = "Show more"
-                            )
-                        }
-                    }
-                }
-                
-                // Show collapse button if expanded and not alwaysExpanded
-                if (expanded && !alwaysExpanded) {
-                    Spacer(Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        IconButton(
-                            onClick = { expanded = false },
-                            modifier = Modifier.size(36.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.KeyboardArrowUp,
-                                contentDescription = "Show less"
                             )
                         }
                     }
