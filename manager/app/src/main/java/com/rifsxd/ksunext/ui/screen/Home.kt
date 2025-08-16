@@ -533,31 +533,39 @@ private fun InfoCard(autoExpand: Boolean = false) {
     }
     
     // Listen for preference changes to update the order
-    LaunchedEffect(Unit) {
-        // This will re-read preferences when the composable is recomposed
-        val newSavedOrder = prefs.getString("info_card_items_order", null)
-        val defaultOrder = listOf(
-            "info_card_show_manager_version",
-            "info_card_show_hook_mode", 
-            "info_card_show_mount_system",
-            "info_card_show_susfs_status",
-            "info_card_show_zygisk_status",
-            "info_card_show_kernel_version",
-            "info_card_show_android_version",
-            "info_card_show_abi",
-            "info_card_show_selinux_status"
-        )
-        val newOrder = if (newSavedOrder.isNullOrEmpty()) {
-            defaultOrder
-        } else {
-            val saved = newSavedOrder.split(",")
-            val result = saved.filter { key -> defaultOrder.contains(key) }.toMutableList()
-            defaultOrder.forEach { key ->
-                if (!result.contains(key)) result.add(key)
+    DisposableEffect(Unit) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == "info_card_items_order") {
+                val newSavedOrder = prefs.getString("info_card_items_order", null)
+                val defaultOrder = listOf(
+                    "info_card_show_manager_version",
+                    "info_card_show_hook_mode", 
+                    "info_card_show_mount_system",
+                    "info_card_show_susfs_status",
+                    "info_card_show_zygisk_status",
+                    "info_card_show_kernel_version",
+                    "info_card_show_android_version",
+                    "info_card_show_abi",
+                    "info_card_show_selinux_status"
+                )
+                val newOrder = if (newSavedOrder.isNullOrEmpty()) {
+                    defaultOrder
+                } else {
+                    val saved = newSavedOrder.split(",")
+                    val result = saved.filter { key -> defaultOrder.contains(key) }.toMutableList()
+                    defaultOrder.forEach { key ->
+                        if (!result.contains(key)) result.add(key)
+                    }
+                    result
+                }
+                itemOrder = newOrder
             }
-            result
         }
-        itemOrder = newOrder
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        
+        onDispose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
     }
 
     val isManager = Natives.becomeManager(ksuApp.packageName)
