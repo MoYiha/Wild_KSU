@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.Crossfade
@@ -402,7 +403,10 @@ fun PhotoEditor(
                 if (activeMenu != "none") {
                     Crossfade(
                         targetState = activeMenu,
-                        animationSpec = tween(200)
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = FastOutSlowInEasing
+                        )
                     ) { menu ->
                         when (menu) {
                             "crop" -> {
