@@ -413,56 +413,7 @@ fun PhotoEditor(
                         when (menu) {
 
 
-                        Text(
-                            text = "Contrast: ${String.format("%.1f", contrast)}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                        Slider(
-                            value = contrast,
-                            onValueChange = { newContrast ->
-                                contrast = newContrast
-                                val imageUriString = imageUri.toString()
-                                prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
-                            },
-                            valueRange = 0.0f..3.0f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        
-                        // Saturation control
-                        Text(
-                            text = "Saturation: ${String.format("%.1f", saturation)}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                        Slider(
-                            value = saturation,
-                            onValueChange = { newSaturation ->
-                                saturation = newSaturation
-                                val imageUriString = imageUri.toString()
-                                prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
-                            },
-                            valueRange = 0.0f..3.0f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        
-                        // Hue control
-                        Text(
-                            text = "Hue: ${String.format("%.0f", hue)}°",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                        Slider(
-                            value = hue,
-                            onValueChange = { newHue ->
-                                hue = newHue
-                                val imageUriString = imageUri.toString()
-                                prefs.edit().putFloat("${imageUriString}_hue", hue).apply()
-                            },
-                            valueRange = 0f..360f,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                                }
+
                             }
                         }
                     }
@@ -474,49 +425,8 @@ fun PhotoEditor(
                      horizontalArrangement = Arrangement.SpaceEvenly,
                      verticalAlignment = Alignment.CenterVertically
                  ) {
-                     // Crop button with Material 3 Expressive styling
-                     IconButton(
-                         onClick = { 
-                             activeMenu = if (activeMenu == "crop") null else "crop"
-                         },
-                         modifier = Modifier
-                             .size(56.dp)
-                             .clip(RoundedCornerShape(16.dp))
-                             .background(
-                                 if (activeMenu == "crop") MaterialTheme.colorScheme.primary
-                                 else MaterialTheme.colorScheme.surfaceVariant
-                             )
-                     ) {
-                         Icon(
-                             imageVector = Icons.Filled.Crop,
-                             contentDescription = "Crop Tools",
-                             tint = if (activeMenu == "crop") MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                             modifier = Modifier.size(24.dp)
-                         )
-                     }
                      
-                     // Color button with Material 3 Expressive styling
-                     IconButton(
-                         onClick = { 
-                             activeMenu = if (activeMenu == "color") null else "color"
-                         },
-                         modifier = Modifier
-                             .size(56.dp)
-                             .clip(RoundedCornerShape(16.dp))
-                             .background(
-                                 if (activeMenu == "color") MaterialTheme.colorScheme.primary
-                                 else MaterialTheme.colorScheme.surfaceVariant
-                             )
-                     ) {
-                         Icon(
-                             imageVector = Icons.Default.Palette,
-                             contentDescription = "Color Adjustments",
-                             tint = if (activeMenu == "color") MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                             modifier = Modifier.size(24.dp)
-                         )
-                     }
+
                      
                      // Reset button with Material 3 Expressive styling
                      IconButton(
