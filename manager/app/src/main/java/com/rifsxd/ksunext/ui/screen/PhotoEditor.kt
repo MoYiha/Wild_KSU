@@ -442,7 +442,7 @@ fun PhotoEditor(
                              .background(MaterialTheme.colorScheme.primary, CircleShape)
                      ) {
                          Icon(
-                             imageVector = if (screenRotationLocked) Icons.Default.ScreenRotation else Icons.Default.ScreenLockRotation,
+                             imageVector = if (screenRotationLocked) Icons.Default.ScreenLockRotation else Icons.Default.ScreenRotation,
                              contentDescription = "Screen Rotation Toggle",
                              tint = MaterialTheme.colorScheme.onPrimary,
                              modifier = Modifier.size(32.dp)
