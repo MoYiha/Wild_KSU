@@ -427,8 +427,8 @@ fun PhotoEditor(
                 // Control bar with 4 buttons
                  Row(
                      modifier = Modifier
-                             .fillMaxWidth(0.2f),
-                     horizontalArrangement = Arrangement.Center,
+                             .fillMaxWidth(0.3f),
+                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                      verticalAlignment = Alignment.CenterVertically
                  ) {
 
