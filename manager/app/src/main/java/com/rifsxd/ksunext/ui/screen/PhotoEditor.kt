@@ -424,100 +424,98 @@ fun PhotoEditor(
                     }
                 }
                 
-                // Control bar with 4 buttons
-                 Row(
-                     modifier = Modifier
-                             .fillMaxWidth(0.8f),
-                     horizontalArrangement = Arrangement.SpaceAround,
-                     verticalAlignment = Alignment.CenterVertically
-                 ) {
-
-
-                     // Screen Rotation Toggle
-                     IconButton(
-                         onClick = { screenRotationLocked = !screenRotationLocked },
-                         modifier = Modifier
-                             .weight(1f)
-                             .clip(RoundedCornerShape(16.dp))
-                             .background(MaterialTheme.colorScheme.surfaceVariant)
-                     ) {
-                         Icon(
-                             imageVector = if (screenRotationLocked) Icons.Default.ScreenLockRotation else Icons.Default.ScreenRotation,
-                             contentDescription = "Screen Rotation Toggle",
-                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                             modifier = Modifier.size(24.dp)
-                         )
-                     }
-                     
-
-                     
-                     // Reset button with Material 3 Expressive styling
-                     IconButton(
-                         onClick = {
-                             // Close any open menus
-                             activeMenu = null
-                             
-                             // Reset all settings
-                             currentScale = 1.0f
-                             currentOffsetX = 0f
-                             currentOffsetY = 0f
-                             currentRotation = 0f
-                             brightness = 1.0f
-                             contrast = 1.0f
-                             saturation = 1.0f
-                             hue = 0f
-                             flipHorizontal = false
-                             flipVertical = false
-                             freeFormEditing = true
-                             
-                             // Update transformations
-                             onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                             
-                             // Clear preferences
-                             val imageUriString = imageUri.toString()
-                             prefs.edit()
-                                 .remove("background_scale")
-                                 .remove("background_rotation")
-                                 .remove("${imageUriString}_brightness")
-                                 .remove("${imageUriString}_contrast")
-                                 .remove("${imageUriString}_saturation")
-                                 .remove("${imageUriString}_hue")
-                                 .remove("${imageUriString}_flip_horizontal")
-                                 .remove("${imageUriString}_flip_vertical")
-                                 .apply()
-                         },
-                         modifier = Modifier
-                             .weight(1f)
-                             .clip(RoundedCornerShape(16.dp))
-                             .background(MaterialTheme.colorScheme.surfaceVariant)
-                     ) {
-                         Icon(
-                             imageVector = Icons.Default.Refresh,
-                             contentDescription = "Reset All",
-                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                             modifier = Modifier.size(24.dp)
-                         )
-                     }
-                     
-                     // Confirm button with Material 3 Expressive styling
-                     IconButton(
-                         onClick = {
-                             activeMenu = null
-                             onSave()
-                         },
-                         modifier = Modifier
-                             .size(56.dp)
-                             .clip(RoundedCornerShape(16.dp))
-                             .background(MaterialTheme.colorScheme.primary)
-                     ) {
-                         Icon(
-                             imageVector = Icons.Default.Check,
-                             contentDescription = "Confirm",
-                             tint = MaterialTheme.colorScheme.onPrimary,
-                             modifier = Modifier.size(24.dp)
-                         )
-                     }
-                 }
+                // Redesigned Control Bar with improved spacing and layout
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Screen Rotation Toggle - Consistent sizing
+                    IconButton(
+                        onClick = { screenRotationLocked = !screenRotationLocked },
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Icon(
+                            imageVector = if (screenRotationLocked) Icons.Default.ScreenLockRotation else Icons.Default.ScreenRotation,
+                            contentDescription = "Screen Rotation Toggle",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    
+                    // Reset button - Flexible width with consistent height
+                    IconButton(
+                        onClick = {
+                            // Close any open menus
+                            activeMenu = null
+                            
+                            // Reset all settings
+                            currentScale = 1.0f
+                            currentOffsetX = 0f
+                            currentOffsetY = 0f
+                            currentRotation = 0f
+                            brightness = 1.0f
+                            contrast = 1.0f
+                            saturation = 1.0f
+                            hue = 0f
+                            flipHorizontal = false
+                            flipVertical = false
+                            freeFormEditing = true
+                            
+                            // Update transformations
+                            onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                            
+                            // Clear preferences
+                            val imageUriString = imageUri.toString()
+                            prefs.edit()
+                                .remove("background_scale")
+                                .remove("background_rotation")
+                                .remove("${imageUriString}_brightness")
+                                .remove("${imageUriString}_contrast")
+                                .remove("${imageUriString}_saturation")
+                                .remove("${imageUriString}_hue")
+                                .remove("${imageUriString}_flip_horizontal")
+                                .remove("${imageUriString}_flip_vertical")
+                                .apply()
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(52.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Reset All",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    
+                    // Confirm button - Prominent primary action
+                    IconButton(
+                        onClick = {
+                            activeMenu = null
+                            onSave()
+                        },
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Confirm",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
             }
         }
     }
