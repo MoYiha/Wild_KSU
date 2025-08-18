@@ -403,7 +403,7 @@ fun PhotoEditor(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 24.dp, bottom = 24.dp),
+                    .padding(top = 48.dp, bottom = 48.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Single Menu Container with AnimatedContent
@@ -427,7 +427,7 @@ fun PhotoEditor(
                 // Control bar with 4 buttons
                  Row(
                      modifier = Modifier
-                         .fillMaxWidth(0.5f)
+                         .fillMaxWidth(0.7f)
                          .padding(horizontal = 8.dp),
                      horizontalArrangement = Arrangement.Center,
                      verticalAlignment = Alignment.CenterVertically
@@ -439,7 +439,7 @@ fun PhotoEditor(
                          onClick = { screenRotationLocked = !screenRotationLocked },
                          modifier = Modifier
                              .size(64.dp)
-                             .background(MaterialTheme.colorScheme.primary, CircleShape)
+                             .background(MaterialTheme.colorScheme.primary)
                      ) {
                          Icon(
                              imageVector = if (screenRotationLocked) Icons.Default.ScreenLockRotation else Icons.Default.ScreenRotation,
