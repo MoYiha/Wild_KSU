@@ -404,7 +404,7 @@ fun PhotoEditor(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Single Menu Container with AnimatedContent
                 if (activeMenu != "none") {
@@ -427,7 +427,7 @@ fun PhotoEditor(
                 // Control bar with 4 buttons
                  Row(
                      modifier = Modifier
-                         .fillMaxWidth(0.3f),
+                             .fillMaxWidth(0.2f),
                      horizontalArrangement = Arrangement.Center,
                      verticalAlignment = Alignment.CenterVertically
                  ) {
