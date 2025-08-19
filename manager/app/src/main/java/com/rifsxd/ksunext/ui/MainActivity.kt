@@ -132,6 +132,11 @@ import com.rifsxd.ksunext.ui.component.BackgroundImageWrapper
 import com.rifsxd.ksunext.ui.component.SearchAppBar
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorSaveCallback
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorSaveCallbackSetter
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorResetCallback
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorScreenRotationCallback
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorScreenRotationLocked
 import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.rootAvailable
 import com.rifsxd.ksunext.ui.util.install
@@ -152,8 +157,7 @@ import java.util.*
 val LocalModuleViewModel = compositionLocalOf<ModuleViewModel> { error("ModuleViewModel not provided") }
 val LocalSuperUserViewModel = compositionLocalOf<SuperUserViewModel> { error("SuperUserViewModel not provided") }
 val LocalFlashViewModel = compositionLocalOf<FlashViewModel> { error("FlashViewModel not provided") }
-val LocalPhotoEditorSaveCallback = compositionLocalOf<(() -> Unit)?> { null }
-val LocalPhotoEditorSaveCallbackSetter = compositionLocalOf<(((() -> Unit)?) -> Unit)?> { null }
+
 
 // Icon type enum
 enum class IconType(val displayName: String, val icon: ImageVector) {
@@ -584,6 +588,9 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     // Create a mutable state for PhotoEditor save callback
                 var photoEditorSaveCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
+                var photoEditorResetCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
+                var photoEditorScreenRotationCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
+                var photoEditorScreenRotationLocked by remember { mutableStateOf(false) }
                 
                 CompositionLocalProvider(
                     LocalSnackbarHost provides snackBarHostState,
@@ -595,6 +602,9 @@ class MainActivity : ComponentActivity() {
                         println("MainActivity: Setting photoEditorSaveCallback to $callback")
                         photoEditorSaveCallback = callback 
                     },
+                    LocalPhotoEditorResetCallback provides photoEditorResetCallback,
+                    LocalPhotoEditorScreenRotationCallback provides photoEditorScreenRotationCallback,
+                    LocalPhotoEditorScreenRotationLocked provides photoEditorScreenRotationLocked
                 ) {
                         val currentDestination by navController.currentBackStackEntryAsState()
                         val isPhotoEditor = currentDestination?.destination?.route == PhotoEditorScreenDestination.route
@@ -720,17 +730,16 @@ private fun UnifiedTopBar(
         PhotoEditorScreenDestination.route -> {
             val context = LocalContext.current
             val photoEditorSaveCallback = LocalPhotoEditorSaveCallback.current
-            var screenRotationLocked by remember { mutableStateOf(false) }
+            val photoEditorResetCallback = LocalPhotoEditorResetCallback.current
+            val photoEditorScreenRotationCallback = LocalPhotoEditorScreenRotationCallback.current
+            val photoEditorScreenRotationLocked = LocalPhotoEditorScreenRotationLocked.current
             
             PhotoEditorTopBar(
                 navigator = navigator,
                 onSave = { photoEditorSaveCallback?.invoke() ?: run {} },
-                onReset = {
-                    // Reset functionality will be handled by PhotoEditor through callback
-                    // This is a placeholder for now
-                },
-                screenRotationLocked = screenRotationLocked,
-                onScreenRotationToggle = { screenRotationLocked = !screenRotationLocked },
+                onReset = { photoEditorResetCallback?.invoke() ?: run {} },
+                screenRotationLocked = photoEditorScreenRotationLocked,
+                onScreenRotationToggle = { photoEditorScreenRotationCallback?.invoke() ?: run {} },
                 modifier = modifier
             )
         }

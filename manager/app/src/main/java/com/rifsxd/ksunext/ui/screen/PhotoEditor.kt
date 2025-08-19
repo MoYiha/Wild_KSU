@@ -58,9 +58,9 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rifsxd.ksunext.ui.util.BackgroundUtils
 import com.rifsxd.ksunext.ui.util.BackgroundTransformation
-import com.rifsxd.ksunext.ui.LocalPhotoEditorResetCallback
-import com.rifsxd.ksunext.ui.LocalPhotoEditorScreenRotationCallback
-import com.rifsxd.ksunext.ui.LocalPhotoEditorScreenRotationLocked
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorResetCallback
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorScreenRotationCallback
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorScreenRotationLocked
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
