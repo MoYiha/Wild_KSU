@@ -58,6 +58,10 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rifsxd.ksunext.ui.util.BackgroundCustomization
 import com.rifsxd.ksunext.ui.util.BackgroundTransformation
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorSaveCallbackSetter
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorResetCallback
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorScreenRotationCallback
+import com.rifsxd.ksunext.ui.util.LocalPhotoEditorScreenRotationLocked
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -156,6 +160,16 @@ fun PhotoEditor(
     
     var screenRotationLocked by remember { mutableStateOf(false) }
     
+    // Get CompositionLocal providers
+    val saveCallbackSetter = LocalPhotoEditorSaveCallbackSetter.current
+    
+    // Set up callbacks for top bar
+    LaunchedEffect(Unit) {
+        saveCallbackSetter?.invoke {
+            onSave()
+        }
+    }
+    
     // Update local state when props change
     LaunchedEffect(scale, offsetX, offsetY, rotation) {
         currentScale = scale
@@ -171,11 +185,41 @@ fun PhotoEditor(
                 .crossfade(false)
                 .build()
         )
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    
+    // Define reset function for top bar
+    val resetFunction = {
+        // Close any open menus
+        activeMenu = null
+        
+        // Reset all settings to defaults (local state only)
+        currentScale = 1f
+        currentOffsetX = 0f
+        currentOffsetY = 0f
+        currentRotation = 0f
+        freeFormEditing = true
+        
+        // Reset UI transparency to 0% when reset button is pressed
+        BackgroundCustomization.resetUITransparency(context)
+        
+        // Update transformations (local state only)
+        onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+    }
+    
+    // Define screen rotation toggle function for top bar
+    val screenRotationToggleFunction = {
+        screenRotationLocked = !screenRotationLocked
+    }
+    
+    CompositionLocalProvider(
+        LocalPhotoEditorResetCallback provides resetFunction,
+        LocalPhotoEditorScreenRotationCallback provides screenRotationToggleFunction,
+        LocalPhotoEditorScreenRotationLocked provides screenRotationLocked
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
         // Main image display with touch gestures
         Image(
             painter = painter,
@@ -344,3 +388,4 @@ fun PhotoEditor(
             }
         }
     }
+}
