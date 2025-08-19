@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Delete
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -164,9 +166,9 @@ fun ThemeSettingsScreen(
                     }
                     
                     ListItem(
-                        leadingContent = { Icon(Icons.Filled.Palette, "Theme") },
+                        leadingContent = { Icon(Icons.Filled.Palette, "Theme Mode") },
                         headlineContent = { Text(
-                            text = "Theme",
+                            text = "Theme Mode",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                         ) },
@@ -222,23 +224,31 @@ fun ThemeSettingsScreen(
                                             val uri = Uri.parse(tempSelectedImageUri!!)
                                             val transformation = BackgroundCustomization.loadBackgroundTransformation(context)
                                             
-                                            // Check if the URI is already pointing to internal storage
-                                            val internalStoragePath = BackgroundCustomization.getInternalBackgroundImagePath(context)
-                                            val isAlreadyInternal = uri.scheme == "file" && uri.path?.contains("images") == true
-                                            
-                                            val finalUri = if (isAlreadyInternal) {
-                                                // Image is already in internal storage, just save the URI
-                                                BackgroundCustomization.saveBackgroundSettings(context, tempSelectedImageUri!!, transformation, saveUri = true)
-                                                tempSelectedImageUri!!
-                                            } else {
-                                                // Copy the image to internal storage first
-                                                val internalPath = BackgroundCustomization.copyImageToInternalStorage(context, uri)
-                                                if (internalPath != null) {
-                                                    val internalUri = BackgroundCustomization.filePathToUri(internalPath)
-                                                    BackgroundCustomization.saveBackgroundSettings(context, internalUri, transformation, saveUri = true)
-                                                    internalUri
+                                            // Copy the temp image to permanent location and save
+                                            val finalUri = if (tempSelectedImageUri!!.startsWith("content://")) {
+                                                // This shouldn't happen as we now use temp files, but handle as fallback
+                                                val copiedPath = BackgroundCustomization.copyImageToInternalStorage(context, uri)
+                                                if (copiedPath != null) {
+                                                    val permanentPath = BackgroundCustomization.copyTempImageToPermanent(context, copiedPath)
+                                                    if (permanentPath != null) {
+                                                        BackgroundCustomization.saveBackgroundSettings(context, permanentPath, transformation, saveUri = true)
+                                                        permanentPath
+                                                    } else {
+                                                        BackgroundCustomization.saveBackgroundSettings(context, copiedPath, transformation, saveUri = true)
+                                                        copiedPath
+                                                    }
                                                 } else {
-                                                    // Fallback to original URI if copy fails
+                                                    BackgroundCustomization.saveBackgroundSettings(context, tempSelectedImageUri!!, transformation, saveUri = true)
+                                                    tempSelectedImageUri!!
+                                                }
+                                            } else {
+                                                // Temp file path - copy to permanent location
+                                                val permanentPath = BackgroundCustomization.copyTempImageToPermanent(context, tempSelectedImageUri!!)
+                                                if (permanentPath != null) {
+                                                    BackgroundCustomization.saveBackgroundSettings(context, permanentPath, transformation, saveUri = true)
+                                                    permanentPath
+                                                } else {
+                                                    // Fallback to temp path if permanent copy fails
                                                     BackgroundCustomization.saveBackgroundSettings(context, tempSelectedImageUri!!, transformation, saveUri = true)
                                                     tempSelectedImageUri!!
                                                 }
@@ -617,22 +627,49 @@ private fun ThemeSelectionDialog(
     onThemeSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val options = themeOptions.map { (value, display) ->
-        ListOption(
-            titleText = display,
-            selected = value == currentTheme
-        )
-    }
-    
-    ListDialog(
-        state = rememberUseCaseState(visible = true, onCloseRequest = { onDismiss() }),
-        header = Header.Default(title = "Theme"),
-        selection = ListSelection.Single(
-            showRadioButtons = true,
-            options = options
-        ) { index, _ ->
-            val selectedTheme = themeOptions[index].first
-            onThemeSelected(selectedTheme)
-        }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Theme Mode",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        text = {
+            Column {
+                themeOptions.forEach { (value, display) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onThemeSelected(value)
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = value == currentTheme,
+                            onClick = {
+                                onThemeSelected(value)
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = display,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        shape = RoundedCornerShape(16.dp)
     )
 }

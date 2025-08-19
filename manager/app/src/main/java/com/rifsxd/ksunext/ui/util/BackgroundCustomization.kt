@@ -28,6 +28,7 @@ object BackgroundCustomization {
     private const val TAG = "Background"
     private const val TRANSFORMED_BACKGROUND_FILENAME = "custom_background_transformed.jpg"
     private const val BACKGROUND_IMAGE_FILENAME = "background_image.jpg"
+    private const val TEMP_BACKGROUND_PREFIX = "temp_background_"
     
     /**
      * Get bitmap from URI
@@ -227,6 +228,10 @@ object BackgroundCustomization {
      * @param sourceUri URI of the image to copy
      * @return File path of the copied image, or null if failed
      */
+    /**
+     * Copy image to internal storage for temporary editing
+     * Uses unique filename to avoid overwriting existing background
+     */
     fun copyImageToInternalStorage(context: Context, sourceUri: Uri): String? {
         return try {
             val inputStream: InputStream? = context.contentResolver.openInputStream(sourceUri)
@@ -241,8 +246,10 @@ object BackgroundCustomization {
                 imagesDir.mkdirs()
             }
             
-            // Create the destination file
-            val destinationFile = File(imagesDir, BACKGROUND_IMAGE_FILENAME)
+            // Create a unique temporary filename to avoid overwriting existing background
+            val timestamp = System.currentTimeMillis()
+            val tempFileName = "${TEMP_BACKGROUND_PREFIX}${timestamp}.jpg"
+            val destinationFile = File(imagesDir, tempFileName)
             
             // Copy the image
             val outputStream = FileOutputStream(destinationFile)
@@ -257,6 +264,40 @@ object BackgroundCustomization {
             
         } catch (e: Exception) {
             Log.e(TAG, "Failed to copy image to internal storage", e)
+            null
+        }
+    }
+    
+    /**
+     * Copy temporary image to permanent background location
+     * Used when user confirms saving the background
+     */
+    fun copyTempImageToPermanent(context: Context, tempImagePath: String): String? {
+        return try {
+            val tempFile = File(tempImagePath)
+            if (!tempFile.exists()) {
+                Log.e(TAG, "Temporary file does not exist: $tempImagePath")
+                return null
+            }
+            
+            val imagesDir = File(context.filesDir, "images")
+            if (!imagesDir.exists()) {
+                imagesDir.mkdirs()
+            }
+            
+            val permanentFile = File(imagesDir, BACKGROUND_IMAGE_FILENAME)
+            
+            // Copy temp file to permanent location
+            tempFile.copyTo(permanentFile, overwrite = true)
+            
+            // Clean up temp file
+            tempFile.delete()
+            
+            Log.d(TAG, "Successfully moved temp image to permanent location: ${permanentFile.absolutePath}")
+            return permanentFile.absolutePath
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to copy temp image to permanent location", e)
             null
         }
     }
