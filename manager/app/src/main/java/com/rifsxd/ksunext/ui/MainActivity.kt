@@ -450,9 +450,16 @@ class MainActivity : ComponentActivity() {
                         }
                         "background_image_uri" -> {
                             // Check internal storage first, then fallback to preferences
-                            backgroundImageUri = BackgroundCustomization.getInternalBackgroundImagePath(this@MainActivity)?.let {
-                BackgroundCustomization.filePathToUri(it) 
-                            } ?: prefs.getString("background_image_uri", null)
+                            val internalPath = BackgroundCustomization.getInternalBackgroundImagePath(this@MainActivity)
+                            val prefsUri = prefs.getString("background_image_uri", null)
+                            
+                            Log.d("MainActivity", "Background URI changed - Internal path: $internalPath, Prefs URI: $prefsUri")
+                            
+                            backgroundImageUri = internalPath?.let {
+                                BackgroundCustomization.filePathToUri(it) 
+                            } ?: prefsUri
+                            
+                            Log.d("MainActivity", "Updated backgroundImageUri to: $backgroundImageUri")
                         }
                         "background_transparency" -> {
                             backgroundTransparency = prefs.getFloat("background_transparency", 0.0f)

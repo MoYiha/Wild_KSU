@@ -3,6 +3,7 @@ package com.rifsxd.ksunext.ui.screen
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -220,6 +221,8 @@ fun ThemeSettingsScreen(
                                     // Save button (only show if there's a temp selection)
                                     if (tempSelectedImageUri != null) {
                                         IconButton(onClick = {
+                                            Log.d("ThemeSettings", "Save button clicked - tempSelectedImageUri: $tempSelectedImageUri")
+                                            
                                             // Load current transformation settings
                                             val transformation = BackgroundCustomization.loadBackgroundTransformation(context)
                                             
@@ -230,24 +233,32 @@ fun ThemeSettingsScreen(
                                                 tempSelectedImageUri!!
                                             }
                                             
+                                            Log.d("ThemeSettings", "Temp path: $tempPath")
+                                            
                                             // Copy temp image to permanent location
                                             val permanentPath = BackgroundCustomization.copyTempImageToPermanent(context, tempPath)
+                                            
+                                            Log.d("ThemeSettings", "Permanent path: $permanentPath")
                                             
                                             if (permanentPath != null) {
                                                 // Save background settings with permanent path
                                                 val permanentUri = BackgroundCustomization.filePathToUri(permanentPath)
+                                                Log.d("ThemeSettings", "Saving with permanent URI: $permanentUri")
                                                 BackgroundCustomization.saveBackgroundSettings(context, permanentUri, transformation, saveUri = true)
                                                 
                                                 // Update UI state
                                                 backgroundImageUri = permanentUri
                                                 tempSelectedImageUri = null
                                                 previousActiveImageUri = permanentUri
+                                                Log.d("ThemeSettings", "Updated backgroundImageUri to: $backgroundImageUri")
                                             } else {
                                                 // Fallback: save with temp path if permanent copy fails
+                                                Log.d("ThemeSettings", "Fallback: saving with temp URI: $tempSelectedImageUri")
                                                 BackgroundCustomization.saveBackgroundSettings(context, tempSelectedImageUri!!, transformation, saveUri = true)
                                                 backgroundImageUri = tempSelectedImageUri
                                                 tempSelectedImageUri = null
                                                 previousActiveImageUri = backgroundImageUri
+                                                Log.d("ThemeSettings", "Updated backgroundImageUri to: $backgroundImageUri (fallback)")
                                             }
                                         }) {
                                             Icon(Icons.Filled.Save, "Save Background")

@@ -172,11 +172,18 @@ object BackgroundCustomization {
         // Only save URI if explicitly requested
         if (saveUri) {
             editor.putString("background_image_uri", imageUri)
+            Log.d(TAG, "Saving background URI to SharedPreferences: $imageUri")
         }
         
         editor.apply()
             
         Log.d(TAG, "Background settings saved: $transformation, URI saved: $saveUri")
+        
+        // Verify the URI was saved correctly
+        if (saveUri) {
+            val savedUri = prefs.getString("background_image_uri", null)
+            Log.d(TAG, "Verified saved URI: $savedUri")
+        }
     }
     
     /**
