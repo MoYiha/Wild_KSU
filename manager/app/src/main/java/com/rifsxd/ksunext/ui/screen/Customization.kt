@@ -1,12 +1,7 @@
 package com.rifsxd.ksunext.ui.screen
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -33,7 +28,6 @@ import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -45,11 +39,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -57,15 +47,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -102,7 +87,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.generated.destinations.HomeSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ModuleSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SuperuserSettingsScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.PhotoEditorScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ThemeSettingsScreenDestination
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
@@ -114,7 +99,7 @@ import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.IconPackHelper
 import com.rifsxd.ksunext.ui.util.IconPack
-import com.rifsxd.ksunext.ui.util.BackgroundCustomization
+import kotlinx.coroutines.launch
 
 import java.util.Locale
 
@@ -357,381 +342,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     }
             )
 
-            // Background Image Setting
-            var backgroundImageUri by rememberSaveable {
-                mutableStateOf(
-                    prefs.getString("background_image_uri", null)
-                )
-            }
-            
-            // Listen for changes to background image URI in SharedPreferences
-            LaunchedEffect(Unit) {
-                // Update state when returning from PhotoEditor
-                backgroundImageUri = prefs.getString("background_image_uri", null)
-            }
-            
-            // Also listen for preference changes during composition
-            LaunchedEffect(prefs) {
-                backgroundImageUri = prefs.getString("background_image_uri", null)
-            }
-            
-            val selectImageLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartActivityForResult()
-            ) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    result.data?.data?.let { uri ->
-                        // Copy image to internal storage to prevent permission issues
-                        val internalPath = BackgroundCustomization.copyImageToInternalStorage(context, uri)
-                        if (internalPath != null) {
-                            // Convert to URI for display
-                            val fileUri = BackgroundCustomization.filePathToUri(internalPath)
-                            // Navigate to PhotoEditor screen
-                            navigator.navigate(PhotoEditorScreenDestination(imageUri = fileUri))
-                        } else {
-                            // Fallback: try to use original URI with permissions
-                            try {
-                                context.contentResolver.takePersistableUriPermission(
-                                    uri,
-                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                                )
-                                // Navigate to PhotoEditor screen
-                                navigator.navigate(PhotoEditorScreenDestination(imageUri = uri.toString()))
-                            } catch (e: Exception) {
-                                // Last resort: save original URI directly
-                                e.printStackTrace()
-                                prefs.edit().putString("background_image_uri", uri.toString()).apply()
-                                backgroundImageUri = uri.toString()
-                            }
-                        }
-                    }
-                }
-            }
 
-            // Background Image Selection
-            ListItem(
-                leadingContent = { Icon(Icons.Filled.Image, stringResource(R.string.settings_background_image)) },
-                headlineContent = { Text(
-                    text = stringResource(R.string.settings_background_image),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
-                supportingContent = { Text(stringResource(R.string.settings_background_image_summary)) },
-                trailingContent = {
-                    Row {
-                        // Crop button (only show if background image is selected)
-                        if (backgroundImageUri != null) {
-                            IconButton(onClick = {
-                                // Navigate to PhotoEditor for current image
-                                backgroundImageUri?.let { uriString ->
-                                    navigator.navigate(PhotoEditorScreenDestination(imageUri = uriString))
-                                }
-                            }) {
-                                Icon(Icons.Filled.Crop, stringResource(R.string.crop_background_image))
-                            }
-                        }
-                        // Delete button (only show if background image is selected)
-                        if (backgroundImageUri != null) {
-                            IconButton(onClick = {
-                                // Clean up internal storage if the image was stored there
-                                BackgroundCustomization.deleteInternalBackgroundImage(context)
-                                prefs.edit().remove("background_image_uri").commit()
-                                backgroundImageUri = null
-                            }) {
-                                Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
-                            }
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .clickable {
-                        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                            type = "image/*"
-                            addCategory(Intent.CATEGORY_OPENABLE)
-                        }
-                        selectImageLauncher.launch(intent)
-                    }
-            )
 
-            // Background Transparency Slider (Darkness) - Only show when background image is enabled
-            if (backgroundImageUri != null) {
-                var backgroundTransparency by rememberSaveable {
-                    mutableFloatStateOf(
-                        prefs.getFloat("background_transparency", 0.0f)
-                    )
-                }
-                
-                ListItem(
-                leadingContent = { Icon(Icons.Filled.Opacity, stringResource(R.string.background_transparency)) },
-                headlineContent = { Text(
-                    text = stringResource(R.string.background_transparency),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
-                supportingContent = { 
-                    Column {
-                        Text(stringResource(R.string.background_transparency_summary))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "0%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp)
-                            )
-                            Slider(
-                                value = backgroundTransparency,
-                                onValueChange = { value ->
-                                    backgroundTransparency = value
-                                    prefs.edit().putFloat("background_transparency", value).commit()
-                                },
-                                valueRange = 0.0f..1.0f,
-                                modifier = Modifier.weight(1f),
-                                colors = SliderDefaults.colors()
-                            )
-                            Text(
-                                text = "100%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp),
-                                textAlign = TextAlign.End
-                            )
-                        }
-                        Text(
-                            text = "${(backgroundTransparency * 100).toInt()}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-                )
 
-                // Background Blur Slider
-                var backgroundBlur by rememberSaveable {
-                    mutableFloatStateOf(
-                        prefs.getFloat("background_blur", 0.0f)
-                    )
-                }
-                
-                ListItem(
-                leadingContent = { Icon(Icons.Filled.BlurCircular, "Background Blur") },
-                headlineContent = { 
-                    Text(
-                        text = "Background Blur",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                supportingContent = { 
-                    Column {
-                        Text("Add blur effect to background image")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "0%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp)
-                            )
-                            Slider(
-                                value = backgroundBlur,
-                                onValueChange = { value ->
-                                    backgroundBlur = value
-                                    prefs.edit().putFloat("background_blur", value).commit()
-                                },
-                                valueRange = 0.0f..1.0f,
-                                modifier = Modifier.weight(1f),
-                                colors = SliderDefaults.colors()
-                            )
-                            Text(
-                                text = "100%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp),
-                                textAlign = TextAlign.End
-                            )
-                        }
-                        Text(
-                            text = "${(backgroundBlur * 100).toInt()}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-                )
-            }
 
-            // UI Transparency Slider - Always available
-            var uiTransparency by rememberSaveable {
-                mutableFloatStateOf(
-                    prefs.getFloat("ui_transparency", 0.0f)
-                )
-            }
-            
-            ListItem(
-                leadingContent = { Icon(Icons.Filled.Tune, "UI Transparency") },
-                headlineContent = { 
-                    Text(
-                        text = "UI Transparency",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                supportingContent = { 
-                    Column {
-                        Text("Adjust the transparency of UI elements")
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "0%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp)
-                            )
-                            Slider(
-                                value = uiTransparency,
-                                onValueChange = { value ->
-                                    uiTransparency = value
-                                    prefs.edit().putFloat("ui_transparency", value).commit()
-                                },
-                                valueRange = 0.0f..1.0f,
-                                modifier = Modifier.weight(1f),
-                                colors = SliderDefaults.colors()
-                            )
-                            Text(
-                                text = "100%",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp),
-                                textAlign = TextAlign.End
-                            )
-                        }
-                        Text(
-                            text = "${(uiTransparency * 100).toInt()}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-            )
 
-            // DPI Scale Settings
-            val systemDpi = remember { context.resources.displayMetrics.densityDpi }
-            var savedDpi by remember { 
-                mutableIntStateOf(
-                    if (prefs.contains("app_dpi")) {
-                        prefs.getInt("app_dpi", systemDpi)
-                    } else {
-                        systemDpi // Use system DPI when no custom setting exists
-                    }
-                )
-            }
-            var currentDpi by rememberSaveable { 
-                mutableIntStateOf(savedDpi)
-            }
-            
-            // Listen for preference changes to update DPI slider when reset button is pressed
-            DisposableEffect(Unit) {
-                val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-                    if (key == "app_dpi") {
-                        val newDpi = if (prefs.contains("app_dpi")) {
-                            prefs.getInt("app_dpi", systemDpi)
-                        } else {
-                            systemDpi
-                        }
-                        savedDpi = newDpi
-                        currentDpi = newDpi
-                    }
-                }
-                prefs.registerOnSharedPreferenceChangeListener(listener)
-                onDispose {
-                    prefs.unregisterOnSharedPreferenceChangeListener(listener)
-                }
-            }
-            
-            ListItem(
-                leadingContent = { Icon(Icons.Filled.ZoomIn, stringResource(R.string.app_dpi_title)) },
-                headlineContent = { 
-                    Text(
-                        text = stringResource(R.string.app_dpi_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                supportingContent = { 
-                    Column {
-                        Text(stringResource(R.string.app_dpi_summary))
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        // DPI Slider
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Low",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp)
-                            )
-                            Slider(
-                                value = currentDpi.toFloat(),
-                                onValueChange = { value ->
-                                    currentDpi = value.toInt()
-                                },
-                                valueRange = 160f..600f,
-                                modifier = Modifier.weight(1f),
-                                colors = SliderDefaults.colors()
-                            )
-                            Text(
-                                text = "High",
-                                style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.width(32.dp),
-                                textAlign = TextAlign.End
-                            )
-                        }
-                        
-                        Text(
-                            text = "$currentDpi DPI",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                        
-                        // Apply button (only show when changes are made)
-                        if (currentDpi != savedDpi) {
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Button(
-                                onClick = {
-                                    // Apply DPI changes directly
-                                    prefs.edit().putInt("app_dpi", currentDpi).apply()
-                                    
-                                    // Calculate scale factor for MainActivity
-                                    val scale = currentDpi.toFloat() / systemDpi.toFloat()
-                                    prefs.edit().putFloat("dpi_scale", scale).apply()
-                                    
-                                    // Restart activity to apply changes
-                                    (context as? Activity)?.recreate()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary
-                                )
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.dpi_apply_settings),
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontSize = 14.sp
-                                )
-                            }
-                        }
-                    }
-                }
-            )
+
+
 
 
 
@@ -766,6 +383,40 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 },
                 modifier = Modifier.clickable { 
                     navigator.navigate(HomeSettingsScreenDestination)
+                }
+            )
+
+            // Theme Settings
+            ListItem(
+                leadingContent = { 
+                    Icon(
+                        imageVector = Icons.Filled.Palette,
+                        contentDescription = "Theme Settings"
+                    ) 
+                },
+                headlineContent = {
+                    Text(
+                        text = "Theme Settings",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = "Customize background, UI transparency, and display settings",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                trailingContent = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Navigate to theme settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                modifier = Modifier.clickable { 
+                    navigator.navigate(ThemeSettingsScreenDestination)
                 }
             )
 

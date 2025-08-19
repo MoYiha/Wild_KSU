@@ -119,6 +119,7 @@ import com.ramcosta.composedestinations.generated.destinations.HomeSettingsScree
 import com.ramcosta.composedestinations.generated.destinations.ModuleSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SuperuserSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.PhotoEditorScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ThemeSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.NavGraphs
 import androidx.navigation.NavDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
@@ -723,6 +724,13 @@ private fun UnifiedTopBar(
         ModuleSettingsScreenDestination.route -> {
             SettingsTopBar(
                 title = "Module Settings",
+                navigator = navigator,
+                modifier = modifier
+            )
+        }
+        ThemeSettingsScreenDestination.route -> {
+            SettingsTopBar(
+                title = "Theme Settings",
                 navigator = navigator,
                 modifier = modifier
             )
