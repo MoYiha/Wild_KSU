@@ -86,16 +86,17 @@ fun ThemeSettingsScreen(
     LaunchedEffect(Unit) {
         // Reset to actual saved value when screen loads/resumes
         val currentSavedUri = prefs.getString("background_image_uri", null)
+        val previousBackgroundUri = backgroundImageUri
         backgroundImageUri = currentSavedUri
         
-        // If we have a temp selection but the saved URI hasn't changed,
-        // it means user cancelled - revert to previous active image
-        if (tempSelectedImageUri != null && backgroundImageUri == previousActiveImageUri) {
+        // If we have a temp selection but the saved URI hasn't changed from what it was before,
+        // it means user cancelled - clear temp selection to revert to previous state
+        if (tempSelectedImageUri != null && currentSavedUri == previousBackgroundUri) {
             tempSelectedImageUri = null // Clear temp selection, revert to saved background
-        } else if (tempSelectedImageUri != null && backgroundImageUri != previousActiveImageUri) {
-            // User saved the temp selection, clear temp state
+        } else if (tempSelectedImageUri != null && currentSavedUri != previousBackgroundUri) {
+            // User saved the temp selection, clear temp state and update previous reference
             tempSelectedImageUri = null
-            previousActiveImageUri = backgroundImageUri
+            previousActiveImageUri = currentSavedUri
         }
     }
 
