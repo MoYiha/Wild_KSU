@@ -103,69 +103,78 @@ fun ThemeSettingsScreen(
     ) {
         // Theme Mode Section
         item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
             ) {
-                Text(
-                    text = "Theme Mode",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Theme Mode",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-                val themeOptions = listOf(
-                    "system_default" to "System Default",
-                    "light" to "Light Mode",
-                    "dark" to "Dark Mode",
-                    "amoled" to "AMOLED Dark"
-                )
-                
-                val currentThemeDisplay = themeOptions.find { it.first == themeMode }?.second ?: "System Default"
-                
-                val themeDialog = rememberCustomDialog { dismiss ->
-                    ThemeSelectionDialog(
-                        themeOptions = themeOptions,
-                        currentTheme = themeMode,
-                        onThemeSelected = { selectedTheme ->
-                            prefs.edit().putString("theme_mode", selectedTheme).commit()
-                            themeMode = selectedTheme
-                            dismiss()
-                        },
-                        onDismiss = { dismiss() }
+                    val themeOptions = listOf(
+                        "system_default" to "System Default",
+                        "light" to "Light Mode",
+                        "dark" to "Dark Mode",
+                        "amoled" to "AMOLED Dark"
+                    )
+                    
+                    val currentThemeDisplay = themeOptions.find { it.first == themeMode }?.second ?: "System Default"
+                    
+                    val themeDialog = rememberCustomDialog { dismiss ->
+                        ThemeSelectionDialog(
+                            themeOptions = themeOptions,
+                            currentTheme = themeMode,
+                            onThemeSelected = { selectedTheme ->
+                                prefs.edit().putString("theme_mode", selectedTheme).commit()
+                                themeMode = selectedTheme
+                                dismiss()
+                            },
+                            onDismiss = { dismiss() }
+                        )
+                    }
+                    
+                    ListItem(
+                        leadingContent = { Icon(Icons.Filled.Palette, "Theme Mode") },
+                        headlineContent = { Text(
+                            text = "Theme Mode",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        ) },
+                        supportingContent = { Text("Current: $currentThemeDisplay") },
+                        modifier = Modifier
+                            .clickable {
+                                themeDialog.show()
+                            }
                     )
                 }
-                
-                ListItem(
-                    leadingContent = { Icon(Icons.Filled.Palette, "Theme Mode") },
-                    headlineContent = { Text(
-                        text = "Theme Mode",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    ) },
-                    supportingContent = { Text("Current: $currentThemeDisplay") },
-                    modifier = Modifier
-                        .clickable {
-                            themeDialog.show()
-                        }
-                )
             }
         }
 
             // Background Image Section
             item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = "Background",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Background",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
 
                         // Background Image Selection
                         ListItem(
@@ -223,52 +232,60 @@ fun ThemeSettingsScreen(
                             }
                             
                             Spacer(modifier = Modifier.height(16.dp))
-            
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Opacity,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 16.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.background_transparency),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.background_transparency_summary),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Text(
-                        text = "${(backgroundTransparency * 100).toInt()}%",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Slider(
-                    value = backgroundTransparency,
-                    onValueChange = { value ->
-                        backgroundTransparency = value
-                        prefs.edit().putFloat("background_transparency", value).commit()
-                    },
-                    valueRange = 0.0f..1.0f,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+                            
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Opacity,
+                                            contentDescription = null,
+                                            modifier = Modifier.padding(end = 16.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Column(
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.background_transparency),
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.background_transparency_summary),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Text(
+                                            text = "${(backgroundTransparency * 100).toInt()}%",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Slider(
+                                        value = backgroundTransparency,
+                                        onValueChange = { value ->
+                                            backgroundTransparency = value
+                                            prefs.edit().putFloat("background_transparency", value).commit()
+                                        },
+                                        valueRange = 0.0f..1.0f,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
                             
                             // Background Blur Slider
                             var backgroundBlur by rememberSaveable {
@@ -278,55 +295,66 @@ fun ThemeSettingsScreen(
                             }
                             
                             Spacer(modifier = Modifier.height(16.dp))
-            
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Tune,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 16.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Background Blur",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "Adjust the blur effect on the background image",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                            
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Tune,
+                                            contentDescription = null,
+                                            modifier = Modifier.padding(end = 16.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                        Column(
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = "Background Blur",
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Text(
+                                                text = "Adjust the blur effect on the background image",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Text(
+                                            text = "${backgroundBlur.toInt()}px",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Slider(
+                                        value = backgroundBlur,
+                                        onValueChange = { value ->
+                                            backgroundBlur = value
+                                            prefs.edit().putFloat("background_blur", value).commit()
+                                        },
+                                        valueRange = 0.0f..50.0f,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+                        }
                     }
-                    Text(
-                        text = "${backgroundBlur.toInt()}px",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-                Slider(
-                    value = backgroundBlur,
-                    onValueChange = { value ->
-                        backgroundBlur = value
-                        prefs.edit().putFloat("background_blur", value).commit()
-                    },
-                    valueRange = 0.0f..50.0f,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
-        }
 
-        // UI Transparency Section
+            // UI Transparency Section
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -351,53 +379,64 @@ fun ThemeSettingsScreen(
                             )
                         }
                         
-                        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Tune,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 16.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "UI Transparency",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "Adjust the transparency of UI elements",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Tune,
+                                        contentDescription = null,
+                                        modifier = Modifier.padding(end = 16.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = "UI Transparency",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            text = "Adjust the transparency of UI elements",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    Text(
+                                        text = "${(uiTransparency * 100).toInt()}%",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Slider(
+                                    value = uiTransparency,
+                                    onValueChange = { value ->
+                                        uiTransparency = value
+                                        prefs.edit().putFloat("ui_transparency", value).commit()
+                                    },
+                                    valueRange = 0.0f..1.0f,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
                 }
-                Text(
-                    text = "${(uiTransparency * 100).toInt()}%",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Slider(
-                value = uiTransparency,
-                onValueChange = { value ->
-                    uiTransparency = value
-                    prefs.edit().putFloat("ui_transparency", value).commit()
-                },
-                valueRange = 0.0f..1.0f,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
 
-        // DPI Scale Section
+            // DPI Scale Section
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -428,84 +467,125 @@ fun ThemeSettingsScreen(
                         }
                         var tempDpi by remember { mutableIntStateOf(savedDpi) }
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 4.dp)
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Filled.AspectRatio,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = stringResource(R.string.dpi_scale_settings),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
+                                    Icon(
+                                        imageVector = Icons.Filled.AspectRatio,
+                                        contentDescription = null,
+                                        modifier = Modifier.padding(end = 16.dp),
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.dpi_scale_settings),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.dpi_scale_settings_summary, savedDpi),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                     Text(
-                                        text = stringResource(R.string.dpi_scale_settings_summary, savedDpi),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                            text = "${tempDpi}dpi",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
                                 }
-                                Text(
-                                    text = "${tempDpi}dpi",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Slider(
+                                     value = tempDpi.toFloat(),
+                                     onValueChange = { newValue ->
+                                         val commonDpiValues = listOf(120, 160, 240, 320, 480, 640)
+                                         val snapThreshold = 15
+                                         
+                                         val snappedValue = commonDpiValues.find { dpi ->
+                                             kotlin.math.abs(newValue - dpi) <= snapThreshold
+                                         } ?: newValue.toInt()
+                                         
+                                         tempDpi = snappedValue
+                                     },
+                                     valueRange = 120f..640f,
+                                     steps = 5,
+                                     modifier = Modifier.fillMaxWidth()
+                                 )
+                                
+                                Spacer(modifier = Modifier.height(16.dp))
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            tempDpi = systemDpi
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.secondary
+                                        )
+                                    ) {
+                                        Text("Reset")
+                                    }
+                                    
+                                    Button(
+                                        onClick = {
+                                            savedDpi = tempDpi
+                                            prefs.edit().putInt("app_dpi", savedDpi).commit()
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        enabled = tempDpi != savedDpi
+                                    ) {
+                                        Text("Confirm")
+                                    }
+                                }
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Slider(
-                                value = tempDpi.toFloat(),
-                                onValueChange = { newValue ->
-                                    val snapDpiValues = listOf(120, 220, 320, 420, 520, 620)
-                                    val snapThreshold = 20
-                                    
-                                    val snappedValue = snapDpiValues.find { dpi ->
-                                        kotlin.math.abs(newValue - dpi) <= snapThreshold
-                                    } ?: newValue.toInt()
-                                    
-                                    tempDpi = snappedValue
-                                },
-                                valueRange = 120f..640f,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
+                        }
+
+
+
+                        // Apply DPI Settings Button
+                        if (savedDpi != systemDpi || prefs.contains("app_dpi")) {
+                            Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.Center
                             ) {
                                 Button(
                                     onClick = {
-                                        tempDpi = systemDpi
+                                        // Restart activity to apply DPI changes
+                                        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+                                        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        context.startActivity(intent)
+                                        if (context is android.app.Activity) {
+                                            context.finish()
+                                        }
                                     },
-                                    modifier = Modifier.weight(1f),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary
+                                        containerColor = MaterialTheme.colorScheme.primary
                                     )
                                 ) {
-                                    Text("Reset")
-                                }
-                                
-                                Button(
-                                    onClick = {
-                                        savedDpi = tempDpi
-                                        prefs.edit().putInt("app_dpi", savedDpi).commit()
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    enabled = tempDpi != savedDpi
-                                ) {
-                                    Text("Confirm")
+                                    Text(
+                                        text = stringResource(R.string.dpi_apply_settings),
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontSize = 14.sp
+                                    )
                                 }
                             }
                         }
@@ -530,23 +610,15 @@ private fun ThemeSelectionDialog(
         )
     }
     
-    // Wrap the dialog in a Card to provide background
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
-    ) {
-        ListDialog(
-            state = rememberUseCaseState(visible = true, onCloseRequest = { onDismiss() }),
-            header = Header.Default(title = "Theme Mode"),
-            selection = ListSelection.Single(
-                showRadioButtons = true,
-                options = options
-            ) { index, _ ->
-                val selectedTheme = themeOptions[index].first
-                onThemeSelected(selectedTheme)
-            }
-        )
-    }
+    ListDialog(
+        state = rememberUseCaseState(visible = true, onCloseRequest = { onDismiss() }),
+        header = Header.Default(title = "Theme Mode"),
+        selection = ListSelection.Single(
+            showRadioButtons = true,
+            options = options
+        ) { index, _ ->
+            val selectedTheme = themeOptions[index].first
+            onThemeSelected(selectedTheme)
+        }
+    )
 }
