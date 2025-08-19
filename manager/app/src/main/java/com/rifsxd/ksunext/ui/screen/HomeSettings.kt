@@ -525,7 +525,6 @@ fun HomeSettingsScreen(
                                 text = when (selectedAppName) {
                                     "kernelsu_next" -> stringResource(R.string.app_name_kernelsu_next)
                                     "wild_ksu" -> stringResource(R.string.app_name_wild_ksu)
-                                    "custom" -> if (customAppName.isNotEmpty()) customAppName else stringResource(R.string.app_name_custom)
                                     else -> stringResource(R.string.app_name_kernelsu_next)
                                 },
                                 style = MaterialTheme.typography.bodySmall,
@@ -805,9 +804,6 @@ fun AppNameSelectionDialog(
     onCustomAppNameChanged: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var showCustomDialog by remember { mutableStateOf(false) }
-    var tempCustomName by remember { mutableStateOf(customAppName) }
-    
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -817,8 +813,7 @@ fun AppNameSelectionDialog(
             Column {
                 val options = listOf(
                     "kernelsu_next" to stringResource(R.string.app_name_kernelsu_next),
-                    "wild_ksu" to stringResource(R.string.app_name_wild_ksu),
-                    "custom" to stringResource(R.string.app_name_custom)
+                    "wild_ksu" to stringResource(R.string.app_name_wild_ksu)
                 )
                 
                 options.forEach { (value, display) ->
@@ -826,12 +821,8 @@ fun AppNameSelectionDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                if (value == "custom") {
-                                    showCustomDialog = true
-                                } else {
-                                    onAppNameSelected(value)
-                                    onDismiss()
-                                }
+                                onAppNameSelected(value)
+                                onDismiss()
                             }
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -839,21 +830,13 @@ fun AppNameSelectionDialog(
                         RadioButton(
                             selected = selectedAppName == value,
                             onClick = {
-                                if (value == "custom") {
-                                    showCustomDialog = true
-                                } else {
-                                    onAppNameSelected(value)
-                                    onDismiss()
-                                }
+                                onAppNameSelected(value)
+                                onDismiss()
                             }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (value == "custom" && selectedAppName == "custom" && customAppName.isNotEmpty()) {
-                                "$display: $customAppName"
-                            } else {
-                                display
-                            },
+                            text = display,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -866,53 +849,6 @@ fun AppNameSelectionDialog(
             }
         }
     )
-    
-    if (showCustomDialog) {
-        AlertDialog(
-            onDismissRequest = { showCustomDialog = false },
-            title = {
-                Text(stringResource(R.string.app_name_custom_dialog_title))
-            },
-            text = {
-                Column {
-                    Text(
-                        text = stringResource(R.string.app_name_custom_dialog_message),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(
-                        value = tempCustomName,
-                        onValueChange = { 
-                            if (it.length <= 20) {
-                                tempCustomName = it
-                            }
-                        },
-                        label = { Text(stringResource(R.string.app_name_custom_hint)) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onCustomAppNameChanged(tempCustomName)
-                        onAppNameSelected("custom")
-                        showCustomDialog = false
-                        onDismiss()
-                    },
-                    enabled = tempCustomName.isNotBlank()
-                ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showCustomDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
 }
 
 @Preview
