@@ -3,8 +3,6 @@ package com.rifsxd.ksunext.ui.util
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
-import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.core.content.ContextCompat
@@ -18,10 +16,10 @@ data class IconPack(
 object IconPackHelper {
     private const val TAG = "IconPackHelper"
     
-    // Common icon pack intents and categories
-    private val ICON_PACK_INTENTS = listOf(
+    // Consolidated icon pack detection methods
+    private val ICON_PACK_QUERIES = listOf(
+        // Intent actions
         "org.adw.launcher.THEMES",
-        "com.gau.go.launcherex.theme",
         "com.novalauncher.THEME",
         "com.teslacoilsw.launcher.THEME",
         "com.fede.launcher.THEME_ICONPACK",
@@ -31,14 +29,6 @@ object IconPackHelper {
         "app.lawnchair.THEME"
     )
     
-    private val ICON_PACK_CATEGORIES = listOf(
-        "com.anddoes.launcher.THEME",
-        "com.fede.launcher.THEME_ICONPACK",
-        "com.novalauncher.THEME",
-        "com.teslacoilsw.launcher.THEME",
-        "com.gau.go.launcherex.theme"
-    )
-    
     /**
      * Get all installed icon packs on the system
      */
@@ -46,10 +36,10 @@ object IconPackHelper {
         val iconPacksMap = mutableMapOf<String, IconPack>()
         val packageManager = context.packageManager
         
-        // Search by intents
-        for (intentAction in ICON_PACK_INTENTS) {
+        // Search by intent actions
+        for (query in ICON_PACK_QUERIES) {
             try {
-                val intent = Intent(intentAction)
+                val intent = Intent(query)
                 val resolveInfos = packageManager.queryIntentActivities(intent, PackageManager.GET_META_DATA)
                 
                 for (resolveInfo in resolveInfos) {
@@ -74,41 +64,7 @@ object IconPackHelper {
                     iconPacksMap[packageName] = IconPack(packageName, name, icon)
                 }
             } catch (e: Exception) {
-                Log.w(TAG, "Error querying intent $intentAction", e)
-            }
-        }
-        
-        // Search by categories
-        for (category in ICON_PACK_CATEGORIES) {
-            try {
-                val intent = Intent(Intent.ACTION_MAIN).apply {
-                    addCategory(category)
-                }
-                val resolveInfos = packageManager.queryIntentActivities(intent, PackageManager.GET_META_DATA)
-                
-                for (resolveInfo in resolveInfos) {
-                    val packageName = resolveInfo.activityInfo.packageName
-                    
-                    // Skip if already found
-                    if (iconPacksMap.containsKey(packageName)) continue
-                    
-                    val appInfo = try {
-                        packageManager.getApplicationInfo(packageName, 0)
-                    } catch (e: PackageManager.NameNotFoundException) {
-                        continue
-                    }
-                    
-                    val name = packageManager.getApplicationLabel(appInfo).toString()
-                    val icon = try {
-                        packageManager.getApplicationIcon(packageName)
-                    } catch (e: PackageManager.NameNotFoundException) {
-                        null
-                    }
-                    
-                    iconPacksMap[packageName] = IconPack(packageName, name, icon)
-                }
-            } catch (e: Exception) {
-                Log.w(TAG, "Error querying category $category", e)
+                Log.w(TAG, "Error querying $query", e)
             }
         }
         
@@ -127,15 +83,12 @@ object IconPackHelper {
             val iconPackContext = context.createPackageContext(iconPackPackage, Context.CONTEXT_IGNORE_SECURITY)
             val iconPackResources = iconPackContext.resources
             
-            // Try different common naming patterns for icon resources
+            // Try common naming patterns for icon resources
             val possibleNames = listOf(
                 targetPackage,
                 targetPackage.replace(".", "_"),
-                "${targetPackage}_icon",
-                "ic_${targetPackage}",
                 "ic_${targetPackage.replace(".", "_")}",
-                targetPackage.substringAfterLast("."),
-                "ic_${targetPackage.substringAfterLast(".")}"
+                targetPackage.substringAfterLast(".")
             )
             
             for (name in possibleNames) {
@@ -147,17 +100,6 @@ object IconPackHelper {
                 } catch (e: Exception) {
                     // Continue to next name
                 }
-            }
-            
-            // Try to find in appfilter.xml (common in icon packs)
-            try {
-                val appFilterId = iconPackResources.getIdentifier("appfilter", "xml", iconPackPackage)
-                if (appFilterId != 0) {
-                    // This would require XML parsing, which is complex
-                    // For now, we'll skip this advanced feature
-                }
-            } catch (e: Exception) {
-                // Ignore
             }
             
         } catch (e: Exception) {
