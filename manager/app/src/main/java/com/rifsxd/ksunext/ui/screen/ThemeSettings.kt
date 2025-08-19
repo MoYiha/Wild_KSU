@@ -79,11 +79,24 @@ fun ThemeSettingsScreen(
     // Temporary state for selected image (doesn't affect displayed background until save)
     var tempSelectedImageUri by remember { mutableStateOf<String?>(null) }
     
+    // Track the previously active image before new selection
+    var previousActiveImageUri by remember { mutableStateOf<String?>(null) }
+    
     // Sync state with actual saved preferences when returning from other screens
     LaunchedEffect(Unit) {
         // Reset to actual saved value when screen loads/resumes
-        backgroundImageUri = prefs.getString("background_image_uri", null)
-        tempSelectedImageUri = null // Clear temp selection
+        val currentSavedUri = prefs.getString("background_image_uri", null)
+        backgroundImageUri = currentSavedUri
+        
+        // If we have a temp selection but the saved URI hasn't changed,
+        // it means user cancelled - revert to previous active image
+        if (tempSelectedImageUri != null && backgroundImageUri == previousActiveImageUri) {
+            tempSelectedImageUri = null // Clear temp selection, revert to saved background
+        } else if (tempSelectedImageUri != null && backgroundImageUri != previousActiveImageUri) {
+            // User saved the temp selection, clear temp state
+            tempSelectedImageUri = null
+            previousActiveImageUri = backgroundImageUri
+        }
     }
 
     // Image picker launcher
@@ -93,6 +106,10 @@ fun ThemeSettingsScreen(
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
                 try {
+                    // Store the currently active image before selecting new one
+                    val currentActiveUri = tempSelectedImageUri ?: backgroundImageUri
+                    previousActiveImageUri = currentActiveUri
+                    
                     // Copy image to internal storage for temporary editing (don't save to preferences yet)
                     val savedPath = BackgroundCustomization.copyImageToInternalStorage(context, uri)
                     if (savedPath != null) {
@@ -224,6 +241,7 @@ fun ThemeSettingsScreen(
                                             prefs.edit().remove("background_image_uri").commit()
                                             backgroundImageUri = null
                                             tempSelectedImageUri = null
+                                            previousActiveImageUri = null
                                         }) {
                                             Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
                                         }
