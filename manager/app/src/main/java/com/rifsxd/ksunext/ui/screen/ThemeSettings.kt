@@ -237,7 +237,8 @@ fun ThemeSettingsScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceContainer
-                                )
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                             ) {
                                 Column(
                                     modifier = Modifier
@@ -299,7 +300,8 @@ fun ThemeSettingsScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceContainer
-                                )
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                             ) {
                                 Column(
                                     modifier = Modifier
@@ -342,7 +344,7 @@ fun ThemeSettingsScreen(
                                             backgroundBlur = value
                                             prefs.edit().putFloat("background_blur", value).commit()
                                         },
-                                        valueRange = 0.0f..25.0f,
+                                        valueRange = 0.0f..50.0f,
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                 }
@@ -381,7 +383,8 @@ fun ThemeSettingsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer
-                            )
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -462,12 +465,14 @@ fun ThemeSettingsScreen(
                                 }
                             )
                         }
+                        var tempDpi by remember { mutableIntStateOf(savedDpi) }
 
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer
-                            )
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                         ) {
                             Column(
                                 modifier = Modifier
@@ -497,18 +502,59 @@ fun ThemeSettingsScreen(
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
+                                    Text(
+                                            text = "${tempDpi}dpi",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Slider(
-                                    value = savedDpi.toFloat(),
-                                    onValueChange = { newValue ->
-                                        savedDpi = newValue.toInt()
-                                        prefs.edit().putInt("app_dpi", savedDpi).commit()
-                                    },
-                                    valueRange = 120f..640f,
-                                    steps = 5,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
+                                     value = tempDpi.toFloat(),
+                                     onValueChange = { newValue ->
+                                         val commonDpiValues = listOf(120, 160, 240, 320, 480, 640)
+                                         val snapThreshold = 15
+                                         
+                                         val snappedValue = commonDpiValues.find { dpi ->
+                                             kotlin.math.abs(newValue - dpi) <= snapThreshold
+                                         } ?: newValue.toInt()
+                                         
+                                         tempDpi = snappedValue
+                                     },
+                                     valueRange = 120f..640f,
+                                     steps = 5,
+                                     modifier = Modifier.fillMaxWidth()
+                                 )
+                                
+                                Spacer(modifier = Modifier.height(16.dp))
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            tempDpi = systemDpi
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.secondary
+                                        )
+                                    ) {
+                                        Text("Reset")
+                                    }
+                                    
+                                    Button(
+                                        onClick = {
+                                            savedDpi = tempDpi
+                                            prefs.edit().putInt("app_dpi", savedDpi).commit()
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        enabled = tempDpi != savedDpi
+                                    ) {
+                                        Text("Confirm")
+                                    }
+                                }
                             }
                         }
 
