@@ -71,6 +71,9 @@ import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ScreenRotation
+import androidx.compose.material.icons.filled.ScreenLockRotation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
@@ -715,9 +718,19 @@ private fun UnifiedTopBar(
             )
         }
         PhotoEditorScreenDestination.route -> {
+            val context = LocalContext.current
+            val photoEditorSaveCallback = LocalPhotoEditorSaveCallback.current
+            var screenRotationLocked by remember { mutableStateOf(false) }
+            
             PhotoEditorTopBar(
                 navigator = navigator,
-                onSave = { /* No save action - handled by floating button */ },
+                onSave = { photoEditorSaveCallback?.invoke() ?: run {} },
+                onReset = {
+                    // Reset functionality will be handled by PhotoEditor through callback
+                    // This is a placeholder for now
+                },
+                screenRotationLocked = screenRotationLocked,
+                onScreenRotationToggle = { screenRotationLocked = !screenRotationLocked },
                 modifier = modifier
             )
         }
@@ -988,6 +1001,9 @@ private fun SettingsTopBar(
 fun PhotoEditorTopBar(
     navigator: DestinationsNavigator,
     onSave: () -> Unit = {},
+    onReset: () -> Unit = {},
+    screenRotationLocked: Boolean = false,
+    onScreenRotationToggle: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
@@ -1004,6 +1020,37 @@ fun PhotoEditorTopBar(
         navigationIcon = {
             IconButton(onClick = { navigator.popBackStack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
+        },
+        actions = {
+            // Screen Rotation Toggle
+            IconButton(
+                onClick = onScreenRotationToggle
+            ) {
+                Icon(
+                    imageVector = if (screenRotationLocked) Icons.Default.ScreenLockRotation else Icons.Default.ScreenRotation,
+                    contentDescription = "Screen Rotation Toggle"
+                )
+            }
+            
+            // Reset button
+            IconButton(
+                onClick = onReset
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Reset All"
+                )
+            }
+            
+            // Confirm button
+            IconButton(
+                onClick = onSave
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Confirm"
+                )
             }
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),

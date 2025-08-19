@@ -58,6 +58,9 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rifsxd.ksunext.ui.util.BackgroundUtils
 import com.rifsxd.ksunext.ui.util.BackgroundTransformation
+import com.rifsxd.ksunext.ui.LocalPhotoEditorResetCallback
+import com.rifsxd.ksunext.ui.LocalPhotoEditorScreenRotationCallback
+import com.rifsxd.ksunext.ui.LocalPhotoEditorScreenRotationLocked
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -106,6 +109,11 @@ fun PhotoEditorScreen(
         println("PhotoEditor: Starting with default transform settings for image: $imageUri")
     }
     
+    // Get callbacks from CompositionLocal
+    val resetCallback = LocalPhotoEditorResetCallback.current
+    val screenRotationCallback = LocalPhotoEditorScreenRotationCallback.current
+    val screenRotationLocked = LocalPhotoEditorScreenRotationLocked.current
+
     PhotoEditor(
         imageUri = Uri.parse(imageUri),
         scale = scale,
@@ -124,6 +132,18 @@ fun PhotoEditorScreen(
         onCancel = {
             // Simply navigate back without making any changes to preserve original state
             navigator.popBackStack()
+        },
+        screenRotationLocked = screenRotationLocked.value,
+        onReset = {
+            // Reset transform values to defaults
+            scale = 1f
+            offsetX = 0f
+            offsetY = 0f
+            rotation = 0f
+            resetCallback()
+        },
+        onScreenRotationToggle = {
+            screenRotationCallback()
         }
     )
 }
@@ -138,7 +158,10 @@ fun PhotoEditor(
     rotation: Float,
     onTransformChange: (Float, Float, Float, Float) -> Unit = { _, _, _, _ -> },
     onSave: () -> Unit = {},
-    onCancel: () -> Unit = {}
+    onCancel: () -> Unit = {},
+    screenRotationLocked: Boolean = false,
+    onReset: () -> Unit = {},
+    onScreenRotationToggle: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -154,7 +177,7 @@ fun PhotoEditor(
 
     var freeFormEditing by remember { mutableStateOf(true) }
     
-    var screenRotationLocked by remember { mutableStateOf(false) }
+    // screenRotationLocked is now passed as a parameter from the top bar
     
     // Update local state when props change
     LaunchedEffect(scale, offsetX, offsetY, rotation) {
@@ -218,129 +241,5 @@ fun PhotoEditor(
             alignment = Alignment.Center
         )
         
-        // Removed full-screen overlays to keep photo visible
-        
-
-        
-
-        
-            // Bottom controls overlay - positioned as a separate layer
-            Surface(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .wrapContentWidth()
-                .windowInsetsPadding(
-                    WindowInsets.systemBars.union(WindowInsets.displayCutout).only(
-                        WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
-                    )
-                )
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            tonalElevation = 3.dp,
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Single Menu Container with AnimatedContent
-                if (activeMenu != "none") {
-                    AnimatedContent(
-                        targetState = activeMenu,
-                        transitionSpec = {
-                            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) with
-                            fadeOut(animationSpec = tween(150))
-                        }
-                    ) { menu ->
-                        when (menu) {
-
-
-
-                            }
-                        }
-                    }
-                }
-                
-                // Control Bar with consistent button sizing and precise container fit
-                Row(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Screen Rotation Toggle - Consistent sizing
-                    IconButton(
-                        onClick = { screenRotationLocked = !screenRotationLocked },
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Icon(
-                            imageVector = if (screenRotationLocked) Icons.Default.ScreenLockRotation else Icons.Default.ScreenRotation,
-                            contentDescription = "Screen Rotation Toggle",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    
-                    // Reset button - Consistent sizing
-                    IconButton(
-                        onClick = {
-                            // Close any open menus
-                            activeMenu = null
-                            
-                            // Reset all settings to defaults (local state only)
-                            currentScale = 1f
-                            currentOffsetX = 0f
-                            currentOffsetY = 0f
-                            currentRotation = 0f
-                            freeFormEditing = true
-                            
-                            // Reset UI transparency to 0% when reset button is pressed
-                            BackgroundUtils.resetUITransparency(context)
-                            
-                            // Update transformations (local state only)
-                            onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
-                            
-                            // Note: Reset only affects local state - user must save to persist changes
-                        },
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Reset All",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    
-                    // Confirm button - Consistent sizing with primary styling
-                    IconButton(
-                        onClick = {
-                            activeMenu = null
-                            onSave()
-                        },
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Confirm",
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-            }
-        }
+        // Bottom navigation buttons have been moved to the top bar
     }
