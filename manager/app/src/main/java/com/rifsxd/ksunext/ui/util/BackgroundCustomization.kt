@@ -156,11 +156,10 @@ object BackgroundCustomization {
      * @param imageUri Original image URI
      * @param transformation Transformation parameters
      */
-    fun saveBackgroundSettings(context: Context, imageUri: String, transformation: BackgroundTransformation) {
+    fun saveBackgroundSettings(context: Context, imageUri: String, transformation: BackgroundTransformation, saveUri: Boolean = false) {
         val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         
-        prefs.edit()
-            .putString("background_image_uri", imageUri)
+        val editor = prefs.edit()
             .putFloat("background_scale_x", transformation.scale)
             .putFloat("background_pos_x", transformation.offsetX)
             .putFloat("background_pos_y", transformation.offsetY)
@@ -168,9 +167,15 @@ object BackgroundCustomization {
             .putFloat("background_transparency", 0.0f)
             .putFloat("background_blur", 0.0f)
             .putString("background_fit_mode", "fit")
-            .apply()
             
-        Log.d(TAG, "Background settings saved: $transformation")
+        // Only save URI if explicitly requested
+        if (saveUri) {
+            editor.putString("background_image_uri", imageUri)
+        }
+        
+        editor.apply()
+            
+        Log.d(TAG, "Background settings saved: $transformation, URI saved: $saveUri")
     }
     
     /**
