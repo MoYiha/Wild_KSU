@@ -70,14 +70,17 @@ fun PhotoEditorScreen(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     
-    // Note: Removed automatic saving of previous URI to prevent unintended saves when entering crop menu
+    // Reset background transparency and blur settings to 0% when entering photo editor
+    LaunchedEffect(Unit) {
+        prefs.edit()
+            .putFloat("background_transparency", 0.0f)
+            .putFloat("background_blur", 0.0f)
+            .apply()
+    }
     
     val saveFunction = { scale: Float, offsetX: Float, offsetY: Float, rotation: Float ->
         // Save transform settings and background configuration
-        // Preserve existing background_transparency setting instead of overriding it
-        val currentTransparency = prefs.getFloat("background_transparency", 0.0f)
-        
-
+        // Keep transparency and blur settings at 0% as initialized
         
         println("PhotoEditor: Saving with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
         
@@ -87,7 +90,8 @@ fun PhotoEditorScreen(
             .putFloat("background_pos_x", offsetX)
             .putFloat("background_pos_y", offsetY)
             .putFloat("background_rotation", rotation)
-            .putFloat("background_transparency", currentTransparency)
+            .putFloat("background_transparency", 0.0f)
+            .putFloat("background_blur", 0.0f)
             .putString("background_fit_mode", "fit")
             .apply()
         println("PhotoEditor: All settings saved, navigating back")
@@ -306,6 +310,13 @@ fun PhotoEditor(
                             currentOffsetY = 0f
                             currentRotation = 0f
                             freeFormEditing = true
+                            
+                            // Reset UI transparency to 0% when reset button is pressed
+                            val context = LocalContext.current
+                            val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                            prefs.edit()
+                                .putFloat("ui_transparency", 0.0f)
+                                .apply()
                             
                             // Update transformations (local state only)
                             onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
