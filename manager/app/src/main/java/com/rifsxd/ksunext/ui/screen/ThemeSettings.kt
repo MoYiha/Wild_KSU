@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
@@ -167,16 +165,10 @@ fun ThemeSettingsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(20.dp)
-                            .clickable(
-                                indication = rememberRipple(
-                                    bounded = true,
-                                    radius = 300.dp
-                                ),
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) {
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable {
                                 themeDialog.show()
                             }
-                            .clip(RoundedCornerShape(12.dp))
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
@@ -231,20 +223,14 @@ fun ThemeSettingsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(20.dp)
-                                .clickable(
-                                    indication = rememberRipple(
-                                        bounded = true,
-                                        radius = 300.dp
-                                    ),
-                                    interactionSource = remember { MutableInteractionSource() }
-                                ) {
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable {
                                     val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                                         type = "image/*"
                                         addCategory(Intent.CATEGORY_OPENABLE)
                                     }
                                     selectImageLauncher.launch(intent)
                                 }
-                                .clip(RoundedCornerShape(12.dp))
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
