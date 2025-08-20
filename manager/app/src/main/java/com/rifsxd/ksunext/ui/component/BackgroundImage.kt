@@ -48,6 +48,11 @@ fun BackgroundImageWrapper(
     // Debug logging
     Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency, Blur: $backgroundBlur")
     
+    // State for blurred image - moved outside to prevent recreation on recomposition
+    // Reset when backgroundImageUri changes
+    var blurredPainter by remember(backgroundImageUri) { mutableStateOf<BitmapPainter?>(null) }
+    var isProcessingBlur by remember(backgroundImageUri) { mutableStateOf(false) }
+    
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image if available
         backgroundImageUri?.let { uriString ->
@@ -62,10 +67,6 @@ fun BackgroundImageWrapper(
                     Log.e("BackgroundImage", "Invalid URI: $uriString", e)
                     return@let
                 }
-                
-                // State for blurred image
-                var blurredPainter by remember { mutableStateOf<BitmapPainter?>(null) }
-                var isProcessingBlur by remember { mutableStateOf(false) }
                 
                 val originalPainter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(context)
