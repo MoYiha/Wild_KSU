@@ -24,6 +24,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -564,6 +566,21 @@ fun ThemeSettingsScreen(
                             
                             Spacer(modifier = Modifier.height(16.dp))
                             
+                            // DPI Preset Values
+                            val dpiPresets = listOf(
+                                120 to "LDPI (120)",
+                                160 to "MDPI (160)", 
+                                213 to "TVDPI (213)",
+                                240 to "HDPI (240)",
+                                320 to "XHDPI (320)",
+                                480 to "XXHDPI (480)",
+                                640 to "XXXHDPI (640)",
+                                720 to "Max (720)"
+                            )
+                            
+                            // Dropdown menu state
+                            var showDpiDropdown by remember { mutableStateOf(false) }
+                            
                             // Custom DPI Input Dialog
                             var showCustomDpiDialog by remember { mutableStateOf(false) }
                             var customDpiText by remember { mutableStateOf("") }
@@ -625,46 +642,100 @@ fun ThemeSettingsScreen(
                                 )
                             }
                             
+                            // DPI Preset Dropdown
+                            Column {
+                                Button(
+                                    onClick = { showDpiDropdown = true },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    )
+                                ) {
+                                    Text("Select DPI Preset")
+                                }
+                                
+                                DropdownMenu(
+                                    expanded = showDpiDropdown,
+                                    onDismissRequest = { showDpiDropdown = false }
+                                ) {
+                                    dpiPresets.forEach { (dpi, label) ->
+                                        DropdownMenuItem(
+                                            text = { Text(label) },
+                                            onClick = {
+                                                tempDpi = dpi
+                                                showDpiDropdown = false
+                                            }
+                                        )
+                                    }
+                                    DropdownMenuItem(
+                                        text = { Text("Custom...") },
+                                        onClick = {
+                                            customDpiText = tempDpi.toString()
+                                            showCustomDpiDialog = true
+                                            showDpiDropdown = false
+                                        }
+                                    )
+                                }
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Button(
+                                // Reset button with Clear icon
+                                IconButton(
                                     onClick = {
                                         tempDpi = systemDpi
                                         savedDpi = systemDpi
                                         prefs.edit().putInt("app_dpi", systemDpi).commit()
                                     },
-                                    modifier = Modifier.weight(1f),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary
-                                    )
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(8.dp)
                                 ) {
-                                    Text("Reset")
+                                    Icon(
+                                        imageVector = Icons.Filled.Clear,
+                                        contentDescription = "Reset DPI",
+                                        tint = MaterialTheme.colorScheme.secondary
+                                    )
                                 }
                                 
-                                Button(
+                                // Custom button with Tune icon
+                                IconButton(
                                     onClick = {
                                         customDpiText = tempDpi.toString()
                                         showCustomDpiDialog = true
                                     },
-                                    modifier = Modifier.weight(1f),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.tertiary
-                                    )
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(8.dp)
                                 ) {
-                                    Text("Custom")
+                                    Icon(
+                                        imageVector = Icons.Filled.Tune,
+                                        contentDescription = "Custom DPI",
+                                        tint = MaterialTheme.colorScheme.tertiary
+                                    )
                                 }
                                 
-                                Button(
+                                // Confirm button with Check icon
+                                IconButton(
                                     onClick = {
                                         savedDpi = tempDpi
                                         prefs.edit().putInt("app_dpi", savedDpi).commit()
                                     },
-                                    modifier = Modifier.weight(1f),
-                                    enabled = tempDpi != savedDpi
+                                    enabled = tempDpi != savedDpi,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(8.dp)
                                 ) {
-                                    Text("Confirm")
+                                    Icon(
+                                        imageVector = Icons.Filled.Check,
+                                        contentDescription = "Confirm DPI",
+                                        tint = if (tempDpi != savedDpi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
                             }
                         }
