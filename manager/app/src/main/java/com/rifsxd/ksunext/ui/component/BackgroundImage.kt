@@ -91,10 +91,13 @@ fun BackgroundImageWrapper(
                 val flipHorizontal = remember { prefs.getBoolean("background_flip_horizontal", false) }
                 val flipVertical = remember { prefs.getBoolean("background_flip_vertical", false) }
                 
-                // Apply transformations with built-in blur modifier
+                // Apply transformations with improved blur modifier
                 val imageModifier = Modifier
                     .fillMaxSize()
-                    .blur(radius = backgroundBlur.dp)
+                    .blur(
+                        radius = (backgroundBlur * 0.5f).dp, // Scale down blur for better quality
+                        edgeTreatment = androidx.compose.ui.draw.BlurredEdgeTreatment.Unbounded
+                    )
                     .graphicsLayer {
                         scaleX = scale * (if (flipHorizontal) -1f else 1f)
                         scaleY = scale * (if (flipVertical) -1f else 1f)
