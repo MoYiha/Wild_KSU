@@ -78,8 +78,7 @@ fun PhotoEditorScreen(
     }
     
     val saveFunction = { scale: Float, offsetX: Float, offsetY: Float, rotation: Float ->
-        // Save only transform settings, not the background URI
-        // This prevents automatic background application until user explicitly saves
+        // Create transformation object
         val transformation = BackgroundTransformation(
             scale = scale,
             offsetX = offsetX,
@@ -87,8 +86,34 @@ fun PhotoEditorScreen(
             rotation = rotation
         )
         
-        // Save transformation settings without applying as background
-        BackgroundCustomization.saveBackgroundSettings(context, imageUri, transformation, saveUri = false)
+        // Check if this is a temp image that needs to be saved as background
+        val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val currentBackgroundUri = prefs.getString("background_image_uri", null)
+        
+        // If this is a new image (not the current background), save it as the new background
+        if (currentBackgroundUri == null || imageUri != currentBackgroundUri) {
+            // Convert temp URI to file path for processing
+            val tempPath = if (imageUri.startsWith("file://")) {
+                imageUri.removePrefix("file://")
+            } else {
+                imageUri
+            }
+            
+            // Copy temp image to permanent location
+            val permanentPath = BackgroundCustomization.copyTempImageToPermanent(context, tempPath)
+            
+            if (permanentPath != null) {
+                // Save background settings with permanent path
+                val permanentUri = BackgroundCustomization.filePathToUri(permanentPath)
+                BackgroundCustomization.saveBackgroundSettings(context, permanentUri, transformation, saveUri = true)
+            } else {
+                // Fallback: save with temp path if permanent copy fails
+                BackgroundCustomization.saveBackgroundSettings(context, imageUri, transformation, saveUri = true)
+            }
+        } else {
+            // Just update transformation settings for existing background
+            BackgroundCustomization.saveBackgroundSettings(context, imageUri, transformation, saveUri = true)
+        }
         
         navigator.popBackStack()
         Unit

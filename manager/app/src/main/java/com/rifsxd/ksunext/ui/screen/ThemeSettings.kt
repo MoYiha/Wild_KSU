@@ -15,7 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Save
+// Removed Save icon import - no longer needed
 import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.*
@@ -78,14 +78,8 @@ fun ThemeSettingsScreen(
         mutableStateOf(prefs.getString("background_image_uri", null))
     }
     
-    // Temporary state for selected image (doesn't affect displayed background until save)
-    var tempSelectedImageUri by rememberSaveable { mutableStateOf<String?>(null) }
-    
-    // Track the previously active image before new selection
-    var previousActiveImageUri by remember { mutableStateOf<String?>(null) }
-    
     // Sync state with actual saved preferences when returning from other screens
-    LaunchedEffect(backgroundImageUri) {
+    LaunchedEffect(Unit) {
         // Update backgroundImageUri from SharedPreferences
         val currentSavedUri = prefs.getString("background_image_uri", null)
         if (backgroundImageUri != currentSavedUri) {
@@ -100,17 +94,11 @@ fun ThemeSettingsScreen(
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
                 try {
-                    // Store the currently active image before selecting new one
-                    val currentActiveUri = tempSelectedImageUri ?: backgroundImageUri
-                    previousActiveImageUri = currentActiveUri
-                    
-                    // Copy image to internal storage for temporary editing (don't save to preferences yet)
+                    // Copy image to internal storage for editing
                     val savedPath = BackgroundCustomization.copyImageToInternalStorage(context, uri)
                     if (savedPath != null) {
                         val savedUri = BackgroundCustomization.filePathToUri(savedPath)
-                        // Update temp state to show buttons, but don't change displayed background
-                        tempSelectedImageUri = savedUri.toString()
-                        // Navigate to photo editor with temp URI - settings will be saved only when user confirms
+                        // Navigate directly to photo editor - saving will happen there
                         navigator.navigate(PhotoEditorScreenDestination(imageUri = savedUri.toString()))
                     }
                 } catch (e: Exception) {
@@ -215,55 +203,10 @@ fun ThemeSettingsScreen(
                             supportingContent = { Text(stringResource(R.string.settings_background_image_summary)) },
                             trailingContent = {
                                 Row {
-                                    // Determine which image to use for buttons (temp selection or saved background)
-                                    val activeImageUri = tempSelectedImageUri ?: backgroundImageUri
+                                    // Use the saved background image for buttons
+                                    val activeImageUri = backgroundImageUri
                                     
-                                    // Save button (only show if there's a temp selection)
-                                    if (tempSelectedImageUri != null) {
-                                        IconButton(onClick = {
-                                            Log.d("ThemeSettings", "Save button clicked - tempSelectedImageUri: $tempSelectedImageUri")
-                                            
-                                            // Load current transformation settings
-                                            val transformation = BackgroundCustomization.loadBackgroundTransformation(context)
-                                            
-                                            // Convert temp URI to file path for processing
-                                            val tempPath = if (tempSelectedImageUri!!.startsWith("file://")) {
-                                                tempSelectedImageUri!!.removePrefix("file://")
-                                            } else {
-                                                tempSelectedImageUri!!
-                                            }
-                                            
-                                            Log.d("ThemeSettings", "Temp path: $tempPath")
-                                            
-                                            // Copy temp image to permanent location
-                                            val permanentPath = BackgroundCustomization.copyTempImageToPermanent(context, tempPath)
-                                            
-                                            Log.d("ThemeSettings", "Permanent path: $permanentPath")
-                                            
-                                            if (permanentPath != null) {
-                                                // Save background settings with permanent path
-                                                val permanentUri = BackgroundCustomization.filePathToUri(permanentPath)
-                                                Log.d("ThemeSettings", "Saving with permanent URI: $permanentUri")
-                                                BackgroundCustomization.saveBackgroundSettings(context, permanentUri, transformation, saveUri = true)
-                                                
-                                                // Update UI state
-                                                backgroundImageUri = permanentUri
-                                                tempSelectedImageUri = null
-                                                previousActiveImageUri = permanentUri
-                                                Log.d("ThemeSettings", "Updated backgroundImageUri to: $backgroundImageUri")
-                                            } else {
-                                                // Fallback: save with temp path if permanent copy fails
-                                                Log.d("ThemeSettings", "Fallback: saving with temp URI: $tempSelectedImageUri")
-                                                BackgroundCustomization.saveBackgroundSettings(context, tempSelectedImageUri!!, transformation, saveUri = true)
-                                                backgroundImageUri = tempSelectedImageUri
-                                                tempSelectedImageUri = null
-                                                previousActiveImageUri = backgroundImageUri
-                                                Log.d("ThemeSettings", "Updated backgroundImageUri to: $backgroundImageUri (fallback)")
-                                            }
-                                        }) {
-                                            Icon(Icons.Filled.Save, "Save Background")
-                                        }
-                                    }
+                                    // Save button removed - saving now happens in PhotoEditor
                                     
                                     // Crop button (only show if background image is selected)
                                     if (activeImageUri != null) {
@@ -281,8 +224,6 @@ fun ThemeSettingsScreen(
                                             BackgroundCustomization.deleteInternalBackgroundImage(context)
                                             prefs.edit().remove("background_image_uri").commit()
                                             backgroundImageUri = null
-                                            tempSelectedImageUri = null
-                                            previousActiveImageUri = null
                                         }) {
                                             Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
                                         }
