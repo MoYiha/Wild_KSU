@@ -644,7 +644,7 @@ fun ThemeSettingsScreen(
                             
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Reset button with Clear icon
@@ -654,9 +654,7 @@ fun ThemeSettingsScreen(
                                         savedDpi = systemDpi
                                         prefs.edit().putInt("app_dpi", systemDpi).commit()
                                     },
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(8.dp)
+                                    modifier = Modifier.padding(8.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Clear,
@@ -666,9 +664,7 @@ fun ThemeSettingsScreen(
                                 }
                                 
                                 // Custom/Preset button with Tune icon
-                                Box(
-                                    modifier = Modifier.weight(1f)
-                                ) {
+                                Box {
                                     IconButton(
                                         onClick = { showDpiDropdown = true },
                                         modifier = Modifier.padding(8.dp)
@@ -711,9 +707,7 @@ fun ThemeSettingsScreen(
                                         prefs.edit().putInt("app_dpi", savedDpi).commit()
                                     },
                                     enabled = tempDpi != savedDpi,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(8.dp)
+                                    modifier = Modifier.padding(8.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Check,
