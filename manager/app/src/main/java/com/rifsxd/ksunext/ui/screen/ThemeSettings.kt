@@ -164,11 +164,12 @@ fun ThemeSettingsScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(20.dp))
                             .clickable {
                                 themeDialog.show()
                             }
+                            .padding(12.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
@@ -222,8 +223,8 @@ fun ThemeSettingsScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(20.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .padding(8.dp)
+                                .clip(RoundedCornerShape(20.dp))
                                 .clickable {
                                     val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                                         type = "image/*"
@@ -231,6 +232,7 @@ fun ThemeSettingsScreen(
                                     }
                                     selectImageLauncher.launch(intent)
                                 }
+                                .padding(12.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
