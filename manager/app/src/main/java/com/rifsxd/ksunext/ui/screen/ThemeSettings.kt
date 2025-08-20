@@ -685,6 +685,8 @@ fun ThemeSettingsScreen(
                                                 text = { Text(label) },
                                                 onClick = {
                                                     tempDpi = dpi
+                                                    savedDpi = dpi
+                                                    prefs.edit().putInt("app_dpi", dpi).commit()
                                                     showDpiDropdown = false
                                                 }
                                             )
