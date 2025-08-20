@@ -97,7 +97,11 @@ fun BackgroundImageWrapper(
                                     when (BlurUtils.getBestBlurMethod(backgroundBlur)) {
                                         BlurUtils.BlurMethod.BOX_BLUR -> BlurUtils.applyBoxBlur(bitmap, backgroundBlur)
                                         BlurUtils.BlurMethod.GAUSSIAN_BLUR -> BlurUtils.applyGaussianBlur(bitmap, backgroundBlur)
-                                        BlurUtils.BlurMethod.RENDER_EFFECT -> bitmap // Fallback to original for RenderEffect
+                                        BlurUtils.BlurMethod.RENDER_EFFECT -> {
+                                            // For RenderEffect, we'll use Gaussian blur as fallback since RenderEffect
+                                            // is applied differently and requires different handling
+                                            BlurUtils.applyGaussianBlur(bitmap, backgroundBlur)
+                                        }
                                     }
                                 }
                                 blurredPainter = BitmapPainter(blurredBitmap.asImageBitmap())
