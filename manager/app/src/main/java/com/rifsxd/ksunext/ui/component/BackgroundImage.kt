@@ -45,8 +45,10 @@ fun BackgroundImageWrapper(
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
     
-    // Debug logging
-    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency, Blur: $backgroundBlur")
+    // Debug logging - only log when values change
+    remember(backgroundImageUri, backgroundFitMode, backgroundTransparency, backgroundBlur) {
+        Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency, Blur: $backgroundBlur")
+    }
     
     // State for blurred image - reset when backgroundImageUri or backgroundBlur changes
     var blurredPainter by remember(backgroundImageUri, backgroundBlur) { mutableStateOf<BitmapPainter?>(null) }
@@ -57,7 +59,10 @@ fun BackgroundImageWrapper(
         // Display background image if available
         backgroundImageUri?.let { uriString ->
             if (uriString.isNotEmpty()) {
-                Log.d("BackgroundImage", "Loading image from URI: $uriString")
+                // Log only when URI changes
+                remember(uriString) {
+                    Log.d("BackgroundImage", "Loading image from URI: $uriString")
+                }
                 
                 // Validate URI
                 try {
@@ -137,15 +142,13 @@ fun BackgroundImageWrapper(
                     originalPainter
                 }
                 
-                // Load transform settings from SharedPreferences
-                val scale = prefs.getFloat("background_scale_x", 1f)
-                val offsetX = prefs.getFloat("background_pos_x", 0f)
-                val offsetY = prefs.getFloat("background_pos_y", 0f)
-                val rotation = prefs.getFloat("background_rotation", 0f)
-                val flipHorizontal = prefs.getBoolean("background_flip_horizontal", false)
-                val flipVertical = prefs.getBoolean("background_flip_vertical", false)
-                
-                Log.d("BackgroundImage", "Transform settings: scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation, flipH=$flipHorizontal, flipV=$flipVertical")
+                // Load transform settings from SharedPreferences - remember to prevent continuous reads
+                val scale = remember { prefs.getFloat("background_scale_x", 1f) }
+                val offsetX = remember { prefs.getFloat("background_pos_x", 0f) }
+                val offsetY = remember { prefs.getFloat("background_pos_y", 0f) }
+                val rotation = remember { prefs.getFloat("background_rotation", 0f) }
+                val flipHorizontal = remember { prefs.getBoolean("background_flip_horizontal", false) }
+                val flipVertical = remember { prefs.getBoolean("background_flip_vertical", false) }
                 
                 // Apply transformations (blur is now handled by custom painter)
                 val imageModifier = Modifier
@@ -179,7 +182,6 @@ fun BackgroundImageWrapper(
         
         // Overlay with darkness control for content readability
         val overlayAlpha = backgroundTransparency
-        Log.d("BackgroundImage", "Overlay alpha: $overlayAlpha")
         Box(
             modifier = Modifier
                 .fillMaxSize()
