@@ -189,15 +189,19 @@ fun BackgroundImageWrapper(
             }
         }
         
-        // Overlay with darkness control for content readability
-        val overlayAlpha = backgroundTransparency
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Color.Black.copy(alpha = overlayAlpha)
+        // Overlay with darkness control for content readability - only apply when background image exists
+        backgroundImageUri?.let { uriString ->
+            if (uriString.isNotEmpty()) {
+                val overlayAlpha = backgroundTransparency
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Color.Black.copy(alpha = overlayAlpha)
+                        )
                 )
-        )
+            }
+        }
         
         // Content on top of background
         content()
