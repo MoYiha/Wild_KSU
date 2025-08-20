@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.rifsxd.ksunext.ui.util.BlurUtils
+import com.rifsxd.ksunext.ui.util.BackgroundCustomization
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import android.graphics.Bitmap
@@ -46,7 +46,7 @@ fun BackgroundImageWrapper(
     val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
     
     // Debug logging
-    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode")
+    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency, Blur: $backgroundBlur")
     
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image if available
@@ -87,24 +87,23 @@ fun BackgroundImageWrapper(
                 
                 // Apply blur effect when needed
                 LaunchedEffect(backgroundBlur, originalPainter.state) {
+                    Log.d("BackgroundImage", "LaunchedEffect triggered - backgroundBlur: $backgroundBlur, painter state: ${originalPainter.state}")
                     if (backgroundBlur > 0f && originalPainter.state is AsyncImagePainter.State.Success) {
+                        Log.d("BackgroundImage", "Starting blur processing with radius: $backgroundBlur")
                         isProcessingBlur = true
                         try {
                             val drawable = (originalPainter.state as AsyncImagePainter.State.Success).result.drawable
                             if (drawable is BitmapDrawable) {
                                 val bitmap = drawable.bitmap
+                                Log.d("BackgroundImage", "Bitmap size: ${bitmap.width}x${bitmap.height}")
+                                Log.d("BackgroundImage", "Applying simple blur with radius: $backgroundBlur")
                                 val blurredBitmap = withContext(Dispatchers.Default) {
-                                    when (BlurUtils.getBestBlurMethod(backgroundBlur)) {
-                                        BlurUtils.BlurMethod.BOX_BLUR -> BlurUtils.applyBoxBlur(bitmap, backgroundBlur)
-                                        BlurUtils.BlurMethod.GAUSSIAN_BLUR -> BlurUtils.applyGaussianBlur(bitmap, backgroundBlur)
-                                        BlurUtils.BlurMethod.RENDER_EFFECT -> {
-                                            // For RenderEffect, we'll use Gaussian blur as fallback since RenderEffect
-                                            // is applied differently and requires different handling
-                                            BlurUtils.applyGaussianBlur(bitmap, backgroundBlur)
-                                        }
-                                    }
+                                    BackgroundCustomization.applyBlur(bitmap, backgroundBlur)
                                 }
                                 blurredPainter = BitmapPainter(blurredBitmap.asImageBitmap())
+                                Log.d("BackgroundImage", "Blur processing completed successfully")
+                            } else {
+                                Log.w("BackgroundImage", "Drawable is not BitmapDrawable: ${drawable::class.java.simpleName}")
                             }
                         } catch (e: Exception) {
                             Log.e("BackgroundImage", "Failed to apply blur: ${e.message}", e)
@@ -113,6 +112,7 @@ fun BackgroundImageWrapper(
                             isProcessingBlur = false
                         }
                     } else {
+                        Log.d("BackgroundImage", "Clearing blur - backgroundBlur: $backgroundBlur, state success: ${originalPainter.state is AsyncImagePainter.State.Success}")
                         blurredPainter = null
                     }
                 }

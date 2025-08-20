@@ -230,6 +230,87 @@ object BackgroundCustomization {
     }
     
     /**
+     * Apply simple blur effect to bitmap
+     * @param bitmap Source bitmap
+     * @param radius Blur radius (0-25)
+     * @return Blurred bitmap
+     */
+    fun applyBlur(bitmap: Bitmap, radius: Float): Bitmap {
+        if (radius <= 0f) return bitmap
+        
+        val width = bitmap.width
+        val height = bitmap.height
+        val pixels = IntArray(width * height)
+        val blurredPixels = IntArray(width * height)
+        
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+        
+        val r = radius.toInt().coerceAtMost(25)
+        
+        // Horizontal pass
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                var red = 0
+                var green = 0
+                var blue = 0
+                var alpha = 0
+                var count = 0
+                
+                for (i in -r..r) {
+                    val sampleX = (x + i).coerceIn(0, width - 1)
+                    val pixel = pixels[y * width + sampleX]
+                    
+                    red += (pixel shr 16) and 0xFF
+                    green += (pixel shr 8) and 0xFF
+                    blue += pixel and 0xFF
+                    alpha += (pixel shr 24) and 0xFF
+                    count++
+                }
+                
+                blurredPixels[y * width + x] = (
+                    ((alpha / count) shl 24) or
+                    ((red / count) shl 16) or
+                    ((green / count) shl 8) or
+                    (blue / count)
+                )
+            }
+        }
+        
+        // Vertical pass
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                var red = 0
+                var green = 0
+                var blue = 0
+                var alpha = 0
+                var count = 0
+                
+                for (i in -r..r) {
+                    val sampleY = (y + i).coerceIn(0, height - 1)
+                    val pixel = blurredPixels[sampleY * width + x]
+                    
+                    red += (pixel shr 16) and 0xFF
+                    green += (pixel shr 8) and 0xFF
+                    blue += pixel and 0xFF
+                    alpha += (pixel shr 24) and 0xFF
+                    count++
+                }
+                
+                pixels[y * width + x] = (
+                    ((alpha / count) shl 24) or
+                    ((red / count) shl 16) or
+                    ((green / count) shl 8) or
+                    (blue / count)
+                )
+            }
+        }
+        
+        val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        result.setPixels(pixels, 0, width, 0, 0, width, height)
+        return result
+    }
+    
+    /**
      * Copy an image from URI to internal storage
      * @param context Application context
      * @param sourceUri URI of the image to copy

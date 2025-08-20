@@ -1300,9 +1300,9 @@ fun RegularTopBar(
                         val editor = prefs.edit()
                         editor.remove("selected_icon_pack") // Reset to default icon theme
                         editor.putBoolean("use_individual_app_cards", false)
-                        editor.putBoolean("hide_favorites_automatically", false)
-                        editor.putBoolean("disable_favorite_button", false)
-                        editor.putBoolean("disable_favorite_sorting", false)
+                        editor.putBoolean("enable_favorite_button", false) // Default off
+                        editor.putBoolean("disable_favorite_button", true) // Opposite of enable
+                        editor.putBoolean("disable_favorite_sorting", true) // Opposite of enable
                         editor.apply()
 
                         // Navigate back and forward to refresh the screen

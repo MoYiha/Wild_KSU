@@ -97,45 +97,27 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
             }
 
             item {
-                // Hide Favorites Automatically Setting
-                var hideFavoritesAutomatically by rememberSaveable {
+                // Enable Favorite Button Setting (includes sorting)
+                var enableFavoriteButton by rememberSaveable {
                     mutableStateOf(
-                        prefs.getBoolean("hide_favorites_automatically", false)
+                        prefs.getBoolean("enable_favorite_button", false)
                     )
                 }
 
                 SwitchItem(
-                    icon = Icons.Filled.VisibilityOff,
-                    title = "Hide Favorites Automatically",
-                    summary = "Automatically hide favorite apps from the superuser list",
-                    checked = hideFavoritesAutomatically
-                ) {
-                    prefs.edit().putBoolean("hide_favorites_automatically", it).apply()
-                    hideFavoritesAutomatically = it
-                }
-            }
-
-            item {
-                // Disable Favorite Button Setting (includes sorting)
-                var disableFavoriteButton by rememberSaveable {
-                    mutableStateOf(
-                        prefs.getBoolean("disable_favorite_button", false)
-                    )
-                }
-
-                SwitchItem(
-                    icon = Icons.Filled.BookmarkBorder,
-                    title = "Disable Favorite Button",
-                    summary = "Hide the favorite button and disable favorite sorting",
-                    checked = disableFavoriteButton
+                    icon = Icons.Filled.Bookmark,
+                    title = "Enable Favorite Button",
+                    summary = "Show the favorite button and enable favorite sorting",
+                    checked = enableFavoriteButton
                 ) {
                     prefs.edit().apply {
-                        putBoolean("disable_favorite_button", it)
-                        // Also set the sorting preference to match
-                        putBoolean("disable_favorite_sorting", it)
+                        putBoolean("enable_favorite_button", it)
+                        // Set the disable preferences to the opposite of enable
+                        putBoolean("disable_favorite_button", !it)
+                        putBoolean("disable_favorite_sorting", !it)
                         apply()
                     }
-                    disableFavoriteButton = it
+                    enableFavoriteButton = it
                 }
             }
         }
