@@ -780,6 +780,7 @@ fun HomeSettingsScreen(
             }
         }
     }
+    } // Added missing closing brace for main LazyColumn
 }
 
 @Preview
