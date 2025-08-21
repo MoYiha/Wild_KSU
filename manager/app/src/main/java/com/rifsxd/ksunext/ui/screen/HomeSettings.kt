@@ -626,13 +626,13 @@ fun HomeSettingsScreen(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.info_card_order_management),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 20.dp)
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
                         
                         Text(
@@ -641,43 +641,29 @@ fun HomeSettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
-                    }
-                }
-            }
 
-            // Info card items with tap to move up/down and hold to move to top/bottom
-            itemsIndexed(
-                items = itemOrder,
-                key = { _, itemKey -> itemKey }
-            ) { index, itemKey ->
-                val item = infoCardItems.find { it.key == itemKey }
-                if (item != null) {
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = slideInVertically(
-                            animationSpec = tween(300),
-                            initialOffsetY = { it / 2 }
-                        ) + fadeIn(animationSpec = tween(300)),
-                        exit = slideOutVertically(
-                            animationSpec = tween(300),
-                            targetOffsetY = { -it / 2 }
-                        ) + fadeOut(animationSpec = tween(300))
-                    ) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer
-                            )
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // Icon
+                        // Info card items with tap to move up/down and hold to move to top/bottom
+                        itemOrder.forEachIndexed { index, itemKey ->
+                            val item = infoCardItems.find { it.key == itemKey }
+                            if (item != null) {
+                                AnimatedVisibility(
+                                    visible = true,
+                                    enter = slideInVertically(
+                                        animationSpec = tween(300),
+                                        initialOffsetY = { it / 2 }
+                                    ) + fadeIn(animationSpec = tween(300)),
+                                    exit = slideOutVertically(
+                                        animationSpec = tween(300),
+                                        targetOffsetY = { -it / 2 }
+                                    ) + fadeOut(animationSpec = tween(300))
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp, horizontal = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                            // Icon
                                 getIconForItem(item.iconType, item.iconData)
                                 
                                 Spacer(modifier = Modifier.width(12.dp))
@@ -790,7 +776,6 @@ fun HomeSettingsScreen(
                             }
                         }
                     }
-                }
             }
         }
     }
