@@ -36,9 +36,6 @@ jobs:
           # Calculate hash of all files except manager directory
           HASH=$(find . -type f \
             -not -path "./manager/*" \
-            -not -path "./.git/*" \
-            -not -path "./.github/workflows/build-manager-ci.yml" \
-            -not -path "./.github/workflows/build-manager-spoofed.yml" \
             -exec sha256sum {} \; | sort | sha256sum | cut -d' ' -f1)
           echo "cache-key=artifacts-$HASH" >> $GITHUB_OUTPUT
           echo "Generated cache key: artifacts-$HASH"
@@ -169,6 +166,17 @@ jobs:
       - name: Restore cached artifacts
         if: needs.check-cache.outputs.cache-hit == 'true'
         uses: actions/cache/restore@v4
+        with:
+          path: |
+            cached-artifacts/susfsd
+            cached-artifacts/ksud_overlayfs
+            cached-artifacts/ksud_magic
+          key: ${{ needs.check-cache.outputs.cache-key }}
+
+      # Force update cache by re-saving restored artifacts
+      - name: Force update cache with restored artifacts
+        if: needs.check-cache.outputs.cache-hit == 'true'
+        uses: actions/cache/save@v4
         with:
           path: |
             cached-artifacts/susfsd
