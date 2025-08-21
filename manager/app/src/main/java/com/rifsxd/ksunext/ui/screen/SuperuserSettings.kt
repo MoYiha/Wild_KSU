@@ -50,7 +50,7 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(20.dp)
                     ) {
                         // Icon Theme Selection
                         var showIconThemeManager by remember { mutableStateOf(false) }

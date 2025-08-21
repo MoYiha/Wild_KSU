@@ -51,7 +51,7 @@ fun ModuleSettingsScreen(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(20.dp)
                     ) {
                         // Module Cards Always Expanded Setting
                         var keepModulesExpanded by rememberSaveable {
