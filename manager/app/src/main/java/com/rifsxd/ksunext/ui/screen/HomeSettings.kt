@@ -141,8 +141,8 @@ fun HomeSettingsScreen(
     )
 
     // Helper function to get icon composable
-    val getIconForItem: @Composable (String, Any) -> @Composable () -> Unit = { iconType, iconData ->
-        {
+    val getIconForItem = { iconType: String, iconData: Any ->
+        @Composable {
             when (iconType) {
                 "vector" -> Icon(
                     imageVector = iconData as ImageVector,
