@@ -90,8 +90,6 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                             )
                         }
 
-)
-
                         Spacer(modifier = Modifier.height(8.dp))
 
                         // Individual App Cards Setting
