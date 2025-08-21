@@ -794,7 +794,6 @@ fun HomeSettingsScreen(
             }
         }
     }
-}
 
 @Preview
 @Composable
