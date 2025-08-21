@@ -776,6 +776,7 @@ fun HomeSettingsScreen(
                             }
                         }
                     }
+                }
             }
         }
     }
