@@ -295,7 +295,7 @@
     <string name="app_name_custom_dialog_message">Enter your custom app name (max 20 characters)</string>
     
     <!-- Home Settings Card Layout -->
-    <string name="home_screen_settings">Home Screen &amp; Info Card Settings</string>
+    <string name="home_screen_settings">Home &amp; Cards</string>
     <string name="info_card_settings">Info Card Settings</string>
     <string name="info_card_order_management">Info Card Order Management</string>
     <string name="info_card_order_description">Tap to move items up/down one position, or long press to move to top/bottom. Use the toggle to enable/disable items.</string>

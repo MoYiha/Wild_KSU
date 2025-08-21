@@ -421,7 +421,7 @@ fun HomeSettingsScreen(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.home_screen_settings),
