@@ -678,7 +678,7 @@ fun HomeSettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Icon
-                                getIconForItem(item.iconType, item.iconData)()
+                                getIconForItem(item.iconType, item.iconData)
                                 
                                 Spacer(modifier = Modifier.width(12.dp))
                                 
