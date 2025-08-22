@@ -119,7 +119,9 @@ fun TemplateEditorScreen(
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -292,6 +294,9 @@ private fun TopBar(
     onSave: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = remember(surfaceContainer) { surfaceContainer }
+    
     TopAppBar(
         title = {
             Column {
@@ -329,6 +334,9 @@ private fun TopBar(
             }
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor
+        ),
         scrollBehavior = scrollBehavior
     )
 }
