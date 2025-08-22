@@ -283,6 +283,10 @@
     <string name="system_info_card_settings">System Info Card Settings</string>
     <string name="system_info_card_settings_summary">Customize system information display and home screen elements</string>
     
+    <!-- Module Settings Customization -->
+    <string name="module_card_customization">Module Settings</string>
+    <string name="module_card_customization_summary">Configure module behavior, sorting, and display options</string>
+    
     <!-- App Name Customization -->
     <string name="app_name_customization">App Name</string>
     <string name="app_name_customization_summary">Change the app name displayed in the interface</string>
