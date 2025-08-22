@@ -13,18 +13,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -126,9 +130,13 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
+            Card(
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column {
 
             val context = LocalContext.current
             val scope = rememberCoroutineScope()
@@ -164,6 +172,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             navigator.navigate(AppProfileTemplateScreenDestination)
                         }
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             var umountChecked by rememberSaveable {
@@ -181,6 +190,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         umountChecked = it
                     }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             if (ksuVersion != null) {
@@ -199,6 +209,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             isSuDisabled = !shouldEnable
                         }
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 
                 SwitchItem(
@@ -217,6 +228,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         isGlobalNamespaceEnabled = it
                     }
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -240,6 +252,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         }
                         prefs.edit().putBoolean("enable_sus_su", it).apply()
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 
@@ -267,6 +280,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     if (isManager) install()
                     showRebootDialog = true
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             if (showRebootDialog) {
@@ -304,6 +318,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             ) {
                 prefs.edit().putBoolean("check_update", it).apply()
             }
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (isOverlayAvailable && useOverlayFs) {
                 val shrink = stringResource(id = R.string.shrink_sparse_image)
@@ -331,6 +346,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             val customization = stringResource(id = R.string.customization)
@@ -350,6 +366,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     navigator.navigate(CustomizationScreenDestination)
                 }
             )
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (ksuVersion != null) {
                 val backupRestore = stringResource(id = R.string.backup_restore)
@@ -369,6 +386,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         navigator.navigate(BackupRestoreScreenDestination)
                     }
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             val developer = stringResource(id = R.string.developer)
@@ -389,6 +407,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         navigator.navigate(DeveloperScreenDestination)
                     }
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
@@ -396,6 +415,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 UninstallItem(navigator) {
                     loadingDialog.withLoading(it)
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             var showBottomsheet by remember { mutableStateOf(false) }
@@ -416,6 +436,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     showBottomsheet = true
                 }
             )
+            Spacer(modifier = Modifier.height(8.dp))
             if (showBottomsheet) {
                 ModalBottomSheet(
                     onDismissRequest = { showBottomsheet = false },
@@ -528,6 +549,8 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     aboutDialog.show()
                 }
             )
+                }
+            }
         }
     }
 }

@@ -398,6 +398,45 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Module Settings Item
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                navigator.navigate(ModuleSettingsScreenDestination)
+                            }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Extension,
+                            contentDescription = "Module Settings",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.module_card_customization),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = stringResource(R.string.module_card_customization_summary),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Navigate to module settings",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // Superuser Settings Item
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
