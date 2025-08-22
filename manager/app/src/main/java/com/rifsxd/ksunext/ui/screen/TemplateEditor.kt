@@ -2,21 +2,26 @@ package com.rifsxd.ksunext.ui.screen
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,10 +41,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInteropFilter
+
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -113,89 +118,128 @@ fun TemplateEditorScreen(
         },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .verticalScroll(rememberScrollState())
-                .pointerInteropFilter {
-                    // disable click and ripple if readOnly
-                    readOnly
-                }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (isCreation) {
-                var errorHint by remember {
-                    mutableStateOf("")
-                }
-                val idConflictError = stringResource(id = R.string.app_profile_template_id_exist)
-                val idInvalidError = stringResource(id = R.string.app_profile_template_id_invalid)
-                TextEdit(
-                    label = stringResource(id = R.string.app_profile_template_id),
-                    text = template.id,
-                    errorHint = errorHint,
-                    isError = errorHint.isNotEmpty()
-                ) { value ->
-                    errorHint = if (isTemplateExist(value)) {
-                        idConflictError
-                    } else if (!isValidTemplateId(value)) {
-                        idInvalidError
-                    } else {
-                        ""
-                    }
-                    template = template.copy(id = value)
-                }
-            }
+            // Template Basic Information Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Template Information",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
 
-            TextEdit(
-                label = stringResource(id = R.string.app_profile_template_name),
-                text = template.name
-            ) { value ->
-                template.copy(name = value).run {
-                    if (autoSave) {
-                        if (!saveTemplate(this)) {
-                            // failed
-                            return@run
-                        }
-                    }
-                    template = this
-                }
-            }
-            TextEdit(
-                label = stringResource(id = R.string.app_profile_template_description),
-                text = template.description
-            ) { value ->
-                template.copy(description = value).run {
-                    if (autoSave) {
-                        if (!saveTemplate(this)) {
-                            // failed
-                            return@run
-                        }
-                    }
-                    template = this
-                }
-            }
-
-            RootProfileConfig(fixedName = true,
-                profile = toNativeProfile(template),
-                onProfileChange = {
-                    template.copy(
-                        uid = it.uid,
-                        gid = it.gid,
-                        groups = it.groups,
-                        capabilities = it.capabilities,
-                        context = it.context,
-                        namespace = it.namespace,
-                        rules = it.rules.split("\n")
-                    ).run {
-                        if (autoSave) {
-                            if (!saveTemplate(this)) {
-                                // failed
-                                return@run
+                        if (isCreation) {
+                            var errorHint by remember {
+                                mutableStateOf("")
+                            }
+                            val idConflictError = stringResource(id = R.string.app_profile_template_id_exist)
+                            val idInvalidError = stringResource(id = R.string.app_profile_template_id_invalid)
+                            TextEdit(
+                                label = stringResource(id = R.string.app_profile_template_id),
+                                text = template.id,
+                                errorHint = errorHint,
+                                isError = errorHint.isNotEmpty()
+                            ) { value ->
+                                errorHint = if (isTemplateExist(value)) {
+                                    idConflictError
+                                } else if (!isValidTemplateId(value)) {
+                                    idInvalidError
+                                } else {
+                                    ""
+                                }
+                                template = template.copy(id = value)
                             }
                         }
-                        template = this
+
+                        TextEdit(
+                            label = stringResource(id = R.string.app_profile_template_name),
+                            text = template.name
+                        ) { value ->
+                            template.copy(name = value).run {
+                                if (autoSave) {
+                                    if (!saveTemplate(this)) {
+                                        // failed
+                                        return@run
+                                    }
+                                }
+                                template = this
+                            }
+                        }
+                        TextEdit(
+                            label = stringResource(id = R.string.app_profile_template_description),
+                            text = template.description
+                        ) { value ->
+                            template.copy(description = value).run {
+                                if (autoSave) {
+                                    if (!saveTemplate(this)) {
+                                        // failed
+                                        return@run
+                                    }
+                                }
+                                template = this
+                            }
+                        }
                     }
-                })
+                }
+            }
+
+            // Root Profile Configuration Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Root Profile Configuration",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        RootProfileConfig(fixedName = true,
+                            profile = toNativeProfile(template),
+                            onProfileChange = {
+                                template.copy(
+                                    uid = it.uid,
+                                    gid = it.gid,
+                                    groups = it.groups,
+                                    capabilities = it.capabilities,
+                                    context = it.context,
+                                    namespace = it.namespace,
+                                    rules = it.rules.split("\n")
+                                ).run {
+                                    if (autoSave) {
+                                        if (!saveTemplate(this)) {
+                                            // failed
+                                            return@run
+                                        }
+                                    }
+                                    template = this
+                                }
+                            })
+                    }
+                }
+            }
         }
     }
 }
