@@ -8,7 +8,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.net.Uri
-import android.util.Log
+
 import androidx.core.graphics.createBitmap
 import java.io.File
 import java.io.FileOutputStream
@@ -25,7 +25,7 @@ data class BackgroundTransformation(
 )
 
 object BackgroundCustomization {
-    private const val TAG = "Background"
+
     private const val TRANSFORMED_BACKGROUND_FILENAME = "custom_background_transformed.jpg"
     private const val BACKGROUND_IMAGE_FILENAME = "background_image.jpg"
     private const val TEMP_BACKGROUND_PREFIX = "temp_background_"
@@ -44,7 +44,6 @@ object BackgroundCustomization {
             inputStream.close()
             bitmap
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to get image bitmap: ${e.message}")
             null
         }
     }
@@ -143,10 +142,8 @@ object BackgroundCustomization {
             outputStream.flush()
             outputStream.close()
             
-            Log.d(TAG, "Successfully saved transformed background to: ${file.absolutePath}")
             Uri.fromFile(file)
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to save transformed image: ${e.message}", e)
             null
         }
     }
@@ -172,18 +169,9 @@ object BackgroundCustomization {
         // Only save URI if explicitly requested
         if (saveUri) {
             editor.putString("background_image_uri", imageUri)
-            Log.d(TAG, "Saving background URI to SharedPreferences: $imageUri")
         }
         
         editor.apply()
-            
-        Log.d(TAG, "Background settings saved: $transformation, URI saved: $saveUri")
-        
-        // Verify the URI was saved correctly
-        if (saveUri) {
-            val savedUri = prefs.getString("background_image_uri", null)
-            Log.d(TAG, "Verified saved URI: $savedUri")
-        }
     }
     
     /**
@@ -212,8 +200,6 @@ object BackgroundCustomization {
             .putFloat("background_transparency", 0.0f)
             .putFloat("background_blur", 0.0f)
             .apply()
-            
-        Log.d(TAG, "Background effects reset to 0%")
     }
     
     /**
@@ -225,8 +211,6 @@ object BackgroundCustomization {
         prefs.edit()
             .putFloat("ui_transparency", 0.0f)
             .apply()
-            
-        Log.d(TAG, "UI transparency reset to 0%")
     }
     
     /**
@@ -236,15 +220,12 @@ object BackgroundCustomization {
      * @return Blurred bitmap
      */
     fun applyBlur(bitmap: Bitmap, radius: Float): Bitmap {
-        Log.d(TAG, "applyBlur called with radius: $radius, bitmap size: ${bitmap.width}x${bitmap.height}")
         if (radius <= 0f) {
-            Log.d(TAG, "Radius is 0 or negative, returning original bitmap")
             return bitmap
         }
         
         // Convert HARDWARE bitmap to software bitmap if needed
         val workingBitmap = if (bitmap.config == Bitmap.Config.HARDWARE) {
-            Log.d(TAG, "Converting HARDWARE bitmap to ARGB_8888 for processing")
             bitmap.copy(Bitmap.Config.ARGB_8888, false)
         } else {
             bitmap
@@ -319,7 +300,6 @@ object BackgroundCustomization {
         
         val result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         result.setPixels(pixels, 0, width, 0, 0, width, height)
-        Log.d(TAG, "Blur processing completed successfully, returning blurred bitmap")
         return result
     }
     
@@ -337,7 +317,6 @@ object BackgroundCustomization {
         return try {
             val inputStream: InputStream? = context.contentResolver.openInputStream(sourceUri)
             if (inputStream == null) {
-                Log.e(TAG, "Failed to open input stream for URI: $sourceUri")
                 return null
             }
             
@@ -360,11 +339,9 @@ object BackgroundCustomization {
                 }
             }
             
-            Log.d(TAG, "Successfully copied image to: ${destinationFile.absolutePath}")
             return destinationFile.absolutePath
             
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to copy image to internal storage", e)
             null
         }
     }
@@ -377,7 +354,6 @@ object BackgroundCustomization {
         return try {
             val tempFile = File(tempImagePath)
             if (!tempFile.exists()) {
-                Log.e(TAG, "Temporary file does not exist: $tempImagePath")
                 return null
             }
             
@@ -394,11 +370,9 @@ object BackgroundCustomization {
             // Clean up temp file
             tempFile.delete()
             
-            Log.d(TAG, "Successfully moved temp image to permanent location: ${permanentFile.absolutePath}")
             return permanentFile.absolutePath
             
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to copy temp image to permanent location", e)
             null
         }
     }
@@ -431,14 +405,11 @@ object BackgroundCustomization {
             
             if (backgroundFile.exists()) {
                 val deleted = backgroundFile.delete()
-                Log.d(TAG, "Background image deleted: $deleted")
                 deleted
             } else {
-                Log.d(TAG, "Background image file does not exist")
                 true
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to delete background image", e)
             false
         }
     }

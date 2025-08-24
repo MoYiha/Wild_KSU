@@ -103,7 +103,7 @@ object IconPackHelper {
             }
             
         } catch (e: Exception) {
-            Log.w(TAG, "Error getting themed icon for $targetPackage from $iconPackPackage", e)
+            // Error getting themed icon
         }
         
         return null

@@ -2,7 +2,7 @@ package com.rifsxd.ksunext.ui.component
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,10 +30,7 @@ fun BackgroundImageWrapper(
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
     
-    // Debug logging - only log when values change
-    remember(backgroundImageUri, backgroundFitMode, backgroundTransparency, backgroundBlur) {
-        Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency, Blur: $backgroundBlur")
-    }
+
     
 
     
@@ -41,19 +38,14 @@ fun BackgroundImageWrapper(
         // Display background image if available
         backgroundImageUri?.let { uriString ->
             if (uriString.isNotEmpty()) {
-                // Log only when URI changes
-                remember(uriString) {
-                    Log.d("BackgroundImage", "Loading image from URI: $uriString")
-                }
+
                 
                 // Validate and parse URI - memoized to prevent continuous parsing
                 val validatedUri = remember(uriString) {
                     try {
                         val uri = Uri.parse(uriString)
-                        Log.d("BackgroundImage", "Parsed URI scheme: ${uri.scheme}, authority: ${uri.authority}")
                         uri
                     } catch (e: Exception) {
-                        Log.e("BackgroundImage", "Invalid URI: $uriString", e)
                         null
                     }
                 }
@@ -65,17 +57,7 @@ fun BackgroundImageWrapper(
                         ImageRequest.Builder(context)
                             .data(validatedUri)
                             .crossfade(false)
-                            .listener(
-                                onStart = { 
-                                    Log.d("BackgroundImage", "Started loading image")
-                                },
-                                onSuccess = { _, _ -> 
-                                    Log.d("BackgroundImage", "Successfully loaded image")
-                                },
-                                onError = { _, result -> 
-                                    Log.e("BackgroundImage", "Failed to load image: ${result.throwable}")
-                                }
-                            )
+
                             .build()
                     }
                 )
