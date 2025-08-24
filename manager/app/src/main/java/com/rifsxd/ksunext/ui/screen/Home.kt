@@ -1079,7 +1079,7 @@ private fun IssueReportCardContent(
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.padding(
             start = CardConstants.ICON_SIZE + CardConstants.ICON_TO_TEXT_SPACING_SMALL,
-            top = CardConstants.ITEM_SPACING_SMALL
+            top = 2.dp
         )
     )
 }
