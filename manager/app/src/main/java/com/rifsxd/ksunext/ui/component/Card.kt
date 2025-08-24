@@ -212,7 +212,7 @@ fun CenteredCardContent(
         )
         Text(
             text = subtitle,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold
         )
     }
