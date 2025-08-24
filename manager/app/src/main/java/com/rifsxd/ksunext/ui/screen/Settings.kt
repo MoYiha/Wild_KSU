@@ -99,6 +99,7 @@ import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.CardType
 import com.rifsxd.ksunext.ui.component.CardConstants
 import com.rifsxd.ksunext.ui.component.CardRowContent
+import com.rifsxd.ksunext.ui.component.CardSwitchContent
 import com.rifsxd.ksunext.ui.component.CardItemSpacer
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.getBugreportFile
@@ -180,12 +181,11 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 mutableStateOf(Natives.isDefaultUmountModules())
             }
             if (ksuVersion != null) {
-                SwitchItem(
+                CardSwitchContent(
                     icon = Icons.Filled.FolderDelete,
                     title = stringResource(id = R.string.settings_umount_modules_default),
-                    summary = stringResource(id = R.string.settings_umount_modules_default_summary),
+                    subtitle = stringResource(id = R.string.settings_umount_modules_default_summary),
                     checked = umountChecked
-
                 ) {
                     if (Natives.setDefaultUmountModules(it)) {
                         umountChecked = it
@@ -199,10 +199,10 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     var isSuDisabled by rememberSaveable {
                         mutableStateOf(!Natives.isSuEnabled())
                     }
-                    SwitchItem(
+                    CardSwitchContent(
                         icon = Icons.Filled.RemoveModerator,
                         title = stringResource(id = R.string.settings_disable_su),
-                        summary = stringResource(id = R.string.settings_disable_su_summary),
+                        subtitle = stringResource(id = R.string.settings_disable_su_summary),
                         checked = isSuDisabled
                     ) { checked ->
                         val shouldEnable = !checked
@@ -213,10 +213,10 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     CardItemSpacer()
                 }
                 
-                SwitchItem(
+                CardSwitchContent(
                     icon = Icons.Filled.Engineering,
                     title = stringResource(id = R.string.settings_global_namespace_mode),
-                    summary = stringResource(id = R.string.settings_global_namespace_mode_summary),
+                    subtitle = stringResource(id = R.string.settings_global_namespace_mode_summary),
                     checked = isGlobalNamespaceEnabled,
                     onCheckedChange = {
                         setGlobalNamespaceEnabled(
@@ -240,10 +240,10 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 if (isSUS_SU) {
                     val isEnabled by observePreferenceAsState(prefs, "enable_sus_su", false)
 
-                    SwitchItem(
+                    CardSwitchContent(
                         icon = Icons.Filled.VisibilityOff,
                         title = stringResource(id = R.string.settings_susfs_toggle),
-                        summary = stringResource(id = R.string.settings_susfs_toggle_summary),
+                        subtitle = stringResource(id = R.string.settings_susfs_toggle_summary),
                         checked = isEnabled
                     ) {
                         if (it) {
@@ -264,10 +264,10 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             val isOverlayAvailable = overlayFsAvailable()
 
             if (ksuVersion != null && isOverlayAvailable) {
-                SwitchItem(
+                CardSwitchContent(
                     icon = Icons.Filled.Build,
                     title = stringResource(id = R.string.use_overlay_fs),
-                    summary = stringResource(id = R.string.use_overlay_fs_summary),
+                    subtitle = stringResource(id = R.string.use_overlay_fs_summary),
                     checked = useOverlayFs
                 ) {
                     prefs.edit().putBoolean("use_overlay_fs", it).apply()
@@ -311,10 +311,10 @@ fun SettingScreen(navigator: DestinationsNavigator) {
 
 
             val checkUpdate by observePreferenceAsState(prefs, "check_update", false)
-            SwitchItem(
+            CardSwitchContent(
                 icon = Icons.Filled.Update,
                 title = stringResource(id = R.string.settings_check_update),
-                summary = stringResource(id = R.string.settings_check_update_summary),
+                subtitle = stringResource(id = R.string.settings_check_update_summary),
                 checked = checkUpdate
             ) {
                 prefs.edit().putBoolean("check_update", it).apply()

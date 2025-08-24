@@ -275,6 +275,57 @@ fun CardRowContent(
 }
 
 /**
+ * Card content with switch control - consistent with CardRowContent layout
+ */
+@Composable
+fun CardSwitchContent(
+    title: String,
+    subtitle: String? = null,
+    icon: ImageVector? = null,
+    checked: Boolean,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.padding(end = CardConstants.ICON_TO_TEXT_SPACING_SMALL)
+            )
+        }
+        
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium
+            )
+            
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        
+        Switch(
+            checked = checked,
+            enabled = enabled,
+            onCheckedChange = onCheckedChange
+        )
+    }
+}
+
+/**
  * Card content with title and body text
  */
 @Composable
