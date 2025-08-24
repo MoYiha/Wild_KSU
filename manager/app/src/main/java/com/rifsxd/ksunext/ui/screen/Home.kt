@@ -419,15 +419,15 @@ private fun StatusCardContent(
                         contentDescription = stringResource(R.string.home_working)
                     )
                     Column(
-                        modifier = Modifier.padding(start = 20.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier = Modifier.padding(start = CardConstants.ICON_TO_TEXT_SPACING),
+                        verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_SMALL)
                     ) {
                         val labelStyle = LabelItemDefaults.style
                         TextRow(
                             trailingContent = {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(CardConstants.ACTION_SPACING)
                                 ) {
                                     LabelItem(
                                         icon = if (Natives.isSafeMode) {
