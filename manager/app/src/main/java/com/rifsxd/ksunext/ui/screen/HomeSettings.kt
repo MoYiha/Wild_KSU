@@ -640,12 +640,6 @@ fun HomeSettingsScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { 
-                                    val newValue = !infoCardAlwaysExpanded
-                                    prefs.edit().putBoolean("info_card_always_expanded", newValue).apply()
-                                    infoCardAlwaysExpanded = newValue
-                                }
                                 .padding(16.dp)
                         ) {
                             Row(

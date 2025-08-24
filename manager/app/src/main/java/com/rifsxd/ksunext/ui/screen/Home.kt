@@ -114,63 +114,71 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             }
         }
 
-        item {
-            CardItemsColumn {
-                if (ksuVersion != null && rootAvailable()) {
-                    CardRow(
-                        modifier = Modifier.height(IntrinsicSize.Min)
-                    ) {
-                        Box(modifier = Modifier.weight(1f)) { 
-                            SuperuserCard(onClick = { 
-                                navigator.navigate(SuperUserScreenDestination) {
-                                    popUpTo(NavGraphs.root) {
-                                        saveState = true
+        // Only show this item if there's content to display
+        val debugWarningCard =
+            LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                .getBoolean("debug_warning_card", false)
+        val debugUpdateCard =
+            LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                .getBoolean("debug_update_card", false)
+        val checkUpdate =
+            LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                .getBoolean("check_update", false)
+        
+        val hasCardContent = (ksuVersion != null && rootAvailable()) ||
+                            (debugWarningCard || (isManager && Natives.requireNewKernel())) ||
+                            (debugWarningCard || (ksuVersion != null && !rootAvailable())) ||
+                            (debugUpdateCard || checkUpdate)
+        
+        if (hasCardContent) {
+            item {
+                CardItemsColumn {
+                    if (ksuVersion != null && rootAvailable()) {
+                        CardRow(
+                            modifier = Modifier.height(IntrinsicSize.Min)
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) { 
+                                SuperuserCard(onClick = { 
+                                    navigator.navigate(SuperUserScreenDestination) {
+                                        popUpTo(NavGraphs.root) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }) 
-                        }
-                        Box(modifier = Modifier.weight(1f)) { 
-                            ModuleCard(onClick = { 
-                                navigator.navigate(ModuleScreenDestination) {
-                                    popUpTo(NavGraphs.root) {
-                                        saveState = true
+                                }) 
+                            }
+                            Box(modifier = Modifier.weight(1f)) { 
+                                ModuleCard(onClick = { 
+                                    navigator.navigate(ModuleScreenDestination) {
+                                        popUpTo(NavGraphs.root) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }) 
+                                }) 
+                            }
                         }
                     }
-                }
 
-                val debugWarningCard =
-                    LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                        .getBoolean("debug_warning_card", false)
-                val debugUpdateCard =
-                    LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                        .getBoolean("debug_update_card", false)
-
-                if (debugWarningCard || (isManager && Natives.requireNewKernel())) {
-                    WarningCard(
-                        stringResource(id = R.string.require_kernel_version).format(
-                            ksuVersion, Natives.MINIMAL_SUPPORTED_KERNEL
+                    if (debugWarningCard || (isManager && Natives.requireNewKernel())) {
+                        WarningCard(
+                            stringResource(id = R.string.require_kernel_version).format(
+                                ksuVersion, Natives.MINIMAL_SUPPORTED_KERNEL
+                            )
                         )
-                    )
-                }
+                    }
 
-                if (debugWarningCard || (ksuVersion != null && !rootAvailable())) {
-                    WarningCard(
-                        stringResource(id = R.string.grant_root_failed)
-                    )
-                }
+                    if (debugWarningCard || (ksuVersion != null && !rootAvailable())) {
+                        WarningCard(
+                            stringResource(id = R.string.grant_root_failed)
+                        )
+                    }
 
-                val checkUpdate =
-                    LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                        .getBoolean("check_update", false)
-                if (debugUpdateCard || checkUpdate) {
-                    UpdateCard()
+                    if (debugUpdateCard || checkUpdate) {
+                        UpdateCard()
+                    }
                 }
             }
         }
