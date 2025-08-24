@@ -326,36 +326,63 @@ private fun StatusCard(
 ) {
     val context = LocalContext.current
     var tapCount by remember { mutableStateOf(0) }
-
-    StandardCard(
-        cardType = CardType.CUSTOM,
-        customColor = if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
-                     else MaterialTheme.colorScheme.errorContainer,
-        onClick = {
-            tapCount++
-            if (tapCount == 5) {
-                Toast.makeText(context, "What are you doing? 🤔", Toast.LENGTH_SHORT).show()
-            } else if (tapCount == 10) {
-                Toast.makeText(context, "Never gonna give you up! 💜", Toast.LENGTH_SHORT).show()
-                val url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
-                intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                if (ksuVersion != null) {
-                    context.startActivity(intent)
-                } else if (kernelVersion.isGKI()) {
-                    onClickInstall()
-                } else {
-                    Toast.makeText(context, "Something weird happened... 🤔", Toast.LENGTH_SHORT).show()
-                }
-            } else if (ksuVersion == null && kernelVersion.isGKI()) {
+    
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
+    
+    val clickHandler = {
+        tapCount++
+        if (tapCount == 5) {
+            Toast.makeText(context, "What are you doing? 🤔", Toast.LENGTH_SHORT).show()
+        } else if (tapCount == 10) {
+            Toast.makeText(context, "Never gonna give you up! 💜", Toast.LENGTH_SHORT).show()
+            val url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+            if (ksuVersion != null) {
+                context.startActivity(intent)
+            } else if (kernelVersion.isGKI()) {
                 onClickInstall()
+            } else {
+                Toast.makeText(context, "Something weird happened... 🤔", Toast.LENGTH_SHORT).show()
             }
+        } else if (ksuVersion == null && kernelVersion.isGKI()) {
+            onClickInstall()
         }
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+    }
+    
+    if (cardBackgroundEnabled) {
+        StandardCard(
+            cardType = CardType.CUSTOM,
+            customColor = if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
+                         else MaterialTheme.colorScheme.errorContainer,
+            onClick = clickHandler
         ) {
+            StatusCardContent(kernelVersion, ksuVersion, lkmMode, moduleUpdateCount)
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { clickHandler() }
+                .padding(CardConstants.CARD_PADDING_LARGE)
+        ) {
+            StatusCardContent(kernelVersion, ksuVersion, lkmMode, moduleUpdateCount)
+        }
+    }
+}
+
+@Composable
+private fun StatusCardContent(
+    kernelVersion: KernelVersion,
+    ksuVersion: Int?,
+    lkmMode: Boolean?,
+    moduleUpdateCount: Int
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
             when {
                 ksuVersion != null -> {
                     val workingMode = when {
@@ -475,15 +502,33 @@ private fun StatusCard(
 fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
-    StandardCard(
-        cardType = CardType.CUSTOM,
-        customColor = color,
-        onClick = onClick
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium
-        )
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
+    
+    if (cardBackgroundEnabled) {
+        StandardCard(
+            cardType = CardType.CUSTOM,
+            customColor = color,
+            onClick = onClick
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .let { if (onClick != null) it.clickable { onClick() } else it }
+                .padding(CardConstants.CARD_PADDING_LARGE)
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 
@@ -627,19 +672,101 @@ private fun InfoCard(autoExpand: Boolean = false) {
         }
     }   
 
-    StandardCard(
-        cardType = CardType.SURFACE,
-        modifier = Modifier
-            .animateContentSize(
-                animationSpec = tween(durationMillis = 300)
-            ),
-        onLongClick = {
-            if (expanded && !alwaysExpanded) {
-                expanded = false
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
+    
+    if (cardBackgroundEnabled) {
+        StandardCard(
+            cardType = CardType.SURFACE,
+            modifier = Modifier
+                .animateContentSize(
+                    animationSpec = tween(durationMillis = 300)
+                ),
+            onLongClick = {
+                if (expanded && !alwaysExpanded) {
+                    expanded = false
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
             }
+        ) {
+            InfoCardContent(
+                showManagerVersion = showManagerVersion,
+                showHookMode = showHookMode,
+                showMountSystem = showMountSystem,
+                showSusfsStatus = showSusfsStatus,
+                showZygiskStatus = showZygiskStatus,
+                showKernelVersion = showKernelVersion,
+                showAndroidVersion = showAndroidVersion,
+                showAbi = showAbi,
+                showSelinuxStatus = showSelinuxStatus,
+                itemOrder = itemOrder,
+                expanded = expanded,
+                alwaysExpanded = alwaysExpanded,
+                enabledOptionsCount = enabledOptionsCount,
+                ksuVersion = ksuVersion,
+                developerOptionsEnabled = developerOptionsEnabled,
+                onExpandedChange = { expanded = it }
+            )
         }
-    ) {
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(CardConstants.CARD_PADDING_LARGE)
+                .animateContentSize(
+                    animationSpec = tween(durationMillis = 300)
+                )
+                .combinedClickable(
+                    onLongClick = {
+                        if (expanded && !alwaysExpanded) {
+                            expanded = false
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                    },
+                    onClick = {}
+                )
+        ) {
+            InfoCardContent(
+                showManagerVersion = showManagerVersion,
+                showHookMode = showHookMode,
+                showMountSystem = showMountSystem,
+                showSusfsStatus = showSusfsStatus,
+                showZygiskStatus = showZygiskStatus,
+                showKernelVersion = showKernelVersion,
+                showAndroidVersion = showAndroidVersion,
+                showAbi = showAbi,
+                showSelinuxStatus = showSelinuxStatus,
+                itemOrder = itemOrder,
+                expanded = expanded,
+                alwaysExpanded = alwaysExpanded,
+                enabledOptionsCount = enabledOptionsCount,
+                ksuVersion = ksuVersion,
+                developerOptionsEnabled = developerOptionsEnabled,
+                onExpandedChange = { expanded = it }
+            )
+        }
+    }
+}
+
+@Composable
+private fun InfoCardContent(
+    showManagerVersion: Boolean,
+    showHookMode: Boolean,
+    showMountSystem: Boolean,
+    showSusfsStatus: Boolean,
+    showZygiskStatus: Boolean,
+    showKernelVersion: Boolean,
+    showAndroidVersion: Boolean,
+    showAbi: Boolean,
+    showSelinuxStatus: Boolean,
+    itemOrder: List<String>,
+    expanded: Boolean,
+    alwaysExpanded: Boolean,
+    enabledOptionsCount: Int,
+    ksuVersion: Int?,
+    developerOptionsEnabled: Boolean,
+    onExpandedChange: (Boolean) -> Unit
+) {
+    val context = LocalContext.current
             @Composable
             fun InfoCardItem(label: String, content: String, icon: Any? = null) {
                 CardItem(
@@ -827,7 +954,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             IconButton(
-                                onClick = { expanded = true },
+                                onClick = { onExpandedChange(true) },
                                 modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
@@ -841,57 +968,115 @@ private fun InfoCard(autoExpand: Boolean = false) {
             }
         }
     }
+}
 
 @Composable
 fun NextCard() {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
     val uriHandler = LocalUriHandler.current
     val url = stringResource(R.string.home_next_kernelsu_repo)
 
-    StandardCard(
-        cardType = CardType.SURFACE,
-        modifier = Modifier.clickable {
-            uriHandler.openUri(url)
+    if (cardBackgroundEnabled) {
+        StandardCard(
+            cardType = CardType.SURFACE,
+            modifier = Modifier.clickable {
+                uriHandler.openUri(url)
+            }
+        ) {
+            CardTextContent(
+                title = stringResource(R.string.home_next_kernelsu),
+                body = stringResource(R.string.home_next_kernelsu_body)
+            )
         }
-    ) {
-        CardTextContent(
-            title = stringResource(R.string.home_next_kernelsu),
-            body = stringResource(R.string.home_next_kernelsu_body)
-        )
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(CardConstants.CARD_PADDING_LARGE)
+                .clickable {
+                    uriHandler.openUri(url)
+                }
+        ) {
+            CardTextContent(
+                title = stringResource(R.string.home_next_kernelsu),
+                body = stringResource(R.string.home_next_kernelsu_body)
+            )
+        }
     }
 }
 
 @Composable
 fun EXperimentalCard() {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
     /*val uriHandler = LocalUriHandler.current
     val url = stringResource(R.string.home_experimental_kernelsu_repo)
     */
 
-    StandardCard(cardType = CardType.SURFACE) {
-        Column {
-            Text(
-                text = stringResource(R.string.home_experimental_kernelsu),
-                style = MaterialTheme.typography.titleSmall
-            )
-            Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
-            Text(
-                text = stringResource(R.string.home_experimental_kernelsu_body),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
-            Text(
-                text = stringResource(R.string.home_experimental_kernelsu_body_point_1),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
-            Text(
-                text = stringResource(R.string.home_experimental_kernelsu_body_point_2),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
-            Text(
-                text = stringResource(R.string.home_experimental_kernelsu_body_point_3),
-                style = MaterialTheme.typography.bodyMedium
-            )
+    if (cardBackgroundEnabled) {
+        StandardCard(cardType = CardType.SURFACE) {
+            Column {
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body_point_1),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body_point_2),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body_point_3),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(CardConstants.CARD_PADDING_LARGE)
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu),
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body_point_1),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body_point_2),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
+                Text(
+                    text = stringResource(R.string.home_experimental_kernelsu_body_point_3),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -903,6 +1088,7 @@ fun IssueReportCard() {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val selectedIconType = prefs.getString("selected_icon_type", "SEASONAL") ?: "SEASONAL"
+    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
     
     // Get the appropriate icon using IconUtils
     val helpIcon = IconUtils.getIcon(selectedIconType)
@@ -911,41 +1097,68 @@ fun IssueReportCard() {
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
 
-    StandardCard(
-        cardType = CardType.SURFACE
-    ) {
-        CardRowContent(
-            text = "",
-            icon = Icons.Filled.HelpOutline,
-            title = stringResource(R.string.issue_report_title),
-            subtitle = stringResource(R.string.issue_report_body),
-            actions = {
-                Row(horizontalArrangement = Arrangement.spacedBy(CardConstants.ACTION_SPACING)) {
-                    IconButton(onClick = { uriHandler.openUri(githubIssueUrl) }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_github),
-                            contentDescription = stringResource(R.string.issue_report_github),
-                        )
-                    }
-                    IconButton(onClick = { uriHandler.openUri(telegramUrl) }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_telegram),
-                            contentDescription = stringResource(R.string.issue_report_telegram),
-                        )
-                    }
+    if (cardBackgroundEnabled) {
+        StandardCard(
+            cardType = CardType.SURFACE
+        ) {
+            IssueReportCardContent(
+                uriHandler = uriHandler,
+                githubIssueUrl = githubIssueUrl,
+                telegramUrl = telegramUrl
+            )
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(CardConstants.CARD_PADDING_LARGE)
+        ) {
+            IssueReportCardContent(
+                uriHandler = uriHandler,
+                githubIssueUrl = githubIssueUrl,
+                telegramUrl = telegramUrl
+            )
+        }
+    }
+}
+
+@Composable
+private fun IssueReportCardContent(
+    uriHandler: androidx.compose.ui.platform.UriHandler,
+    githubIssueUrl: String,
+    telegramUrl: String
+) {
+    CardRowContent(
+        text = "",
+        icon = Icons.Filled.HelpOutline,
+        title = stringResource(R.string.issue_report_title),
+        subtitle = stringResource(R.string.issue_report_body),
+        actions = {
+            Row(horizontalArrangement = Arrangement.spacedBy(CardConstants.ACTION_SPACING)) {
+                IconButton(onClick = { uriHandler.openUri(githubIssueUrl) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_github),
+                        contentDescription = stringResource(R.string.issue_report_github),
+                    )
+                }
+                IconButton(onClick = { uriHandler.openUri(telegramUrl) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_telegram),
+                        contentDescription = stringResource(R.string.issue_report_telegram),
+                    )
                 }
             }
+        }
+    )
+    // Additional body text
+    Text(
+        text = stringResource(R.string.issue_report_body_2),
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier.padding(
+            start = CardConstants.ICON_SIZE + CardConstants.ICON_TO_TEXT_SPACING,
+            top = CardConstants.ITEM_SPACING_SMALL
         )
-        // Additional body text
-        Text(
-            text = stringResource(R.string.issue_report_body_2),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(
-                start = CardConstants.ICON_SIZE + CardConstants.ICON_TO_TEXT_SPACING,
-                top = CardConstants.ITEM_SPACING_SMALL
-            )
-        )
-    }
+    )
 }
 
 fun getManagerVersion(context: Context): Pair<String, Long> {
