@@ -17,10 +17,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -383,110 +385,56 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 CardItemSpacer()
             }
 
-            var showBottomsheet by remember { mutableStateOf(false) }
+            val exportLogsDialog = rememberCustomDialog { dismiss ->
+                ExportLogsDialog(
+                    onSaveLog = {
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm")
+                        val current = LocalDateTime.now().format(formatter)
+                        exportBugreportLauncher.launch("KernelSU_Next_bugreport_${current}.tar.gz")
+                        dismiss()
+                    },
+                    onShareLog = {
+                        scope.launch {
+                            val bugreport = loadingDialog.withLoading {
+                                withContext(Dispatchers.IO) {
+                                    getBugreportFile(context)
+                                }
+                            }
+
+                            val uri: Uri =
+                                FileProvider.getUriForFile(
+                                    context,
+                                    "${BuildConfig.APPLICATION_ID}.fileprovider",
+                                    bugreport
+                                )
+
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                setDataAndType(uri, "application/gzip")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+
+                            context.startActivity(
+                                Intent.createChooser(
+                                    shareIntent,
+                                    context.getString(R.string.send_log)
+                                )
+                            )
+                        }
+                        dismiss()
+                    },
+                    onDismiss = dismiss
+                )
+            }
 
             CardRowContent(
                 text = stringResource(id = R.string.export_log),
                 icon = Icons.Filled.BugReport,
                 modifier = Modifier.clickable {
-                    showBottomsheet = true
+                    exportLogsDialog.show()
                 }
             )
             CardItemSpacer()
-            if (showBottomsheet) {
-                ModalBottomSheet(
-                    onDismissRequest = { showBottomsheet = false },
-                    content = {
-                        Row(
-                            modifier = Modifier
-                                .padding(10.dp)
-                                .align(Alignment.CenterHorizontally)
-
-                        ) {
-                            Box {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(CardConstants.CARD_PADDING_LARGE)
-                                        .clickable {
-                                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm")
-                                            val current = LocalDateTime.now().format(formatter)
-                                            exportBugreportLauncher.launch("KernelSU_Next_bugreport_${current}.tar.gz")
-                                            showBottomsheet = false
-                                        }
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Save,
-                                        contentDescription = null,
-                                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                                    )
-                                    Text(
-                                        text = stringResource(id = R.string.save_log),
-                                        modifier = Modifier.padding(top = CardConstants.CARD_PADDING_LARGE),
-                                        textAlign = TextAlign.Center.also {
-                                            LineHeightStyle(
-                                                alignment = LineHeightStyle.Alignment.Center,
-                                                trim = LineHeightStyle.Trim.None
-                                            )
-                                        }
-
-                                    )
-                                }
-                            }
-                            Box {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(CardConstants.CARD_PADDING_LARGE)
-                                        .clickable {
-                                            scope.launch {
-                                                val bugreport = loadingDialog.withLoading {
-                                                    withContext(Dispatchers.IO) {
-                                                        getBugreportFile(context)
-                                                    }
-                                                }
-
-                                                val uri: Uri =
-                                                    FileProvider.getUriForFile(
-                                                        context,
-                                                        "${BuildConfig.APPLICATION_ID}.fileprovider",
-                                                        bugreport
-                                                    )
-
-                                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                                    putExtra(Intent.EXTRA_STREAM, uri)
-                                                    setDataAndType(uri, "application/gzip")
-                                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                                }
-
-                                                context.startActivity(
-                                                    Intent.createChooser(
-                                                        shareIntent,
-                                                        context.getString(R.string.send_log)
-                                                    )
-                                                )
-                                            }
-                                        }
-                                ) {
-                                    Icon(
-                                        Icons.Filled.Share,
-                                        contentDescription = null,
-                                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                                    )
-                                    Text(
-                                        text = stringResource(id = R.string.send_log),
-                                        modifier = Modifier.padding(top = CardConstants.CARD_PADDING_LARGE),
-                                        textAlign = TextAlign.Center.also {
-                                            LineHeightStyle(
-                                                alignment = LineHeightStyle.Alignment.Center,
-                                                trim = LineHeightStyle.Trim.None
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                )
-            }
 
             val about = stringResource(id = R.string.about)
             CardRowContent(
@@ -606,6 +554,91 @@ fun rememberUninstallDialog(onSelected: (UninstallType) -> Unit): DialogHandle {
             selection = options[index]
         })
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExportLogsDialog(
+    onSaveLog: () -> Unit,
+    onShareLog: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = R.string.export_log),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Choose how you want to export the logs:",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onSaveLog() }
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Filled.Save,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.save_log),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onShareLog() }
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            Icons.Filled.Share,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.send_log),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Preview
