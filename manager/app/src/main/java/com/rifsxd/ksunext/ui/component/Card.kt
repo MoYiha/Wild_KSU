@@ -30,9 +30,14 @@ object CardConstants {
     val ITEM_SPACING_LARGE = 16.dp
     val ITEM_SPACING_MEDIUM = 10.dp
     val ITEM_SPACING_SMALL = 4.dp
+    val ITEM_SPACING_EXTRA_SMALL = 2.dp
     val ITEM_SPACING_TINY = 2.dp
     val ICON_TO_TEXT_SPACING = 20.dp
     val ICON_TO_TEXT_SPACING_SMALL = 16.dp
+    val ACTION_SPACING = 8.dp
+    
+    // Icon sizes
+    val ICON_SIZE = 24.dp
     
     // Card dimensions (flexible, not fixed)
     val CARD_MIN_HEIGHT = 80.dp
@@ -219,6 +224,8 @@ fun CenteredCardContent(
 @Composable
 fun CardRowContent(
     text: String,
+    title: String? = null,
+    subtitle: String? = null,
     icon: ImageVector? = null,
     modifier: Modifier = Modifier,
     actions: @Composable RowScope.() -> Unit = {}
@@ -235,11 +242,30 @@ fun CardRowContent(
             )
         }
         
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
+        Column(
             modifier = Modifier.weight(1f)
-        )
+        ) {
+            if (title != null) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+            
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
         
         actions()
     }

@@ -584,7 +584,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
     }   
 
     StandardCard(
-        cardType = CardType.SURFACE_CONTAINER,
+        cardType = CardType.SURFACE,
         modifier = Modifier
             .animateContentSize(
                 animationSpec = tween(durationMillis = 300)
@@ -805,7 +805,7 @@ fun NextCard() {
     val url = stringResource(R.string.home_next_kernelsu_repo)
 
     StandardCard(
-        cardType = CardType.SURFACE_CONTAINER,
+        cardType = CardType.SURFACE,
         modifier = Modifier.clickable {
             uriHandler.openUri(url)
         }
@@ -823,7 +823,7 @@ fun EXperimentalCard() {
     val url = stringResource(R.string.home_experimental_kernelsu_repo)
     */
 
-    StandardCard(cardType = CardType.SURFACE_CONTAINER) {
+    StandardCard(cardType = CardType.SURFACE) {
         Column {
             Text(
                 text = stringResource(R.string.home_experimental_kernelsu),
@@ -869,7 +869,7 @@ fun IssueReportCard() {
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
 
     StandardCard(
-        cardType = CardType.SURFACE_CONTAINER
+        cardType = CardType.SURFACE
     ) {
         CardRowContent(
             icon = Icons.Filled.HelpOutline,
