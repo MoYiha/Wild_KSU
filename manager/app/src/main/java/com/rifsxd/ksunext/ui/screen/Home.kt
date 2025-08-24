@@ -497,7 +497,6 @@ private fun StatusCardContent(
         }
     }
 }
-}
 
 @Composable
 fun WarningCard(
@@ -769,6 +768,7 @@ private fun InfoCardContent(
 ) {
     val context = LocalContext.current
             
+            @Composable
             fun InfoCardItem(label: String, content: String, icon: Any? = null) {
                 CardItem(
                     label = label,
