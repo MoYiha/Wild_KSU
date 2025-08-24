@@ -78,6 +78,7 @@ import com.rifsxd.ksunext.ui.util.IconUtils
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.theme.getCardElevation
 import com.rifsxd.ksunext.ui.component.*
+import com.rifsxd.ksunext.ui.component.CardConstants
 
 import androidx.compose.material3.ElevatedCard
 
@@ -1075,7 +1076,7 @@ private fun IssueReportCardContent(
         text = stringResource(R.string.issue_report_body_2),
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.padding(
-            start = CardConstants.ICON_SIZE + CardConstants.ICON_TO_TEXT_SPACING_SMALL,
+            start = CardConstants.ICON_SIZE + CardConstants.ICON_TO_TEXT_SPACING,
             top = CardConstants.ITEM_SPACING_SMALL
         )
     )
