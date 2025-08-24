@@ -143,7 +143,14 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                     }
                 }
 
-                if (isManager && Natives.requireNewKernel()) {
+                val debugWarningCard =
+                    LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                        .getBoolean("debug_warning_card", false)
+                val debugUpdateCard =
+                    LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                        .getBoolean("debug_update_card", false)
+
+                if (debugWarningCard || (isManager && Natives.requireNewKernel())) {
                     WarningCard(
                         stringResource(id = R.string.require_kernel_version).format(
                             ksuVersion, Natives.MINIMAL_SUPPORTED_KERNEL
@@ -151,7 +158,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                     )
                 }
 
-                if (ksuVersion != null && !rootAvailable()) {
+                if (debugWarningCard || (ksuVersion != null && !rootAvailable())) {
                     WarningCard(
                         stringResource(id = R.string.grant_root_failed)
                     )
@@ -160,7 +167,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                 val checkUpdate =
                     LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
                         .getBoolean("check_update", false)
-                if (checkUpdate) {
+                if (debugUpdateCard || checkUpdate) {
                     UpdateCard()
                 }
             }
@@ -172,7 +179,9 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 
         if (showHelpCard) {
             item {
-                IssueReportCard()
+                CardItemsColumn {
+                    IssueReportCard()
+                }
             }
         }
     }

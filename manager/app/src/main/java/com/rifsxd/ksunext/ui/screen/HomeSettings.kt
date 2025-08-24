@@ -129,6 +129,14 @@ fun HomeSettingsScreen(
         mutableStateOf(prefs.getString("selected_app_name", "kernelsu_next") ?: "kernelsu_next")
     }
     
+    // Card debugging state variables
+    var debugWarningCard by rememberSaveable {
+        mutableStateOf<Boolean>(prefs.getBoolean("debug_warning_card", false))
+    }
+    var debugUpdateCard by rememberSaveable {
+        mutableStateOf<Boolean>(prefs.getBoolean("debug_update_card", false))
+    }
+    
     val onSelectedAppNameChanged = { newAppName: String ->
         selectedAppName = newAppName
         prefs.edit().putString("selected_app_name", newAppName).apply()
@@ -397,6 +405,53 @@ fun HomeSettingsScreen(
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Help Card Toggle (moved from above)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { 
+                                    val newValue = !showHelpCard
+                                    prefs.edit().putBoolean("show_help_card", newValue).apply()
+                                    showHelpCard = newValue
+                                }
+                                .padding(16.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.HelpOutline,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.help_card_customization),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.help_card_customization_summary),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = showHelpCard,
+                                    onCheckedChange = {
+                                        prefs.edit().putBoolean("show_help_card", it).apply()
+                                        showHelpCard = it
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             },
@@ -532,53 +587,6 @@ fun HomeSettingsScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Help Card Toggle
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { 
-                                    val newValue = !showHelpCard
-                                    prefs.edit().putBoolean("show_help_card", newValue).apply()
-                                    showHelpCard = newValue
-                                }
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.HelpOutline,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.help_card_customization),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.help_card_customization_summary),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = showHelpCard,
-                                    onCheckedChange = {
-                                        prefs.edit().putBoolean("show_help_card", it).apply()
-                                        showHelpCard = it
-                                    }
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
                         // Card Background Toggle
                         Column(
                             modifier = Modifier
@@ -660,6 +668,127 @@ fun HomeSettingsScreen(
                                     onCheckedChange = {
                                         prefs.edit().putBoolean("info_card_always_expanded", it).apply()
                                         infoCardAlwaysExpanded = it
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Card Debugging Section
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Card Debugging",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        
+                        Text(
+                            text = "Enable or disable conditional cards on the home screen for debugging purposes",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        // Warning Card Toggle
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { 
+                                    val newValue = !debugWarningCard
+                                    prefs.edit().putBoolean("debug_warning_card", newValue).apply()
+                                    debugWarningCard = newValue
+                                }
+                                .padding(16.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Warning,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = "Warning Card",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "Force show warning cards (root not available, kernel version)",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = debugWarningCard,
+                                    onCheckedChange = {
+                                        prefs.edit().putBoolean("debug_warning_card", it).apply()
+                                        debugWarningCard = it
+                                    }
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Update Card Toggle
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { 
+                                    val newValue = !debugUpdateCard
+                                    prefs.edit().putBoolean("debug_update_card", newValue).apply()
+                                    debugUpdateCard = newValue
+                                }
+                                .padding(16.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Update,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = "Update Card",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "Force show update card regardless of check_update setting",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = debugUpdateCard,
+                                    onCheckedChange = {
+                                        prefs.edit().putBoolean("debug_update_card", it).apply()
+                                        debugUpdateCard = it
                                     }
                                 )
                             }
