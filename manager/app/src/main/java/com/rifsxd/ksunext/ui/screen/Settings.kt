@@ -294,6 +294,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     UninstallItem(navigator) {
                         loadingDialog.withLoading(it)
                     }
+                    CardItemSpacer()
                 }
             }
         }
