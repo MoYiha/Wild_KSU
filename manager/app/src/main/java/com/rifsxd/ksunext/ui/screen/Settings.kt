@@ -410,34 +410,31 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 )
             }
         }
+    }
             
-        if (showRebootDialog) {
-                AlertDialog(
-                    onDismissRequest = { showRebootDialog = false },
-                    title = { Text(
-                        text = stringResource(R.string.reboot_required),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    ) },
-                    text = { Text(stringResource(R.string.reboot_message)) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showRebootDialog = false
-                            reboot()
-                        }) {
-                            Text(stringResource(R.string.reboot))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showRebootDialog = false }) {
-                            Text(stringResource(R.string.later))
-                        }
-                    }
-                )
-            }
+    if (showRebootDialog) {
+        AlertDialog(
+            onDismissRequest = { showRebootDialog = false },
+            title = { Text(
+                text = stringResource(R.string.reboot_required),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold
+            ) },
+            text = { Text(stringResource(R.string.reboot_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRebootDialog = false
+                    reboot()
+                }) {
+                    Text(stringResource(R.string.reboot))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRebootDialog = false }) {
+                    Text(stringResource(R.string.later))
                 }
             }
-        }
+        )
     }
 }
 
