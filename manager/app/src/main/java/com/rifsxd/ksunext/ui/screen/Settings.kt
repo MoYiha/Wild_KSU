@@ -243,6 +243,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             isGlobalNamespaceEnabled = it
                         }
                     )
+                    CardItemSpacer()
                 }
 
                 val suSFS = getSuSFS()
