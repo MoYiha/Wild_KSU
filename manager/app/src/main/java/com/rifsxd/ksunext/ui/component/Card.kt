@@ -108,7 +108,7 @@ fun StandardCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(CardConstants.CARD_PADDING_LARGE),
+                .padding(CardConstants.CARD_PADDING_MEDIUM),
             content = content
         )
     }
