@@ -109,6 +109,7 @@ fun StandardCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(CardConstants.CARD_PADDING_MEDIUM),
+            verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_MEDIUM),
             content = content
         )
     }
