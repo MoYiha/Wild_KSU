@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
-
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -50,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Alignment
@@ -96,6 +97,7 @@ import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.CardConstants
 import com.rifsxd.ksunext.ui.component.CardRowContent
 import com.rifsxd.ksunext.ui.component.CardItemSpacer
+import com.rifsxd.ksunext.ui.component.rememberNoRippleInteractionSource
 import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.*
@@ -312,9 +314,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     text = stringResource(R.string.info_card_customization),
                     subtitle = stringResource(R.string.info_card_customization_summary),
                     modifier = Modifier
-                         .clickable {
-                             navigator.navigate(HomeSettingsScreenDestination)
-                         }
+                         .clickable(
+                             onClick = { navigator.navigate(HomeSettingsScreenDestination) },
+                             interactionSource = rememberNoRippleInteractionSource(),
+                             indication = null
+                         )
                 )
 
                 CardItemSpacer()
@@ -325,9 +329,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     text = "Superuser Settings",
                     subtitle = "Customize superuser app display and behavior",
                     modifier = Modifier
-                         .clickable {
-                             navigator.navigate(SuperuserSettingsScreenDestination)
-                         }
+                         .clickable(
+                             onClick = { navigator.navigate(SuperuserSettingsScreenDestination) },
+                             interactionSource = rememberNoRippleInteractionSource(),
+                             indication = null
+                         )
                 )
 
                 CardItemSpacer()
@@ -338,9 +344,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     text = stringResource(R.string.module_card_customization),
                     subtitle = stringResource(R.string.module_card_customization_summary),
                     modifier = Modifier
-                         .clickable {
-                             navigator.navigate(ModuleSettingsScreenDestination)
-                         }
+                         .clickable(
+                             onClick = { navigator.navigate(ModuleSettingsScreenDestination) },
+                             interactionSource = rememberNoRippleInteractionSource(),
+                             indication = null
+                         )
                 )
             }
         }

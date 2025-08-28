@@ -4,9 +4,11 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,6 +20,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.rifsxd.ksunext.ui.theme.getCardElevation
+
+/**
+ * Custom interaction source that removes ripple effects
+ */
+@Composable
+fun rememberNoRippleInteractionSource(): MutableInteractionSource {
+    return remember { MutableInteractionSource() }
+}
 
 /**
  * Card Design System Constants
@@ -99,9 +109,15 @@ fun StandardCard(
                 when {
                     onClick != null && onLongClick != null -> Modifier.combinedClickable(
                         onClick = onClick,
-                        onLongClick = onLongClick
+                        onLongClick = onLongClick,
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
                     )
-                    onClick != null -> Modifier.clickable(onClick = onClick)
+                    onClick != null -> Modifier.clickable(
+                        onClick = onClick,
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
+                    )
                     else -> Modifier
                 }
             )
@@ -142,8 +158,16 @@ fun CompactCard(
             containerColor = containerColor
         ),
         elevation = getCardElevation(),
-        onClick = onClick ?: {},
         modifier = modifier
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(
+                        onClick = onClick,
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
+                    )
+                } else Modifier
+            )
     ) {
         Box(
             modifier = Modifier
