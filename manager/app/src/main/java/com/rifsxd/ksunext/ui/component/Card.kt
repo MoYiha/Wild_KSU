@@ -298,8 +298,7 @@ fun CardSwitchContent(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.padding(
-                    end = CardConstants.ICON_TO_TEXT_SPACING_SMALL,
-                    top = 2.dp
+                    end = CardConstants.ICON_TO_TEXT_SPACING_SMALL
                 )
             )
         }
@@ -309,7 +308,7 @@ fun CardSwitchContent(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Text(
                     text = title,
