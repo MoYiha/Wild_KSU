@@ -109,7 +109,7 @@ fun StandardCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(CardConstants.CARD_PADDING_MEDIUM),
-            verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_MEDIUM),
+            verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_LARGE),
             content = content
         )
     }
@@ -291,13 +291,16 @@ fun CardSwitchContent(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = if (subtitle != null) Alignment.Top else Alignment.CenterVertically
     ) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.padding(end = CardConstants.ICON_TO_TEXT_SPACING_SMALL)
+                modifier = Modifier.padding(
+                    end = CardConstants.ICON_TO_TEXT_SPACING_SMALL,
+                    top = if (subtitle != null) 2.dp else 0.dp
+                )
             )
         }
         
@@ -322,7 +325,12 @@ fun CardSwitchContent(
         Switch(
             checked = checked,
             enabled = enabled,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            modifier = if (subtitle != null) {
+                Modifier.padding(top = 24.dp)
+            } else {
+                Modifier
+            }
         )
     }
 }
