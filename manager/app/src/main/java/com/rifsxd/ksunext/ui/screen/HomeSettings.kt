@@ -64,6 +64,10 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.component.rememberNoRippleInteractionSource
+import com.rifsxd.ksunext.ui.component.StandardCard
+import com.rifsxd.ksunext.ui.component.CardSwitchContent
+import com.rifsxd.ksunext.ui.component.CardRowContent
+import com.rifsxd.ksunext.ui.component.CardItemSpacer
 import com.rifsxd.ksunext.ui.util.IconUtils
 
 // Icon helper functions moved to IconUtils

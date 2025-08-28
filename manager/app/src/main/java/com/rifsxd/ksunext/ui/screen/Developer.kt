@@ -56,6 +56,9 @@ import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.SwitchItem
+import com.rifsxd.ksunext.ui.component.StandardCard
+import com.rifsxd.ksunext.ui.component.CardSwitchContent
+import com.rifsxd.ksunext.ui.component.CardItemSpacer
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.*
 
@@ -81,16 +84,7 @@ fun DeveloperScreen(navigator: DestinationsNavigator) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+            StandardCard {
                     val context = LocalContext.current
                     val scope = rememberCoroutineScope()
                     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -101,34 +95,35 @@ fun DeveloperScreen(navigator: DestinationsNavigator) {
                             prefs.getBoolean("enable_developer_options", false)
                         )
                     }
-                    if (ksuVersion != null) {
-                        SwitchItem(
-                            icon = Icons.Filled.DeveloperMode,
-                            title = stringResource(id = R.string.enable_developer_options),
-                            summary = stringResource(id = R.string.enable_developer_options_summary),
-                            checked = developerOptionsEnabled
-                        ) {
-                            prefs.edit().putBoolean("enable_developer_options", it).apply()
-                            developerOptionsEnabled = it
-                        }
+                if (ksuVersion != null) {
+                    CardSwitchContent(
+                        icon = Icons.Filled.DeveloperMode,
+                        text = stringResource(id = R.string.enable_developer_options),
+                        subText = stringResource(id = R.string.enable_developer_options_summary),
+                        checked = developerOptionsEnabled
+                    ) {
+                        prefs.edit().putBoolean("enable_developer_options", it).apply()
+                        developerOptionsEnabled = it
                     }
+                }
 
-                    var enableWebDebugging by rememberSaveable {
-                        mutableStateOf(
-                            prefs.getBoolean("enable_web_debugging", false)
-                        )
-                    }
-                    if (ksuVersion != null) {
-                        SwitchItem(
-                            enabled = developerOptionsEnabled,
-                            icon = Icons.Filled.Web,
-                            title = stringResource(id = R.string.enable_web_debugging),
-                            summary = stringResource(id = R.string.enable_web_debugging_summary),
-                            checked = enableWebDebugging
-                        ) {
-                            prefs.edit().putBoolean("enable_web_debugging", it).apply()
-                            enableWebDebugging = it
-                        }
+                var enableWebDebugging by rememberSaveable {
+                    mutableStateOf(
+                        prefs.getBoolean("enable_web_debugging", false)
+                    )
+                }
+                if (ksuVersion != null) {
+                    CardItemSpacer()
+                    
+                    CardSwitchContent(
+                        enabled = developerOptionsEnabled,
+                        icon = Icons.Filled.Web,
+                        text = stringResource(id = R.string.enable_web_debugging),
+                        subText = stringResource(id = R.string.enable_web_debugging_summary),
+                        checked = enableWebDebugging
+                    ) {
+                        prefs.edit().putBoolean("enable_web_debugging", it).apply()
+                        enableWebDebugging = it
                     }
                 }
             }

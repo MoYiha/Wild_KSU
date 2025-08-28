@@ -105,6 +105,7 @@ import com.rifsxd.ksunext.ui.component.CardConstants
 import com.rifsxd.ksunext.ui.component.CardRowContent
 import com.rifsxd.ksunext.ui.component.CardSwitchContent
 import com.rifsxd.ksunext.ui.component.CardItemSpacer
+import com.rifsxd.ksunext.ui.component.rememberNoRippleInteractionSource
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.getBugreportFile
 import com.rifsxd.ksunext.ui.util.*
@@ -266,26 +267,41 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     }
                 }
 
+                if (suSFS == "Supported" && isSUS_SU && isOverlayAvailable && useOverlayFs) {
+                    CardItemSpacer()
+                }
+
                 if (isOverlayAvailable && useOverlayFs) {
                     val shrink = stringResource(id = R.string.shrink_sparse_image)
                     val shrinkMessage = stringResource(id = R.string.shrink_sparse_image_message)
                     CardRowContent(
                         text = shrink,
                         icon = Icons.Filled.Compress,
-                        modifier = Modifier.clickable {
-                            scope.launch {
-                                val result = shrinkDialog.awaitConfirm(title = shrink, content = shrinkMessage)
-                                if (result == ConfirmResult.Confirmed) {
-                                    loadingDialog.withLoading {
-                                        shrinkModules()
+                        modifier = Modifier.clickable(
+                            onClick = {
+                                scope.launch {
+                                    val result = shrinkDialog.awaitConfirm(title = shrink, content = shrinkMessage)
+                                    if (result == ConfirmResult.Confirmed) {
+                                        loadingDialog.withLoading {
+                                            shrinkModules()
+                                        }
                                     }
                                 }
-                            }
-                        }
+                            },
+                            interactionSource = rememberNoRippleInteractionSource(),
+                            indication = null
+                        )
                     )
                 }
                 
-                val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
+                if (isOverlayAvailable && useOverlayFs) {
+                    val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
+                    if (lkmMode) {
+                        CardItemSpacer()
+                    }
+                } else {
+                    val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
+                }
                 if (lkmMode) {
                     UninstallItem(navigator) {
                         loadingDialog.withLoading(it)
@@ -307,24 +323,36 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     prefs.edit().putBoolean("check_update", it).apply()
                 }
 
+                CardItemSpacer()
+
                 val customization = stringResource(id = R.string.customization)
                 CardRowContent(
                     text = customization,
                     icon = Icons.Filled.Palette,
-                    modifier = Modifier.clickable {
-                        navigator.navigate(CustomizationScreenDestination)
-                    }
+                    modifier = Modifier.clickable(
+                        onClick = { navigator.navigate(CustomizationScreenDestination) },
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
+                    )
                 )
+
+                CardItemSpacer()
 
                 if (ksuVersion != null) {
                     val backupRestore = stringResource(id = R.string.backup_restore)
                     CardRowContent(
                         text = backupRestore,
                         icon = Icons.Filled.Backup,
-                        modifier = Modifier.clickable {
-                            navigator.navigate(BackupRestoreScreenDestination)
-                        }
+                        modifier = Modifier.clickable(
+                            onClick = { navigator.navigate(BackupRestoreScreenDestination) },
+                            interactionSource = rememberNoRippleInteractionSource(),
+                            indication = null
+                        )
                     )
+                }
+
+                if (ksuVersion != null) {
+                    CardItemSpacer()
                 }
 
                 val developer = stringResource(id = R.string.developer)
@@ -332,10 +360,16 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     CardRowContent(
                         text = developer,
                         icon = Icons.Filled.DeveloperBoard,
-                        modifier = Modifier.clickable {
-                            navigator.navigate(DeveloperScreenDestination)
-                        }
+                        modifier = Modifier.clickable(
+                            onClick = { navigator.navigate(DeveloperScreenDestination) },
+                            interactionSource = rememberNoRippleInteractionSource(),
+                            indication = null
+                        )
                     )
+                }
+
+                if (ksuVersion != null) {
+                    CardItemSpacer()
                 }
 
                 val exportLogsDialog = rememberCustomDialog { dismiss ->
@@ -383,18 +417,24 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 CardRowContent(
                     text = stringResource(id = R.string.export_log),
                     icon = Icons.Filled.BugReport,
-                    modifier = Modifier.clickable {
-                        exportLogsDialog.show()
-                    }
+                    modifier = Modifier.clickable(
+                        onClick = { exportLogsDialog.show() },
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
+                    )
                 )
+
+                CardItemSpacer()
 
                 val about = stringResource(id = R.string.about)
                 CardRowContent(
                     text = about,
                     icon = Icons.Filled.ContactPage,
-                    modifier = Modifier.clickable {
-                        aboutDialog.show()
-                    }
+                    modifier = Modifier.clickable(
+                        onClick = { aboutDialog.show() },
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
+                    )
                 )
             }
         }

@@ -24,6 +24,9 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.ui.component.SwitchItem
+import com.rifsxd.ksunext.ui.component.StandardCard
+import com.rifsxd.ksunext.ui.component.CardSwitchContent
+import com.rifsxd.ksunext.ui.component.CardItemSpacer
 
 @Destination<RootGraph>
 @Composable
@@ -44,33 +47,24 @@ fun ModuleSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
+                StandardCard {
                         // Module Cards Always Expanded Setting
                         var keepModulesExpanded by rememberSaveable {
                             mutableStateOf(
                                 prefs.getBoolean("keep_modules_expanded", false)
                             )
                         }
-                        SwitchItem(
-                            icon = Icons.Filled.ExpandMore,
-                            title = "Keep Module Cards Expanded",
-                            summary = "Always keep module cards expanded instead of collapsing them",
-                            checked = keepModulesExpanded
-                        ) {
-                            prefs.edit().putBoolean("keep_modules_expanded", it).apply()
-                            keepModulesExpanded = it
-                        }
+                    CardSwitchContent(
+                        icon = Icons.Filled.ExpandMore,
+                        text = "Keep Module Cards Expanded",
+                        subText = "Always keep module cards expanded instead of collapsing them",
+                        checked = keepModulesExpanded
+                    ) {
+                        prefs.edit().putBoolean("keep_modules_expanded", it).apply()
+                        keepModulesExpanded = it
+                    }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                    CardItemSpacer()
 
                         // Banner Toggle Setting
                         var useBanner by rememberSaveable {
@@ -78,17 +72,17 @@ fun ModuleSettingsScreen(
                                 prefs.getBoolean("use_banner", true)
                             )
                         }
-                        SwitchItem(
-                            icon = Icons.Filled.ViewCarousel,
-                            title = "Enable Module Banners",
-                            summary = "Show background banners for modules",
-                            checked = useBanner
-                        ) {
-                            prefs.edit().putBoolean("use_banner", it).apply()
-                            useBanner = it
-                        }
+                    CardSwitchContent(
+                        icon = Icons.Filled.ViewCarousel,
+                        text = "Enable Module Banners",
+                        subText = "Show background banners for modules",
+                        checked = useBanner
+                    ) {
+                        prefs.edit().putBoolean("use_banner", it).apply()
+                        useBanner = it
+                    }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                    CardItemSpacer()
 
                         // Hide Module Details Text Setting
                         var hideModuleDetails by rememberSaveable {
@@ -96,15 +90,14 @@ fun ModuleSettingsScreen(
                                 prefs.getBoolean("hide_module_details", false)
                             )
                         }
-                        SwitchItem(
-                            icon = Icons.Filled.VisibilityOff,
-                            title = "Hide Module Details",
-                            summary = "Hide descriptive text like module size, web UI, action, and Zygisk requirements",
-                            checked = hideModuleDetails
-                        ) {
-                            prefs.edit().putBoolean("hide_module_details", it).apply()
-                            hideModuleDetails = it
-                        }
+                    CardSwitchContent(
+                        icon = Icons.Filled.VisibilityOff,
+                        text = "Hide Module Details",
+                        subText = "Hide descriptive text like module size, web UI, action, and Zygisk requirements",
+                        checked = hideModuleDetails
+                    ) {
+                        prefs.edit().putBoolean("hide_module_details", it).apply()
+                        hideModuleDetails = it
                     }
                 }
             }

@@ -65,6 +65,10 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.ConfirmResult
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.component.rememberLoadingDialog
+import com.rifsxd.ksunext.ui.component.StandardCard
+import com.rifsxd.ksunext.ui.component.CardRowContent
+import com.rifsxd.ksunext.ui.component.CardItemSpacer
+import com.rifsxd.ksunext.ui.component.rememberNoRippleInteractionSource
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.*
 
@@ -94,16 +98,7 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+            StandardCard {
 
             val context = LocalContext.current
             val scope = rememberCoroutineScope()
@@ -135,21 +130,13 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                 )
             }
 
-                    val moduleBackup = stringResource(id = R.string.module_backup)
-                    val backupMessage = stringResource(id = R.string.module_backup_message)
-                    ListItem(
-                        leadingContent = {
-                            Icon(
-                                Icons.Filled.Backup,
-                                moduleBackup
-                            )
-                        },
-                        headlineContent = { Text(
-                            text = moduleBackup,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        ) },
-                        modifier = Modifier.clickable {
+                val moduleBackup = stringResource(id = R.string.module_backup)
+                val backupMessage = stringResource(id = R.string.module_backup_message)
+                CardRowContent(
+                    text = moduleBackup,
+                    icon = Icons.Filled.Backup,
+                    modifier = Modifier.clickable(
+                        onClick = {
                             scope.launch {
                                 val result = backupDialog.awaitConfirm(title = moduleBackup, content = backupMessage)
                                 if (result == ConfirmResult.Confirmed) {
@@ -158,8 +145,13 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                                     }
                                 }
                             }
-                        }
+                        },
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
                     )
+                )
+
+                CardItemSpacer()
 
             if (showRebootDialog) {
                 AlertDialog(
@@ -192,58 +184,40 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         mutableStateOf(readMountSystemFile())
                     }
 
-                    val moduleRestore = stringResource(id = R.string.module_restore)
-                    val restoreMessage = stringResource(id = R.string.module_restore_message)
+                val moduleRestore = stringResource(id = R.string.module_restore)
+                val restoreMessage = stringResource(id = R.string.module_restore_message)
 
-                    ListItem(
-                        leadingContent = {
-                            Icon(
-                                Icons.Filled.Restore,
-                                moduleRestore,
-                                tint = if (useOverlayFs) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurface
-                            )
-                        },
-                        headlineContent = { 
-                            Text(
-                                moduleRestore,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = if (useOverlayFs) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f) else MaterialTheme.colorScheme.onSurface
-                            ) 
-                        },
-                        modifier = Modifier.clickable(
-                            enabled = !useOverlayFs,
-                            onClick = {
-                                scope.launch {
-                                    val result = restoreDialog.awaitConfirm(title = moduleRestore, content = restoreMessage)
-                                    if (result == ConfirmResult.Confirmed) {
-                                        loadingDialog.withLoading {
-                                            moduleRestore()
-                                            showRebootDialog = true
-                                        }
+                CardRowContent(
+                    text = moduleRestore,
+                    icon = Icons.Filled.Restore,
+                    enabled = !useOverlayFs,
+                    modifier = Modifier.clickable(
+                        enabled = !useOverlayFs,
+                        onClick = {
+                            scope.launch {
+                                val result = restoreDialog.awaitConfirm(title = moduleRestore, content = restoreMessage)
+                                if (result == ConfirmResult.Confirmed) {
+                                    loadingDialog.withLoading {
+                                        moduleRestore()
+                                        showRebootDialog = true
                                     }
                                 }
                             }
-                        )
-                    )
-
-                    HorizontalDivider(thickness = Dp.Hairline)
-
-                    val allowlistBackup = stringResource(id = R.string.allowlist_backup)
-                    val allowlistbackupMessage = stringResource(id = R.string.allowlist_backup_message)
-                    ListItem(
-                        leadingContent = {
-                            Icon(
-                                Icons.Filled.Backup,
-                                allowlistBackup
-                            )
                         },
-                        headlineContent = { Text(
-                            text = allowlistBackup,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        ) },
-                        modifier = Modifier.clickable {
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
+                    )
+                )
+
+                CardItemSpacer()
+
+                val allowlistBackup = stringResource(id = R.string.allowlist_backup)
+                val allowlistbackupMessage = stringResource(id = R.string.allowlist_backup_message)
+                CardRowContent(
+                    text = allowlistBackup,
+                    icon = Icons.Filled.Backup,
+                    modifier = Modifier.clickable(
+                        onClick = {
                             scope.launch {
                                 val result = backupDialog.awaitConfirm(title = allowlistBackup, content = allowlistbackupMessage)
                                 if (result == ConfirmResult.Confirmed) {
@@ -252,24 +226,21 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                                     }
                                 }
                             }
-                        }
-                    )
-
-                    val allowlistRestore = stringResource(id = R.string.allowlist_restore)
-                    val allowlistrestoreMessage = stringResource(id = R.string.allowlist_restore_message)
-                    ListItem(
-                        leadingContent = {
-                            Icon(
-                                Icons.Filled.Restore,
-                                allowlistRestore
-                            )
                         },
-                        headlineContent = { Text(
-                            text = allowlistRestore,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        ) },
-                        modifier = Modifier.clickable {
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
+                    )
+                )
+
+                CardItemSpacer()
+
+                val allowlistRestore = stringResource(id = R.string.allowlist_restore)
+                val allowlistrestoreMessage = stringResource(id = R.string.allowlist_restore_message)
+                CardRowContent(
+                    text = allowlistRestore,
+                    icon = Icons.Filled.Restore,
+                    modifier = Modifier.clickable(
+                        onClick = {
                             scope.launch {
                                 val result = restoreDialog.awaitConfirm(title = allowlistRestore, content = allowlistrestoreMessage)
                                 if (result == ConfirmResult.Confirmed) {
@@ -278,8 +249,11 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                                     }
                                 }
                             }
-                        }
+                        },
+                        interactionSource = rememberNoRippleInteractionSource(),
+                        indication = null
                     )
+                )
                 }
             }
         }
