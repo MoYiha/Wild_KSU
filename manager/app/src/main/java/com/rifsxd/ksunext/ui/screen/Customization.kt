@@ -5,8 +5,7 @@ import android.content.SharedPreferences
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.foundation.indication
+import androidx.compose.material3.ripple
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -290,7 +289,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     modifier = Modifier
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple()
+                            indication = ripple()
                         ) {
                             languageDialog.show()
                         }
@@ -305,9 +304,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     subtitle = "Customize background, UI transparency, and display settings",
                     modifier = Modifier
                         .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple()
-                        ) {
+                             interactionSource = remember { MutableInteractionSource() },
+                             indication = ripple()
+                         ) {
                             navigator.navigate(ThemeSettingsScreenDestination)
                         }
                 )
@@ -320,12 +319,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     text = stringResource(R.string.info_card_customization),
                     subtitle = stringResource(R.string.info_card_customization_summary),
                     modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple()
-                        ) {
-                            navigator.navigate(HomeSettingsScreenDestination)
-                        }
+                         .clickable(
+                             interactionSource = remember { MutableInteractionSource() },
+                             indication = ripple()
+                         ) {
+                             navigator.navigate(HomeSettingsScreenDestination)
+                         }
                 )
 
                 CardItemSpacer()
@@ -336,12 +335,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     text = "Superuser Settings",
                     subtitle = "Customize superuser app display and behavior",
                     modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple()
-                        ) {
-                            navigator.navigate(SuperuserSettingsScreenDestination)
-                        }
+                         .clickable(
+                             interactionSource = remember { MutableInteractionSource() },
+                             indication = ripple()
+                         ) {
+                             navigator.navigate(SuperuserSettingsScreenDestination)
+                         }
                 )
 
                 CardItemSpacer()
@@ -352,12 +351,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     text = stringResource(R.string.module_card_customization),
                     subtitle = stringResource(R.string.module_card_customization_summary),
                     modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple()
-                        ) {
-                            navigator.navigate(ModuleSettingsScreenDestination)
-                        }
+                         .clickable(
+                             interactionSource = remember { MutableInteractionSource() },
+                             indication = ripple()
+                         ) {
+                             navigator.navigate(ModuleSettingsScreenDestination)
+                         }
                 )
             }
         }
