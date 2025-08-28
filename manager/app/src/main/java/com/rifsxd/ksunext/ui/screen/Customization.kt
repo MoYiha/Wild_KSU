@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -284,9 +287,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     icon = Icons.Filled.Translate,
                     text = language,
                     subtitle = currentLanguageDisplay,
-                    modifier = Modifier.clickable {
-                        languageDialog.show()
-                    }
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple()
+                        ) {
+                            languageDialog.show()
+                        }
                 )
 
                 CardItemSpacer()
@@ -296,9 +303,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     icon = Icons.Filled.Palette,
                     text = "Theme Settings",
                     subtitle = "Customize background, UI transparency, and display settings",
-                    modifier = Modifier.clickable {
-                        navigator.navigate(ThemeSettingsScreenDestination)
-                    }
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple()
+                        ) {
+                            navigator.navigate(ThemeSettingsScreenDestination)
+                        }
                 )
 
                 CardItemSpacer()
@@ -308,9 +319,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     icon = Icons.Filled.Info,
                     text = stringResource(R.string.info_card_customization),
                     subtitle = stringResource(R.string.info_card_customization_summary),
-                    modifier = Modifier.clickable {
-                        navigator.navigate(HomeSettingsScreenDestination)
-                    }
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple()
+                        ) {
+                            navigator.navigate(HomeSettingsScreenDestination)
+                        }
                 )
 
                 CardItemSpacer()
@@ -320,9 +335,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     icon = Icons.Filled.SupervisorAccount,
                     text = "Superuser Settings",
                     subtitle = "Customize superuser app display and behavior",
-                    modifier = Modifier.clickable {
-                        navigator.navigate(SuperuserSettingsScreenDestination)
-                    }
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple()
+                        ) {
+                            navigator.navigate(SuperuserSettingsScreenDestination)
+                        }
                 )
 
                 CardItemSpacer()
@@ -332,9 +351,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     icon = Icons.Filled.Extension,
                     text = stringResource(R.string.module_card_customization),
                     subtitle = stringResource(R.string.module_card_customization_summary),
-                    modifier = Modifier.clickable {
-                        navigator.navigate(ModuleSettingsScreenDestination)
-                    }
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple()
+                        ) {
+                            navigator.navigate(ModuleSettingsScreenDestination)
+                        }
                 )
             }
         }
