@@ -22,7 +22,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
@@ -335,7 +335,7 @@ fun PhotoEditor(
                     AnimatedContent(
                         targetState = activeMenu,
                         transitionSpec = {
-                            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) with
+                            fadeIn(animationSpec = tween(300, easing = FastOutSlowInEasing)) togetherWith
                             fadeOut(animationSpec = tween(150))
                         }
                     ) { menu ->

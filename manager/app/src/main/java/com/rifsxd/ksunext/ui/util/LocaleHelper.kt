@@ -78,10 +78,20 @@ object LocaleHelper {
         Locale.setDefault(locale)
         val resources = context.resources
         val configuration = resources.configuration
-        configuration.locale = locale
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            configuration.setLocale(locale)
+        } else {
+            @Suppress("DEPRECATION")
+            configuration.locale = locale
+        }
         configuration.setLayoutDirection(locale)
-        resources.updateConfiguration(configuration, resources.displayMetrics)
-        return context
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return context.createConfigurationContext(configuration)
+        } else {
+            @Suppress("DEPRECATION")
+            resources.updateConfiguration(configuration, resources.displayMetrics)
+            return context
+        }
     }
     
     /**

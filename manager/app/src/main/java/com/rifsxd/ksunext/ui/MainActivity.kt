@@ -187,7 +187,6 @@ private fun getIcon(iconType: IconType): Any {
         IconType.KSU_NEXT -> painterResource(R.drawable.ic_ksu_next)
         IconType.CANNABIS -> painterResource(R.drawable.ic_cannabis)
         IconType.AMOGUS_SUSFS -> painterResource(R.drawable.ic_sus)
-        else -> iconType.icon
     }
 }
 
@@ -379,7 +378,12 @@ class MainActivity : ComponentActivity() {
 
         val zipUri: Uri? = when (intent?.action) {
             Intent.ACTION_VIEW, Intent.ACTION_SEND -> {
-                val uri = intent.data ?: intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                val uri = intent.data ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                }
                 uri?.let {
                     val name = when (it.scheme) {
                         "file" -> it.lastPathSegment ?: ""

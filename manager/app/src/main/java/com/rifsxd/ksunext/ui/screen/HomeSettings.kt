@@ -605,7 +605,7 @@ fun HomeSettingsScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
-                                    imageVector = Icons.Filled.HelpOutline,
+                                    imageVector = Icons.AutoMirrored.Filled.HelpOutline,
                                     contentDescription = null,
                                     modifier = Modifier.padding(end = 16.dp),
                                     tint = MaterialTheme.colorScheme.primary

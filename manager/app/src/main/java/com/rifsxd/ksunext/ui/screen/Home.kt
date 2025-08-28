@@ -1054,7 +1054,7 @@ private fun IssueReportCardContent(
     Column {
         CardRowContent(
             text = stringResource(R.string.issue_report_body),
-            icon = Icons.Filled.HelpOutline,
+            icon = Icons.AutoMirrored.Filled.HelpOutline,
             title = stringResource(R.string.issue_report_title),
             subtitle = stringResource(R.string.issue_report_body_2),
             actions = {
