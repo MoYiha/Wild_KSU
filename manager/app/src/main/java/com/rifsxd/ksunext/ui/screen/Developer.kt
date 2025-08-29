@@ -98,8 +98,8 @@ fun DeveloperScreen(navigator: DestinationsNavigator) {
                 if (ksuVersion != null) {
                     CardSwitchContent(
                         icon = Icons.Filled.DeveloperMode,
-                        text = stringResource(id = R.string.enable_developer_options),
-                        subText = stringResource(id = R.string.enable_developer_options_summary),
+                        title = stringResource(id = R.string.enable_developer_options),
+                        subtitle = stringResource(id = R.string.enable_developer_options_summary),
                         checked = developerOptionsEnabled
                     ) {
                         prefs.edit().putBoolean("enable_developer_options", it).apply()
@@ -118,8 +118,8 @@ fun DeveloperScreen(navigator: DestinationsNavigator) {
                     CardSwitchContent(
                         enabled = developerOptionsEnabled,
                         icon = Icons.Filled.Web,
-                        text = stringResource(id = R.string.enable_web_debugging),
-                        subText = stringResource(id = R.string.enable_web_debugging_summary),
+                        title = stringResource(id = R.string.enable_web_debugging),
+                        subtitle = stringResource(id = R.string.enable_web_debugging_summary),
                         checked = enableWebDebugging
                     ) {
                         prefs.edit().putBoolean("enable_web_debugging", it).apply()

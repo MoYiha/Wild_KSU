@@ -56,8 +56,8 @@ fun ModuleSettingsScreen(
                         }
                     CardSwitchContent(
                         icon = Icons.Filled.ExpandMore,
-                        text = "Keep Module Cards Expanded",
-                        subText = "Always keep module cards expanded instead of collapsing them",
+                        title = "Keep Module Cards Expanded",
+                        subtitle = "Always keep module cards expanded instead of collapsing them",
                         checked = keepModulesExpanded
                     ) {
                         prefs.edit().putBoolean("keep_modules_expanded", it).apply()
@@ -74,8 +74,8 @@ fun ModuleSettingsScreen(
                         }
                     CardSwitchContent(
                         icon = Icons.Filled.ViewCarousel,
-                        text = "Enable Module Banners",
-                        subText = "Show background banners for modules",
+                        title = "Enable Module Banners",
+                        subtitle = "Show background banners for modules",
                         checked = useBanner
                     ) {
                         prefs.edit().putBoolean("use_banner", it).apply()
@@ -92,8 +92,8 @@ fun ModuleSettingsScreen(
                         }
                     CardSwitchContent(
                         icon = Icons.Filled.VisibilityOff,
-                        text = "Hide Module Details",
-                        subText = "Hide descriptive text like module size, web UI, action, and Zygisk requirements",
+                        title = "Hide Module Details",
+                        subtitle = "Hide descriptive text like module size, web UI, action, and Zygisk requirements",
                         checked = hideModuleDetails
                     ) {
                         prefs.edit().putBoolean("hide_module_details", it).apply()

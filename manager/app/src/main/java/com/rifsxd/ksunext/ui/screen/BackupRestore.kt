@@ -190,7 +190,6 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                 CardRowContent(
                     text = moduleRestore,
                     icon = Icons.Filled.Restore,
-                    enabled = !useOverlayFs,
                     modifier = Modifier.clickable(
                         enabled = !useOverlayFs,
                         onClick = {
@@ -254,7 +253,6 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         indication = null
                     )
                 )
-                }
             }
         }
     }

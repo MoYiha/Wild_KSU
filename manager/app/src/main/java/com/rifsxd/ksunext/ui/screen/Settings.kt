@@ -294,13 +294,11 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     )
                 }
                 
+                val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
                 if (isOverlayAvailable && useOverlayFs) {
-                    val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
                     if (lkmMode) {
                         CardItemSpacer()
                     }
-                } else {
-                    val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
                 }
                 if (lkmMode) {
                     UninstallItem(navigator) {
