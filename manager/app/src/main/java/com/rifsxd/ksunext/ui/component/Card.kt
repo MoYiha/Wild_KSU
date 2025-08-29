@@ -362,6 +362,79 @@ fun CardSwitchContent(
 }
 
 /**
+ * Card content with slider control - consistent with CardRowContent layout
+ */
+@Composable
+fun CardSliderContent(
+    title: String,
+    subtitle: String? = null,
+    icon: ImageVector? = null,
+    value: Float,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+    valueDisplay: String? = null,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onValueChange: (Float) -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.padding(
+                        end = CardConstants.ICON_TO_TEXT_SPACING_SMALL
+                    ),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+            
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_SMALL)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium.copy(lineHeight = 20.sp),
+                    fontWeight = FontWeight.Medium
+                )
+                
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall.copy(lineHeight = 16.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            if (valueDisplay != null) {
+                Text(
+                    text = valueDisplay,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_MEDIUM))
+        
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            valueRange = valueRange,
+            enabled = enabled,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+/**
  * Card content with title and body text
  */
 @Composable

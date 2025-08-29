@@ -50,6 +50,7 @@ import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.CardRowContent
 import com.rifsxd.ksunext.ui.component.CardSwitchContent
+import com.rifsxd.ksunext.ui.component.CardSliderContent
 import com.rifsxd.ksunext.ui.component.CardItemSpacer
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -170,201 +171,95 @@ fun ThemeSettingsScreen(
 
             // Background Image Section
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                // Background Transparency and Blur sliders state
+                var backgroundTransparency by rememberSaveable {
+                    mutableFloatStateOf(
+                        prefs.getFloat("background_transparency", 0.0f)
                     )
+                }
+                
+                var backgroundBlur by rememberSaveable {
+                    mutableFloatStateOf(
+                        prefs.getFloat("background_blur", 0.0f)
+                    )
+                }
+                
+                StandardCard(
+                    title = "Background"
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Background",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                    // Background Image Selection
+                    CardRowContent(
+                        title = stringResource(R.string.settings_background_image),
+                        subtitle = stringResource(R.string.settings_background_image_summary),
+                        icon = Icons.Filled.Image,
+                        modifier = Modifier.clickable {
+                            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                                type = "image/*"
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                            }
+                            selectImageLauncher.launch(intent)
+                        },
+                        trailingContent = {
+                            Row {
+                                // Use the saved background image for buttons
+                                val activeImageUri = backgroundImageUri
+                                
+                                // Crop button (only show if background image is selected)
+                                if (activeImageUri != null) {
+                                    IconButton(onClick = {
+                                        // Navigate to PhotoEditor for current image
+                                        navigator.navigate(PhotoEditorScreenDestination(imageUri = activeImageUri))
+                                    }) {
+                                        Icon(Icons.Filled.Crop, stringResource(R.string.crop_background_image))
+                                    }
+                                }
+                                // Delete button (only show if background image is selected)
+                                if (activeImageUri != null) {
+                                    IconButton(onClick = {
+                                        // Clean up internal storage if the image was stored there
+                                        BackgroundCustomization.deleteInternalBackgroundImage(context)
+                                        prefs.edit().remove("background_image_uri").commit()
+                                        backgroundImageUri = null
+                                    }) {
+                                        Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
+                                    }
+                                }
+                            }
+                        }
+                    )
+                    
+                    // Background Transparency Slider (only show when background image is enabled)
+                    if (backgroundImageUri != null) {
+                        CardItemSpacer()
+                        
+                        CardSliderContent(
+                            title = stringResource(R.string.background_transparency),
+                            subtitle = stringResource(R.string.background_transparency_summary),
+                            icon = Icons.Filled.Opacity,
+                            value = backgroundTransparency,
+                            valueRange = 0.0f..1.0f,
+                            valueDisplay = "${(backgroundTransparency * 100).toInt()}%",
+                            onValueChange = { value ->
+                                backgroundTransparency = value
+                                prefs.edit().putFloat("background_transparency", value).apply()
+                            }
                         )
-
-                        // Background Image Selection
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable {
-                                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                                        type = "image/*"
-                                        addCategory(Intent.CATEGORY_OPENABLE)
-                                    }
-                                    selectImageLauncher.launch(intent)
-                                }
-                                .padding(20.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Image,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.settings_background_image),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.settings_background_image_summary),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Row {
-                                    // Use the saved background image for buttons
-                                    val activeImageUri = backgroundImageUri
-                                    
-                                    // Save button removed - saving now happens in PhotoEditor
-                                    
-                                    // Crop button (only show if background image is selected)
-                                    if (activeImageUri != null) {
-                                        IconButton(onClick = {
-                                            // Navigate to PhotoEditor for current image
-                                            navigator.navigate(PhotoEditorScreenDestination(imageUri = activeImageUri))
-                                        }) {
-                                            Icon(Icons.Filled.Crop, stringResource(R.string.crop_background_image))
-                                        }
-                                    }
-                                    // Delete button (only show if background image is selected)
-                                    if (activeImageUri != null) {
-                                        IconButton(onClick = {
-                                            // Clean up internal storage if the image was stored there
-                                            BackgroundCustomization.deleteInternalBackgroundImage(context)
-                                            prefs.edit().remove("background_image_uri").commit()
-                                            backgroundImageUri = null
-                                        }) {
-                                            Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
-                                        }
-                                    }
-                                }
+                        
+                        CardItemSpacer()
+                        
+                        // Background Blur Slider
+                        CardSliderContent(
+                            title = "Background Blur",
+                            subtitle = "Adjust the blur effect on the background image",
+                            icon = Icons.Filled.Tune,
+                            value = backgroundBlur,
+                            valueRange = 0.0f..50.0f,
+                            valueDisplay = "${backgroundBlur.toInt()}px",
+                            onValueChange = { value ->
+                                backgroundBlur = value
+                                prefs.edit().putFloat("background_blur", value).apply()
                             }
-                        }
-
-                        // Background Transparency Slider (only show when background image is enabled)
-                        if (backgroundImageUri != null) { // Only show sliders for actually saved background
-                            var backgroundTransparency by rememberSaveable {
-                                mutableFloatStateOf(
-                                    prefs.getFloat("background_transparency", 0.0f)
-                                )
-                            }
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp)
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Opacity,
-                                        contentDescription = null,
-                                        modifier = Modifier.padding(end = 16.dp),
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                    Column(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.background_transparency),
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Text(
-                                            text = stringResource(R.string.background_transparency_summary),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    Text(
-                                        text = "${(backgroundTransparency * 100).toInt()}%",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Slider(
-                                    value = backgroundTransparency,
-                                    onValueChange = { value ->
-                                        backgroundTransparency = value
-                                        prefs.edit().putFloat("background_transparency", value).apply()
-                                    },
-                                    valueRange = 0.0f..1.0f,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            
-                            // Background Blur Slider
-                            var backgroundBlur by rememberSaveable {
-                                mutableFloatStateOf(
-                                    prefs.getFloat("background_blur", 0.0f)
-                                )
-                            }
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp)
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Tune,
-                                        contentDescription = null,
-                                        modifier = Modifier.padding(end = 16.dp),
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                    Column(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text(
-                                            text = "Background Blur",
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Text(
-                                            text = "Adjust the blur effect on the background image",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    Text(
-                                        text = "${backgroundBlur.toInt()}px",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Slider(
-                                    value = backgroundBlur,
-                                    onValueChange = { value ->
-                                        backgroundBlur = value
-                                        prefs.edit().putFloat("background_blur", value).apply()
-                                    },
-                                    valueRange = 0.0f..50.0f,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
+                        )
                     }
                 }
             }
