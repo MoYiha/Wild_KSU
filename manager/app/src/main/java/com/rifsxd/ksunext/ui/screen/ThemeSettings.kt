@@ -185,6 +185,14 @@ fun ThemeSettingsScreen(
                 }
                 
                 StandardCard {
+                    Text(
+                        text = "Background",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    CardItemSpacer()
+                    
                     // Background Image Selection
                     CardRowContent(
                         text = stringResource(R.string.settings_background_image),
@@ -209,7 +217,11 @@ fun ThemeSettingsScreen(
                                         // Navigate to PhotoEditor for current image
                                         navigator.navigate(PhotoEditorScreenDestination(imageUri = activeImageUri))
                                     }) {
-                                        Icon(Icons.Filled.Crop, stringResource(R.string.crop_background_image))
+                                        Icon(
+                                            Icons.Filled.Crop, 
+                                            stringResource(R.string.crop_background_image),
+                                            tint = Color.White
+                                        )
                                     }
                                 }
                                 // Delete button (only show if background image is selected)
@@ -220,7 +232,11 @@ fun ThemeSettingsScreen(
                                         prefs.edit().remove("background_image_uri").commit()
                                         backgroundImageUri = null
                                     }) {
-                                        Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
+                                        Icon(
+                                            Icons.Filled.Delete, 
+                                            stringResource(R.string.background_image_remove),
+                                            tint = Color.White
+                                        )
                                     }
                                 }
                             }
