@@ -126,10 +126,7 @@ fun HomeSettingsScreen(
         mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_selinux_status", true))
     }
     
-    // Card background toggle state
-    var cardBackgroundEnabled by rememberSaveable {
-        mutableStateOf<Boolean>(prefs.getBoolean("card_background_enabled", true))
-    }
+
     
     // App name customization state
     var selectedAppName by rememberSaveable {
@@ -462,20 +459,6 @@ fun HomeSettingsScreen(
                         onCheckedChange = { isChecked ->
                             val newAppName = if (isChecked) "wild_ksu" else "kernelsu_next"
                             onSelectedAppNameChanged(newAppName)
-                        }
-                    )
-                    
-                    CardItemSpacer()
-                    
-                    // Card Background Toggle
-                    CardSwitchContent(
-                        icon = Icons.Filled.CropFree,
-                        title = "Card Background",
-                        subtitle = "Toggle card background and padding for expanded layout",
-                        checked = cardBackgroundEnabled,
-                        onCheckedChange = {
-                            prefs.edit().putBoolean("card_background_enabled", it).apply()
-                            cardBackgroundEnabled = it
                         }
                     )
                     

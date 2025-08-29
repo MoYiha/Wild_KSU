@@ -193,81 +193,39 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 
 @Composable
 private fun SuperuserCard(onClick: () -> Unit = {}) {
-    val context = LocalContext.current
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
     val count = getSuperuserCount()
     
-    if (cardBackgroundEnabled) {
-        CompactCard(
-            cardType = CardType.SECONDARY,
-            onClick = onClick
-        ) {
-            CenteredCardContent(
-                title = if (count <= 1) {
-                    stringResource(R.string.home_superuser_count_singular)
-                } else {
-                    stringResource(R.string.home_superuser_count_plural)
-                },
-                subtitle = count.toString()
-            )
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { onClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            CenteredCardContent(
-                title = if (count <= 1) {
-                    stringResource(R.string.home_superuser_count_singular)
-                } else {
-                    stringResource(R.string.home_superuser_count_plural)
-                },
-                subtitle = count.toString()
-            )
-        }
+    CompactCard(
+        cardType = CardType.SECONDARY,
+        onClick = onClick
+    ) {
+        CenteredCardContent(
+            title = if (count <= 1) {
+                stringResource(R.string.home_superuser_count_singular)
+            } else {
+                stringResource(R.string.home_superuser_count_plural)
+            },
+            subtitle = count.toString()
+        )
     }
 }
 
 @Composable
 private fun ModuleCard(onClick: () -> Unit = {}) {
-    val context = LocalContext.current
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
     val count = getModuleCount()
     
-    if (cardBackgroundEnabled) {
-        CompactCard(
-            cardType = CardType.SECONDARY,
-            onClick = onClick
-        ) {
-            CenteredCardContent(
-                title = if (count <= 1) {
-                    stringResource(R.string.home_module_count_singular)
-                } else {
-                    stringResource(R.string.home_module_count_plural)
-                },
-                subtitle = count.toString()
-            )
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { onClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            CenteredCardContent(
-                title = if (count <= 1) {
-                    stringResource(R.string.home_module_count_singular)
-                } else {
-                    stringResource(R.string.home_module_count_plural)
-                },
-                subtitle = count.toString()
-            )
-        }
+    CompactCard(
+        cardType = CardType.SECONDARY,
+        onClick = onClick
+    ) {
+        CenteredCardContent(
+            title = if (count <= 1) {
+                stringResource(R.string.home_module_count_singular)
+            } else {
+                stringResource(R.string.home_module_count_plural)
+            },
+            subtitle = count.toString()
+        )
     }
 }
 
@@ -350,9 +308,6 @@ private fun StatusCard(
     val context = LocalContext.current
     var tapCount by remember { mutableStateOf(0) }
     
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
-    
     val clickHandler = {
         tapCount++
         if (tapCount == 5) {
@@ -374,24 +329,13 @@ private fun StatusCard(
         }
     }
     
-    if (cardBackgroundEnabled) {
-        StandardCard(
-            cardType = CardType.CUSTOM,
-            customColor = if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
-                         else MaterialTheme.colorScheme.errorContainer,
-            onClick = clickHandler
-        ) {
-            StatusCardContent(kernelVersion, ksuVersion, lkmMode, moduleUpdateCount)
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { clickHandler() }
-                .padding(CardConstants.CARD_PADDING_LARGE)
-        ) {
-            StatusCardContent(kernelVersion, ksuVersion, lkmMode, moduleUpdateCount)
-        }
+    StandardCard(
+        cardType = CardType.CUSTOM,
+        customColor = if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
+                     else MaterialTheme.colorScheme.errorContainer,
+        onClick = clickHandler
+    ) {
+        StatusCardContent(kernelVersion, ksuVersion, lkmMode, moduleUpdateCount)
     }
 }
 
@@ -524,37 +468,17 @@ private fun StatusCardContent(
 fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
-    val context = LocalContext.current
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
-    
-    if (cardBackgroundEnabled) {
-        StandardCard(
-            cardType = CardType.CUSTOM,
-            customColor = color,
-            onClick = onClick
-        ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .let { if (onClick != null) it.clickable { onClick() } else it }
-                .padding(CardConstants.CARD_PADDING_LARGE)
-        ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+    StandardCard(
+        cardType = CardType.CUSTOM,
+        customColor = color,
+        onClick = onClick
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -703,78 +627,37 @@ private fun InfoCard(autoExpand: Boolean = false) {
         }
     }   
 
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
-    
-    if (cardBackgroundEnabled) {
-        StandardCard(
-            cardType = CardType.SURFACE,
-            modifier = Modifier
-                .animateContentSize(
-                    animationSpec = tween(durationMillis = 300)
-                ),
-            onLongClick = {
-                if (expanded && !alwaysExpanded) {
-                    expanded = false
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
+    StandardCard(
+        cardType = CardType.SURFACE,
+        modifier = Modifier
+            .animateContentSize(
+                animationSpec = tween(durationMillis = 300)
+            ),
+        onLongClick = {
+            if (expanded && !alwaysExpanded) {
+                expanded = false
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
             }
-        ) {
-            InfoCardContent(
-                showManagerVersion = showManagerVersion,
-                showHookMode = showHookMode,
-                showMountSystem = showMountSystem,
-                showSusfsStatus = showSusfsStatus,
-                showZygiskStatus = showZygiskStatus,
-                showKernelVersion = showKernelVersion,
-                showAndroidVersion = showAndroidVersion,
-                showAbi = showAbi,
-                showSelinuxStatus = showSelinuxStatus,
-                itemOrder = itemOrder,
-                expanded = expanded,
-                alwaysExpanded = alwaysExpanded,
-                enabledOptionsCount = enabledOptionsCount,
-                ksuVersion = ksuVersion,
-                developerOptionsEnabled = developerOptionsEnabled,
-                onExpandedChange = { expanded = it }
-            )
         }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(CardConstants.CARD_PADDING_LARGE)
-                .animateContentSize(
-                    animationSpec = tween(durationMillis = 300)
-                )
-                .combinedClickable(
-                    onLongClick = {
-                        if (expanded && !alwaysExpanded) {
-                            expanded = false
-                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                        }
-                    },
-                    onClick = {}
-                )
-        ) {
-            InfoCardContent(
-                showManagerVersion = showManagerVersion,
-                showHookMode = showHookMode,
-                showMountSystem = showMountSystem,
-                showSusfsStatus = showSusfsStatus,
-                showZygiskStatus = showZygiskStatus,
-                showKernelVersion = showKernelVersion,
-                showAndroidVersion = showAndroidVersion,
-                showAbi = showAbi,
-                showSelinuxStatus = showSelinuxStatus,
-                itemOrder = itemOrder,
-                expanded = expanded,
-                alwaysExpanded = alwaysExpanded,
-                enabledOptionsCount = enabledOptionsCount,
-                ksuVersion = ksuVersion,
-                developerOptionsEnabled = developerOptionsEnabled,
-                onExpandedChange = { expanded = it }
-            )
-        }
+    ) {
+        InfoCardContent(
+            showManagerVersion = showManagerVersion,
+            showHookMode = showHookMode,
+            showMountSystem = showMountSystem,
+            showSusfsStatus = showSusfsStatus,
+            showZygiskStatus = showZygiskStatus,
+            showKernelVersion = showKernelVersion,
+            showAndroidVersion = showAndroidVersion,
+            showAbi = showAbi,
+            showSelinuxStatus = showSelinuxStatus,
+            itemOrder = itemOrder,
+            expanded = expanded,
+            alwaysExpanded = alwaysExpanded,
+            enabledOptionsCount = enabledOptionsCount,
+            ksuVersion = ksuVersion,
+            developerOptionsEnabled = developerOptionsEnabled,
+            onExpandedChange = { expanded = it }
+        )
     }
 }
 
@@ -1011,7 +894,6 @@ fun IssueReportCard() {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val selectedIconType = prefs.getString("selected_icon_type", "SEASONAL") ?: "SEASONAL"
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
     
     // Get the appropriate icon using IconUtils
     val helpIcon = IconUtils.getIcon(selectedIconType)
@@ -1020,28 +902,14 @@ fun IssueReportCard() {
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
 
-    if (cardBackgroundEnabled) {
-        StandardCard(
-            cardType = CardType.SURFACE
-        ) {
-            IssueReportCardContent(
-                uriHandler = uriHandler,
-                githubIssueUrl = githubIssueUrl,
-                telegramUrl = telegramUrl
-            )
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(CardConstants.CARD_PADDING_LARGE)
-        ) {
-            IssueReportCardContent(
-                uriHandler = uriHandler,
-                githubIssueUrl = githubIssueUrl,
-                telegramUrl = telegramUrl
-            )
-        }
+    StandardCard(
+        cardType = CardType.SURFACE
+    ) {
+        IssueReportCardContent(
+            uriHandler = uriHandler,
+            githubIssueUrl = githubIssueUrl,
+            telegramUrl = telegramUrl
+        )
     }
 }
 
