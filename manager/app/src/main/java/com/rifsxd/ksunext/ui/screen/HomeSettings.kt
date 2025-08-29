@@ -432,256 +432,101 @@ fun HomeSettingsScreen(
     ) {
             // Home & Cards
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                StandardCard {
+                    Text(
+                        text = stringResource(R.string.home_screen_settings),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
                     )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.home_screen_settings),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-
-                        // Home Screen Icon Style
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable {
-                                    showIconDialog = true
-                                }
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // Show current icon preview
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = 16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    val currentIcon = IconUtils.getIcon(selectedIconType)
-                                    when (currentIcon) {
-                                        is ImageVector -> Icon(
-                                            imageVector = currentIcon,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(20.dp),
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                        is Painter -> Icon(
-                                            painter = currentIcon,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(20.dp),
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-                                }
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.home_screen_icon_style),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.home_screen_icon_style_summary) + ". " + stringResource(R.string.home_screen_icon_current, currentIconDisplay),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = "Navigate to settings",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // App Name Toggle
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Title,
+                    
+                    CardItemSpacer()
+                    
+                    // Home Screen Icon Style
+                    CardRowContent(
+                        icon = {
+                            val currentIcon = IconUtils.getIcon(selectedIconType)
+                            when (currentIcon) {
+                                is ImageVector -> Icon(
+                                    imageVector = currentIcon,
                                     contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.White
                                 )
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.app_name_customization),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = "Switch to Wild KSU",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = selectedAppName == "wild_ksu",
-                                    onCheckedChange = { isChecked ->
-                                        val newAppName = if (isChecked) "wild_ksu" else "kernelsu_next"
-                                        onSelectedAppNameChanged(newAppName)
-                                    }
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Card Background Toggle
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { 
-                                    val newValue = !cardBackgroundEnabled
-                                    prefs.edit().putBoolean("card_background_enabled", newValue).apply()
-                                    cardBackgroundEnabled = newValue
-                                }
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.CropFree,
+                                is Painter -> Icon(
+                                    painter = currentIcon,
                                     contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = "Card Background",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = "Toggle card background and padding for expanded layout",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = cardBackgroundEnabled,
-                                    onCheckedChange = {
-                                        prefs.edit().putBoolean("card_background_enabled", it).apply()
-                                        cardBackgroundEnabled = it
-                                    }
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.White
                                 )
                             }
+                        },
+                        text = stringResource(R.string.home_screen_icon_style),
+                        subtitle = stringResource(R.string.home_screen_icon_style_summary) + ". " + stringResource(R.string.home_screen_icon_current, currentIconDisplay),
+                        trailingIcon = Icons.AutoMirrored.Filled.ArrowForward,
+                        modifier = Modifier.clickable {
+                            showIconDialog = true
                         }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Help Card Toggle
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable { 
-                                    val newValue = !showHelpCard
-                                    prefs.edit().putBoolean("show_help_card", newValue).apply()
-                                    showHelpCard = newValue
-                                }
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.help_card_customization),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.help_card_customization_summary),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = showHelpCard,
-                                    onCheckedChange = {
-                                        prefs.edit().putBoolean("show_help_card", it).apply()
-                                        showHelpCard = it
-                                    }
-                                )
-                            }
+                    )
+                    
+                    CardItemSpacer()
+                    
+                    // App Name Toggle
+                    CardSwitchContent(
+                        icon = Icons.Filled.Title,
+                        iconTint = Color.White,
+                        text = stringResource(R.string.app_name_customization),
+                        subtitle = "Switch to Wild KSU",
+                        checked = selectedAppName == "wild_ksu",
+                        onCheckedChange = { isChecked ->
+                            val newAppName = if (isChecked) "wild_ksu" else "kernelsu_next"
+                            onSelectedAppNameChanged(newAppName)
                         }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // Always Expanded Toggle
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.ExpandMore,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.info_card_always_expanded),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.info_card_always_expanded_summary),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Switch(
-                                    checked = infoCardAlwaysExpanded,
-                                    onCheckedChange = {
-                                        prefs.edit().putBoolean("info_card_always_expanded", it).apply()
-                                        infoCardAlwaysExpanded = it
-                                    }
-                                )
-                            }
+                    )
+                    
+                    CardItemSpacer()
+                    
+                    // Card Background Toggle
+                    CardSwitchContent(
+                        icon = Icons.Filled.CropFree,
+                        iconTint = Color.White,
+                        text = "Card Background",
+                        subtitle = "Toggle card background and padding for expanded layout",
+                        checked = cardBackgroundEnabled,
+                        onCheckedChange = {
+                            prefs.edit().putBoolean("card_background_enabled", it).apply()
+                            cardBackgroundEnabled = it
                         }
-                    }
+                    )
+                    
+                    CardItemSpacer()
+                    
+                    // Help Card Toggle
+                    CardSwitchContent(
+                        icon = Icons.AutoMirrored.Filled.HelpOutline,
+                        iconTint = Color.White,
+                        text = stringResource(R.string.help_card_customization),
+                        subtitle = stringResource(R.string.help_card_customization_summary),
+                        checked = showHelpCard,
+                        onCheckedChange = {
+                            prefs.edit().putBoolean("show_help_card", it).apply()
+                            showHelpCard = it
+                        }
+                    )
+                    
+                    CardItemSpacer()
+                    
+                    // Always Expanded Toggle
+                    CardSwitchContent(
+                        icon = Icons.Filled.ExpandMore,
+                        iconTint = Color.White,
+                        text = stringResource(R.string.info_card_always_expanded),
+                        subtitle = stringResource(R.string.info_card_always_expanded_summary),
+                        checked = infoCardAlwaysExpanded,
+                        onCheckedChange = {
+                            prefs.edit().putBoolean("info_card_always_expanded", it).apply()
+                            infoCardAlwaysExpanded = it
+                        }
+                    )
                 }
             }
 
