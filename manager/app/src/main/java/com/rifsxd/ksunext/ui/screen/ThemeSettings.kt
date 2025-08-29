@@ -184,11 +184,10 @@ fun ThemeSettingsScreen(
                     )
                 }
                 
-                StandardCard(
-                    title = "Background"
-                ) {
+                StandardCard {
                     // Background Image Selection
                     CardRowContent(
+                        text = stringResource(R.string.settings_background_image),
                         title = stringResource(R.string.settings_background_image),
                         subtitle = stringResource(R.string.settings_background_image_summary),
                         icon = Icons.Filled.Image,
@@ -199,7 +198,7 @@ fun ThemeSettingsScreen(
                             }
                             selectImageLauncher.launch(intent)
                         },
-                        trailingContent = {
+                        actions = {
                             Row {
                                 // Use the saved background image for buttons
                                 val activeImageUri = backgroundImageUri
