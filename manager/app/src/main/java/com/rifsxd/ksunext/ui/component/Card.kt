@@ -373,6 +373,7 @@ fun CardSliderContent(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     valueDisplay: String? = null,
     enabled: Boolean = true,
+    iconTint: Color = MaterialTheme.colorScheme.primary,
     modifier: Modifier = Modifier,
     onValueChange: (Float) -> Unit
 ) {
@@ -389,7 +390,7 @@ fun CardSliderContent(
                     modifier = Modifier.padding(
                         end = CardConstants.ICON_TO_TEXT_SPACING_SMALL
                     ),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = iconTint
                 )
             }
             

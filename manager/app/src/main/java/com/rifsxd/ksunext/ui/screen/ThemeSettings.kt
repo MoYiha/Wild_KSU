@@ -196,7 +196,6 @@ fun ThemeSettingsScreen(
                     // Background Image Selection
                     CardRowContent(
                         text = stringResource(R.string.settings_background_image),
-                        title = stringResource(R.string.settings_background_image),
                         subtitle = stringResource(R.string.settings_background_image_summary),
                         icon = Icons.Filled.Image,
                         modifier = Modifier.clickable {
@@ -254,6 +253,7 @@ fun ThemeSettingsScreen(
                             value = backgroundTransparency,
                             valueRange = 0.0f..1.0f,
                             valueDisplay = "${(backgroundTransparency * 100).toInt()}%",
+                            iconTint = Color.White,
                             onValueChange = { value ->
                                 backgroundTransparency = value
                                 prefs.edit().putFloat("background_transparency", value).apply()
@@ -270,6 +270,7 @@ fun ThemeSettingsScreen(
                             value = backgroundBlur,
                             valueRange = 0.0f..50.0f,
                             valueDisplay = "${backgroundBlur.toInt()}px",
+                            iconTint = Color.White,
                             onValueChange = { value ->
                                 backgroundBlur = value
                                 prefs.edit().putFloat("background_blur", value).apply()
