@@ -221,6 +221,10 @@
     <string name="use_webuix_eruda_summary">Inject a debug console into WebUI X to make debugging easier. Requires web debugging to be on.</string>
     <string name="customization">Customization</string>
     <string name="developer">Developer</string>
+    <string name="theme_settings">Theme Settings</string>
+    <string name="theme_settings_summary">Customize app appearance and theme options</string>
+    <string name="superuser_settings">Superuser Settings</string>
+    <string name="superuser_settings_summary">Manage superuser access and permissions</string>
     <string name="sucompat_disabled">SUCOMPAT DISABLED</string>
     <string name="zygisk_required">Zygisk required</string>
     <string name="zygisk_status">Zygisk Injection</string>
