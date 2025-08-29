@@ -268,7 +268,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 }
 
                 if (suSFS == "Supported" && isSUS_SU && isOverlayAvailable && useOverlayFs) {
-                    CardItemSpacer()
+                    CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
                 }
 
                 if (isOverlayAvailable && useOverlayFs) {
@@ -297,7 +297,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
                 if (isOverlayAvailable && useOverlayFs) {
                     if (lkmMode) {
-                        CardItemSpacer()
+                        CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
                     }
                 }
                 if (lkmMode) {
@@ -321,7 +321,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     prefs.edit().putBoolean("check_update", it).apply()
                 }
 
-                CardItemSpacer()
+                CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
 
                 val customization = stringResource(id = R.string.customization)
                 CardRowContent(
@@ -334,7 +334,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     )
                 )
 
-                CardItemSpacer()
+                CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
 
                 if (ksuVersion != null) {
                     val backupRestore = stringResource(id = R.string.backup_restore)
@@ -350,7 +350,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 }
 
                 if (ksuVersion != null) {
-                    CardItemSpacer()
+                    CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
                 }
 
                 val developer = stringResource(id = R.string.developer)
@@ -367,7 +367,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 }
 
                 if (ksuVersion != null) {
-                    CardItemSpacer()
+                    CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
                 }
 
                 val exportLogsDialog = rememberCustomDialog { dismiss ->
@@ -422,7 +422,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     )
                 )
 
-                CardItemSpacer()
+                CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
 
                 val about = stringResource(id = R.string.about)
                 CardRowContent(
