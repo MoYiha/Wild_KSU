@@ -8,8 +8,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -52,6 +55,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.CardColumn
+import com.rifsxd.ksunext.ui.component.CardConstants
 import com.rifsxd.ksunext.ui.component.CardRowContent
 import com.rifsxd.ksunext.ui.component.CardType
 import com.rifsxd.ksunext.ui.component.DialogHandle
@@ -155,40 +159,45 @@ fun InstallScreen(navigator: DestinationsNavigator) {
         })
     }
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(CardConstants.CARD_PADDING_MEDIUM),
+        verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_MEDIUM)
     ) {
-        SelectInstallMethod { method ->
-            installMethod = method
+        item {
+            SelectInstallMethod { method ->
+                installMethod = method
+            }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            (lkmSelection as? LkmSelection.LkmUri)?.let {
-                Text(
-                    stringResource(
-                        id = R.string.selected_lkm,
-                        it.uri.lastPathSegment ?: "(file)"
-                    )
-                )
-            }
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                enabled = installMethod != null,
-                onClick = {
-                    onClickNext()
-                },
-                colors = ButtonDefaults.buttonColors(),
-                border = null
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
-                Text(
-                    stringResource(id = R.string.install_next),
-                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
-                )
+                (lkmSelection as? LkmSelection.LkmUri)?.let {
+                    Text(
+                        stringResource(
+                            id = R.string.selected_lkm,
+                            it.uri.lastPathSegment ?: "(file)"
+                        )
+                    )
+                }
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = installMethod != null,
+                    onClick = {
+                        onClickNext()
+                    },
+                    colors = ButtonDefaults.buttonColors(),
+                    border = null
+                ) {
+                    Text(
+                        stringResource(id = R.string.install_next),
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
+                    )
+                }
             }
         }
     }
@@ -279,11 +288,15 @@ private fun SelectInstallMethod(onSelected: (InstallMethod) -> Unit = {}) {
         }
     }
 
-    CardColumn(
-        modifier = Modifier.padding(horizontal = 16.dp)
-    ) {
+    CardColumn {
         radioOptions.forEach { option ->
-            val isSelected = option.javaClass == selectedOption?.javaClass
+            val isSelected = when {
+                option is InstallMethod.SelectFile && selectedOption is InstallMethod.SelectFile -> 
+                    selectedOption.uri != null
+                option is InstallMethod.DirectInstall && selectedOption is InstallMethod.DirectInstall -> true
+                option is InstallMethod.DirectInstallToInactiveSlot && selectedOption is InstallMethod.DirectInstallToInactiveSlot -> true
+                else -> false
+            }
             StandardCard(
                 cardType = if (isSelected) CardType.PRIMARY else CardType.SURFACE,
                 onClick = { onClick(option) },
