@@ -300,7 +300,7 @@ pub fn restore(
     flash: bool,
 ) -> Result<()> {
     let tmpdir = tempfile::Builder::new()
-        .prefix("KernelSU Next")
+        .prefix("Wild KSU")
         .tempdir()
         .context("create temp dir failed")?;
     let workdir = tmpdir.path();
@@ -338,7 +338,7 @@ pub fn restore(
         is_kernelsu_patched
             || is_kernelsu_patched_vendor_init_boot
             || is_kernelsu_patched_vendor_ramdisk,
-        "boot image is not patched by KernelSU Next"
+        "boot image is not patched by Wild KSU"
     );
 
     let mut new_boot = None;
@@ -636,7 +636,7 @@ fn do_patch(
         "Cannot work with Magisk patched image"
     );
 
-    println!("- Adding KernelSU Next LKM");
+    println!("- Adding Wild KSU LKM");
     let is_kernelsu_patched = is_kernelsu_patched(&magiskboot, workdir)?;
     let is_kernelsu_patched_vendor_init_boot =
         is_kernelsu_patched_vendor_init_boot(&magiskboot, workdir)?;

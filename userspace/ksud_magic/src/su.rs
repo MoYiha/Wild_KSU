@@ -42,7 +42,7 @@ pub fn grant_root(_global_mnt: bool) -> Result<()> {
 }
 
 fn print_usage(program: &str, opts: Options) {
-    let brief = format!("KernelSU Next\n\nUsage: {program} [options] [-] [user [argument...]]");
+    let brief = format!("Wild KSU\n\nUsage: {program} [options] [-] [user [argument...]]");
     print!("{}", opts.usage(&brief));
 }
 
