@@ -40,7 +40,7 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
         contentPadding = PaddingValues(CardConstants.CARD_PADDING_MEDIUM),
         verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_PADDING_MEDIUM)
     ) {
-        // Icon Theme Settings Card
+        // App Display Settings Card
         item {
             StandardCard {
                 // Icon Theme Selection
@@ -67,12 +67,9 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                         onDismiss = { showIconThemeManager = false }
                     )
                 }
-            }
-        }
-        
-        // App Display Settings Card
-        item {
-            StandardCard {
+
+                CardItemSpacer()
+
                 // Individual App Cards Setting
                 var useIndividualCards by rememberSaveable {
                     mutableStateOf(
