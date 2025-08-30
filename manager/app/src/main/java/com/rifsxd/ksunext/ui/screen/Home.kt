@@ -25,6 +25,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.rounded.CheckCircleOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.DisposableEffect
@@ -130,28 +132,28 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                 CardItemsColumn {
                     if (ksuVersion != null && rootAvailable()) {
                         if (selectedLayoutType == "MIUIX") {
-                            // MIUIX Layout: Vertical stacking
-                            SuperuserCard(onClick = { 
-                                navigator.navigate(SuperUserScreenDestination) {
-                                    popUpTo(NavGraphs.root) {
-                                        saveState = true
+                            // MIUIX Layout: Tiann's StatusCard design
+                            TiannStatusCard(
+                                ksuVersion = ksuVersion,
+                                onClickSuperuser = {
+                                    navigator.navigate(SuperUserScreenDestination) {
+                                        popUpTo(NavGraphs.root) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            })
-                            
-                            CardItemSpacer()
-                            
-                            ModuleCard(onClick = { 
-                                navigator.navigate(ModuleScreenDestination) {
-                                    popUpTo(NavGraphs.root) {
-                                        saveState = true
+                                },
+                                onClickModule = {
+                                    navigator.navigate(ModuleScreenDestination) {
+                                        popUpTo(NavGraphs.root) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
-                            })
+                            )
                         } else {
                             // STOCK Layout: Side-by-side arrangement
                             CardRow(
@@ -969,6 +971,137 @@ private fun IssueReportCardContent(
                 }
             }
         )
+    }
+}
+
+@Composable
+fun TiannStatusCard(
+    ksuVersion: Int,
+    onClickSuperuser: () -> Unit = {},
+    onClickModule: () -> Unit = {},
+) {
+    val safeMode = when {
+        Natives.isSafeMode -> " [${stringResource(id = R.string.safe_mode)}]"
+        else -> ""
+    }
+    
+    val workingText = "${stringResource(id = R.string.home_working)}$safeMode"
+    
+    CardRow(
+        modifier = Modifier.height(IntrinsicSize.Min)
+    ) {
+        // Main status card (left side)
+        Card(
+            modifier = Modifier
+                .weight(2f)
+                .fillMaxHeight(),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isSystemInDarkTheme()) Color(0xFF1A3825) else Color(0xFFDFFAE4)
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .offset(38.dp, 45.dp),
+                    contentAlignment = Alignment.BottomEnd
+                ) {
+                    Icon(
+                        modifier = Modifier.size(170.dp),
+                        imageVector = Icons.Rounded.CheckCircleOutline,
+                        tint = Color(0xFF36D167),
+                        contentDescription = null
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(all = 16.dp)
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = workingText,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.home_working_version, ksuVersion),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
+        }
+        
+        // Right column with Superuser and Module cards
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                onClick = onClickSuperuser
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.superuser),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = getSuperuserCount().toString(),
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+            
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                onClick = onClickModule
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.module),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 15.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = getModuleCount().toString(),
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        }
     }
 }
 
