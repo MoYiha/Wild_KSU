@@ -308,13 +308,13 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Manager-Normal
+          name: Manager
           path: manager/app/build/outputs/apk/release/*.apk
 
       - name: Upload Mappings
         uses: actions/upload-artifact@v4
         with:
-          name: Mappings-Normal
+          name: Mappings
           path: manager/app/build/outputs/mapping/release/
 
       - name: Send APK to Telegram
