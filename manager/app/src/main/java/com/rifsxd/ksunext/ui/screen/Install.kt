@@ -291,8 +291,10 @@ private fun SelectInstallMethod(onSelected: (InstallMethod) -> Unit = {}) {
     CardColumn {
         radioOptions.forEach { option ->
             val isSelected = when {
-                option is InstallMethod.SelectFile && selectedOption is InstallMethod.SelectFile -> 
-                    selectedOption.uri != null
+                option is InstallMethod.SelectFile && selectedOption is InstallMethod.SelectFile -> {
+                    val selected = selectedOption as InstallMethod.SelectFile
+                    selected.uri != null
+                }
                 option is InstallMethod.DirectInstall && selectedOption is InstallMethod.DirectInstall -> true
                 option is InstallMethod.DirectInstallToInactiveSlot && selectedOption is InstallMethod.DirectInstallToInactiveSlot -> true
                 else -> false
