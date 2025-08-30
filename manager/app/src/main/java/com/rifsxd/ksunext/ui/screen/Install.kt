@@ -6,24 +6,21 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-
+import androidx.compose.material.icons.filled.FileOpen
+import androidx.compose.material.icons.filled.InstallMobile
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 
@@ -54,7 +51,11 @@ import com.ramcosta.composedestinations.generated.destinations.FlashScreenDestin
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.R
+import com.rifsxd.ksunext.ui.component.CardColumn
+import com.rifsxd.ksunext.ui.component.CardRowContent
+import com.rifsxd.ksunext.ui.component.CardType
 import com.rifsxd.ksunext.ui.component.DialogHandle
+import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.util.LkmSelection
@@ -252,7 +253,6 @@ private fun SelectInstallMethod(onSelected: (InstallMethod) -> Unit = {}) {
     val dialogContent = stringResource(id = R.string.install_inactive_slot_warning)
 
     val onClick = { option: InstallMethod ->
-
         when (option) {
             is InstallMethod.SelectFile -> {
                 selectImageLauncher.launch(Intent(Intent.ACTION_GET_CONTENT).apply {
@@ -271,48 +271,29 @@ private fun SelectInstallMethod(onSelected: (InstallMethod) -> Unit = {}) {
         }
     }
 
-    Column {
+    val getIconForOption = { option: InstallMethod ->
+        when (option) {
+            is InstallMethod.SelectFile -> Icons.Filled.FileOpen
+            is InstallMethod.DirectInstall -> Icons.Filled.InstallMobile
+            is InstallMethod.DirectInstallToInactiveSlot -> Icons.Filled.Update
+        }
+    }
+
+    CardColumn(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
         radioOptions.forEach { option ->
-            val interactionSource = remember { MutableInteractionSource() }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .toggleable(
-                        value = option.javaClass == selectedOption?.javaClass,
-                        onValueChange = {
-                            onClick(option)
-                        },
-                        role = Role.RadioButton,
-                        indication = LocalIndication.current,
-                        interactionSource = interactionSource
-                    )
+            val isSelected = option.javaClass == selectedOption?.javaClass
+            StandardCard(
+                cardType = if (isSelected) CardType.PRIMARY else CardType.SURFACE,
+                onClick = { onClick(option) },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                RadioButton(
-                    selected = option.javaClass == selectedOption?.javaClass,
-                    onClick = {
-                        onClick(option)
-                    },
-                    interactionSource = interactionSource
+                CardRowContent(
+                    text = stringResource(id = option.label),
+                    subtitle = option.summary,
+                    icon = getIconForOption(option)
                 )
-                Column(
-                    modifier = Modifier.padding(vertical = 12.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = option.label),
-                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                        fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
-                        fontStyle = MaterialTheme.typography.titleMedium.fontStyle
-                    )
-                    option.summary?.let {
-                        Text(
-                            text = it,
-                            fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                            fontFamily = MaterialTheme.typography.bodySmall.fontFamily,
-                            fontStyle = MaterialTheme.typography.bodySmall.fontStyle
-                        )
-                    }
-                }
             }
         }
     }
