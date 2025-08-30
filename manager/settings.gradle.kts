@@ -17,5 +17,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Wild KSU"
+rootProject.name = "Wild-KSU"
 include(":app")
