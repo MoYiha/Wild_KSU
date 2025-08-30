@@ -537,7 +537,7 @@ fn do_patch(
     }
 
     let tmpdir = tempfile::Builder::new()
-        .prefix("KernelSU Next")
+        .prefix("Wild KSU")
         .tempdir()
         .context("create temp dir failed")?;
     let workdir = tmpdir.path();
