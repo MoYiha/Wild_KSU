@@ -8,7 +8,7 @@
   <string name="issue_report_github_link">https://github.com/KernelSU-Next/KernelSU-Next/issues</string>
   <string name="issue_report_telegram_link">https://t.me/ksunext</string>
   <string name="confirm">确认</string>
-  <string name="app_name">KernelSU Next</string>
+  <string name="app_name">Wild KSU</string>
   <string name="home">首页</string>
   <string name="home_not_installed">未安装</string>
   <string name="home_click_to_install">点击安装</string>
@@ -17,8 +17,8 @@
   <string name="home_working">工作中</string>
   <string name="home_working_version">版本: %d</string>
   <string name="home_module_update_count">%d 个模块可更新！</string>
-  <string name="home_failure">无法在内核中找到 KernelSU Next v2 签名！[ !KSU_NEXT || != size/hash ]</string>
-  <string name="home_failure_tip">请让你的内核开发人员集成 KernelSU Next！</string>
+  <string name="home_failure">无法在内核中找到 Wild KSU v2 签名！[ !KSU_NEXT || != size/hash ]</string>
+  <string name="home_failure_tip">请让你的内核开发人员集成 Wild KSU！</string>
   <string name="home_kernel">内核版本</string>
   <string name="hook_mode">Hook 模式</string>
   <string name="enable">启用</string>
@@ -87,7 +87,7 @@
   <string name="home_overlayfs_mount">OverlayFS</string>
   <string name="unavailable">不可用</string>
   <string name="use_overlay_fs">使用 OverlayFS</string>
-  <string name="use_overlay_fs_summary">使用 OverlayFS 而非 Magic Mount 作为 KernelSU Next 的挂载系统。</string>
+  <string name="use_overlay_fs_summary">使用 OverlayFS 而非 Magic Mount 作为 Wild KSU 的挂载系统。</string>
   <string name="reboot_required">需要重启</string>
   <string name="reboot_message">更改将在系统重启后生效。现在重启？</string>
   <string name="module_restore">恢复模块</string>
@@ -109,7 +109,7 @@
   <string name="home_next_kernelsu_body">下一个实验性分支。请在 GitHub 上查看！</string>
   <string name="home_experimental_kernelsu">⚠️ 实验性开发警告！</string>
   <string name="home_experimental_kernelsu_repo">127.0.0.1</string>
-  <string name="home_experimental_kernelsu_body">KernelSU Next 是一个非官方版本，一直处于积极的实验开发阶段。它按原样提供，不保证稳定性、性能或可靠性。</string>
+  <string name="home_experimental_kernelsu_body">Wild KSU 是一个非官方版本，一直处于积极的实验开发阶段。它按原样提供，不保证稳定性、性能或可靠性。</string>
   <string name="home_experimental_kernelsu_body_point_1"> • 风险自担：可能会出现崩溃、意外行为或导致系统故障。</string>
   <string name="home_experimental_kernelsu_body_point_2"> • 不做保证：开发者不对数据丢失、系统损坏等问题负责。</string>
   <string name="home_experimental_kernelsu_body_point_3"> • 仅供测试：此版适合了解风险并能轻松解决问题的用户。</string>
