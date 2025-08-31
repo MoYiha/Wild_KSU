@@ -184,6 +184,13 @@ private fun AppItem(
                     }
                 }
             } else null,
+            colors = if (useIndividualCards) {
+                ListItemDefaults.colors(
+                    containerColor = Color.Transparent
+                )
+            } else {
+                ListItemDefaults.colors()
+            }
         )
     }
     
@@ -194,7 +201,9 @@ private fun AppItem(
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             cardType = CardType.SURFACE
         ) {
-            content()
+            Box(modifier = Modifier.padding(horizontal = 0.dp)) {
+                content()
+            }
         }
     } else {
         content()
