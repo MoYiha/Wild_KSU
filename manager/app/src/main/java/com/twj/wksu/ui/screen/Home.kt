@@ -109,7 +109,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
         verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING)
     ) {
         // Only show StatusCard in STOCK layout, not in MIUIX layouts
-        if (selectedLayoutType != "MIUIX" && selectedLayoutType != "MIUIX_NORMAL") {
+        if (selectedLayoutType != "MIUIX") {
             item {
                 val lkmMode = ksuVersion?.let {
                     if (it >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && kernelVersion.isGKI()) Natives.isLkmMode else null
@@ -135,7 +135,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             item {
                 CardItemsColumn {
                     if (ksuVersion != null && rootAvailable()) {
-                        if (selectedLayoutType == "MIUIX" || selectedLayoutType == "MIUIX_NORMAL") {
+                        if (selectedLayoutType == "MIUIX") {
                             // MIUIX Layout: Custom StatusCard design
                             val lkmMode = ksuVersion.let {
                                 if (it >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && kernelVersion.isGKI()) Natives.isLkmMode else null
@@ -144,7 +144,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                                 ksuVersion = ksuVersion,
                                 kernelVersion = kernelVersion,
                                 lkmMode = lkmMode,
-                                useNormalColors = selectedLayoutType == "MIUIX_NORMAL",
+
                                 onClickSuperuser = {
                                     navigator.navigate(SuperUserScreenDestination) {
                                         popUpTo(NavGraphs.root) {
@@ -989,7 +989,6 @@ fun MiuixStatusCard(
     ksuVersion: Int,
     kernelVersion: KernelVersion,
     lkmMode: Boolean?,
-    useNormalColors: Boolean = false,
     onClickSuperuser: () -> Unit = {},
     onClickModule: () -> Unit = {},
 ) {
@@ -1018,11 +1017,7 @@ fun MiuixStatusCard(
                 .weight(2f)
                 .fillMaxHeight(),
             colors = CardDefaults.cardColors(
-                containerColor = if (useNormalColors) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    if (isSystemInDarkTheme()) Color(0xFF1A3825) else Color(0xFFDFFAE4)
-                }
+                containerColor = MaterialTheme.colorScheme.primaryContainer
             )
         ) {
             Box(
