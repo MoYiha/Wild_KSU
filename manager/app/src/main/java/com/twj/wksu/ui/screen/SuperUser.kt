@@ -83,7 +83,9 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = if (useIndividualCards) PaddingValues(16.dp) else PaddingValues(0.dp),
+            verticalArrangement = if (useIndividualCards) Arrangement.spacedBy(8.dp) else Arrangement.Top
         ) {
             items(viewModel.appList, key = { it.packageName + it.uid }) { app ->
                 AppItem(app, prefs, useIndividualCards) {
@@ -196,9 +198,7 @@ private fun AppItem(
     
     if (useIndividualCards) {
         StandardCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
             cardType = CardType.SURFACE
         ) {
             content()
