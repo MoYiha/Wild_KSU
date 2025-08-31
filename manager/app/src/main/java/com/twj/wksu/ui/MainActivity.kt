@@ -128,6 +128,7 @@ import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
 import com.twj.wksu.Natives
 import com.twj.wksu.ksuApp
 import com.twj.wksu.R
+import com.twj.wksu.getKernelVersion
 import com.twj.wksu.ui.screen.BottomBarDestination
 import com.twj.wksu.ui.theme.KernelSUTheme
 import com.twj.wksu.ui.component.BackgroundImageWrapper
@@ -1295,17 +1296,20 @@ fun RegularTopBar(
             
             // Show LKM and restart icons only on home screen
             if (isHomeScreen) {
-                // Bake LKM icon
-                IconButton(
-                    onClick = {
-                        // Navigate to Install screen for LKM selection and options
-                        navigator.navigate(InstallScreenDestination)
+                // Bake LKM icon - only show on GKI2 devices (5.10+ kernels)
+                val kernelVersion = getKernelVersion()
+                if (kernelVersion.isGKI()) {
+                    IconButton(
+                        onClick = {
+                            // Navigate to Install screen for LKM selection and options
+                            navigator.navigate(InstallScreenDestination)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Archive,
+                            contentDescription = "Bake LKM"
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Archive,
-                        contentDescription = "Bake LKM"
-                    )
                 }
                 
                 // Restart icon with dropdown menu
