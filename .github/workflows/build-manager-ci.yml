@@ -122,8 +122,8 @@ jobs:
           key: ${{ needs.check-cache.outputs.cache-key }}
 
   build-manager:
-    needs: [check-cache, build-ksud]
-    if: always() && needs.check-cache.result == 'success' && (needs.check-cache.outputs.cache-hit == 'true' || needs.build-ksud.result == 'success')
+    needs: [check-cache, cache-artifacts]
+    if: always() && needs.check-cache.result == 'success' && (needs.check-cache.outputs.cache-hit == 'true' || needs.cache-artifacts.result == 'success')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -169,17 +169,6 @@ jobs:
       - name: Restore cached artifacts
         if: needs.check-cache.outputs.cache-hit == 'true'
         uses: actions/cache/restore@v4
-        with:
-          path: |
-            cached-artifacts/susfsd
-            cached-artifacts/ksud_overlayfs
-            cached-artifacts/ksud_magic
-          key: ${{ needs.check-cache.outputs.cache-key }}
-
-      # Force update cache by re-saving restored artifacts
-      - name: Force update cache with restored artifacts
-        if: needs.check-cache.outputs.cache-hit == 'true'
-        uses: actions/cache/save@v4
         with:
           path: |
             cached-artifacts/susfsd
@@ -247,26 +236,26 @@ jobs:
           
           if [ "${{ needs.check-cache.outputs.cache-hit }}" == "true" ]; then
             # Copy from cached artifacts
-            cp -f ../cached-artifacts/susfsd/arm64-v8a/susfsd ../manager/app/src/main/jniLibs/arm64-v8a/libsusfsd.so
-            cp -f ../cached-artifacts/susfsd/armeabi-v7a/susfsd ../manager/app/src/main/jniLibs/armeabi-v7a/libsusfsd.so
-            cp -f ../cached-artifacts/susfsd/x86_64/susfsd ../manager/app/src/main/jniLibs/x86_64/libsusfsd.so
-            cp -f ../cached-artifacts/ksud_overlayfs/aarch64-linux-android/release/ksud ../manager/app/src/main/jniLibs/arm64-v8a/libksud_overlayfs.so
-            cp -f ../cached-artifacts/ksud_overlayfs/armv7-linux-androideabi/release/ksud ../manager/app/src/main/jniLibs/armeabi-v7a/libksud_overlayfs.so
-            cp -f ../cached-artifacts/ksud_overlayfs/x86_64-linux-android/release/ksud ../manager/app/src/main/jniLibs/x86_64/libksud_overlayfs.so
-            cp -f ../cached-artifacts/ksud_magic/aarch64-linux-android/release/ksud ../manager/app/src/main/jniLibs/arm64-v8a/libksud_magic.so
-            cp -f ../cached-artifacts/ksud_magic/armv7-linux-androideabi/release/ksud ../manager/app/src/main/jniLibs/armeabi-v7a/libksud_magic.so
-            cp -f ../cached-artifacts/ksud_magic/x86_64-linux-android/release/ksud ../manager/app/src/main/jniLibs/x86_64/libksud_magic.so
+            cp -f ../cached-artifacts/susfsd/arm64-v8a/susfsd app/src/main/jniLibs/arm64-v8a/libsusfsd.so
+            cp -f ../cached-artifacts/susfsd/armeabi-v7a/susfsd app/src/main/jniLibs/armeabi-v7a/libsusfsd.so
+            cp -f ../cached-artifacts/susfsd/x86_64/susfsd app/src/main/jniLibs/x86_64/libsusfsd.so
+            cp -f ../cached-artifacts/ksud_overlayfs/aarch64-linux-android/release/ksud app/src/main/jniLibs/arm64-v8a/libksud_overlayfs.so
+            cp -f ../cached-artifacts/ksud_overlayfs/armv7-linux-androideabi/release/ksud app/src/main/jniLibs/armeabi-v7a/libksud_overlayfs.so
+            cp -f ../cached-artifacts/ksud_overlayfs/x86_64-linux-android/release/ksud app/src/main/jniLibs/x86_64/libksud_overlayfs.so
+            cp -f ../cached-artifacts/ksud_magic/aarch64-linux-android/release/ksud app/src/main/jniLibs/arm64-v8a/libksud_magic.so
+            cp -f ../cached-artifacts/ksud_magic/armv7-linux-androideabi/release/ksud app/src/main/jniLibs/armeabi-v7a/libksud_magic.so
+            cp -f ../cached-artifacts/ksud_magic/x86_64-linux-android/release/ksud app/src/main/jniLibs/x86_64/libksud_magic.so
           else
             # Copy from fresh artifacts
-            cp -f ../arm64-v8a/susfsd ../manager/app/src/main/jniLibs/arm64-v8a/libsusfsd.so
-            cp -f ../armeabi-v7a/susfsd ../manager/app/src/main/jniLibs/armeabi-v7a/libsusfsd.so
-            cp -f ../x86_64/susfsd ../manager/app/src/main/jniLibs/x86_64/libsusfsd.so
-            cp -f ../ksud_overlayfs/aarch64-linux-android/release/ksud ../manager/app/src/main/jniLibs/arm64-v8a/libksud_overlayfs.so
-            cp -f ../ksud_overlayfs/armv7-linux-androideabi/release/ksud ../manager/app/src/main/jniLibs/armeabi-v7a/libksud_overlayfs.so
-            cp -f ../ksud_overlayfs/x86_64-linux-android/release/ksud ../manager/app/src/main/jniLibs/x86_64/libksud_overlayfs.so
-            cp -f ../ksud_magic/aarch64-linux-android/release/ksud ../manager/app/src/main/jniLibs/arm64-v8a/libksud_magic.so
-            cp -f ../ksud_magic/armv7-linux-androideabi/release/ksud ../manager/app/src/main/jniLibs/armeabi-v7a/libksud_magic.so
-            cp -f ../ksud_magic/x86_64-linux-android/release/ksud ../manager/app/src/main/jniLibs/x86_64/libksud_magic.so
+            cp -f ../arm64-v8a/susfsd app/src/main/jniLibs/arm64-v8a/libsusfsd.so
+            cp -f ../armeabi-v7a/susfsd app/src/main/jniLibs/armeabi-v7a/libsusfsd.so
+            cp -f ../x86_64/susfsd app/src/main/jniLibs/x86_64/libsusfsd.so
+            cp -f ../ksud_overlayfs/aarch64-linux-android/release/ksud app/src/main/jniLibs/arm64-v8a/libksud_overlayfs.so
+            cp -f ../ksud_overlayfs/armv7-linux-androideabi/release/ksud app/src/main/jniLibs/armeabi-v7a/libksud_overlayfs.so
+            cp -f ../ksud_overlayfs/x86_64-linux-android/release/ksud app/src/main/jniLibs/x86_64/libksud_overlayfs.so
+            cp -f ../ksud_magic/aarch64-linux-android/release/ksud app/src/main/jniLibs/arm64-v8a/libksud_magic.so
+            cp -f ../ksud_magic/armv7-linux-androideabi/release/ksud app/src/main/jniLibs/armeabi-v7a/libksud_magic.so
+            cp -f ../ksud_magic/x86_64-linux-android/release/ksud app/src/main/jniLibs/x86_64/libksud_magic.so
           fi
 
       - name: Build with Gradle
