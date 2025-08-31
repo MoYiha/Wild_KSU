@@ -68,6 +68,7 @@ import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Power
 import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -532,9 +533,13 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val showBottomBar = when (currentDestination?.route) {
-                    FlashScreenDestination.route -> false // Hide for FlashScreenDestination
-                    ExecuteModuleActionScreenDestination.route -> false // Hide for ExecuteModuleActionScreen
+                // Check if bottom bar is disabled in theme settings
+                val hideBottomBar = prefs.getBoolean("hide_bottom_bar", false)
+                
+                val showBottomBar = when {
+                    hideBottomBar -> false // Hide if disabled in theme settings
+                    currentDestination?.route == FlashScreenDestination.route -> false // Hide for FlashScreenDestination
+                    currentDestination?.route == ExecuteModuleActionScreenDestination.route -> false // Hide for ExecuteModuleActionScreen
                     else -> true
                 }
 
@@ -1157,6 +1162,21 @@ fun RegularTopBar(
             }
         },
         actions = {
+            // Show settings icon when bottom bar is hidden
+            val hideBottomBar = prefs.getBoolean("hide_bottom_bar", false)
+            if (hideBottomBar && currentDestination?.route == HomeScreenDestination.route) {
+                IconButton(
+                    onClick = {
+                        navigator.navigate(SettingScreenDestination)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Settings"
+                    )
+                }
+            }
+            
             // Show reset button for HomeSettings screen
             if (currentDestination?.route == HomeSettingsScreenDestination.route) {
                 var showHomeSettingsResetDialog by remember { mutableStateOf(false) }

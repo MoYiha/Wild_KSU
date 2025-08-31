@@ -90,6 +90,11 @@ fun ThemeSettingsScreen(
         mutableStateOf(prefs.getString("background_image_uri", null))
     }
     
+    // Bottom bar toggle state
+    var hideBottomBar by rememberSaveable {
+        mutableStateOf(prefs.getBoolean("hide_bottom_bar", false))
+    }
+    
     // Sync state with actual saved preferences when returning from other screens
     LaunchedEffect(Unit) {
         // Update backgroundImageUri from SharedPreferences
@@ -164,6 +169,30 @@ fun ThemeSettingsScreen(
                     subtitle = "Current: $currentThemeDisplay",
                     modifier = Modifier.clickable {
                         themeDialog.show()
+                    }
+                )
+            }
+        }
+        
+        // Navigation Section
+        item {
+            StandardCard {
+                Text(
+                    text = "Navigation",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                CardItemSpacer()
+                
+                CardSwitchContent(
+                    title = "Hide Bottom Bar",
+                    subtitle = "Move settings icon to top bar and hide bottom navigation",
+                    icon = Icons.Filled.ViewAgenda,
+                    checked = hideBottomBar,
+                    onCheckedChange = { enabled ->
+                        hideBottomBar = enabled
+                        prefs.edit().putBoolean("hide_bottom_bar", enabled).commit()
                     }
                 )
             }
