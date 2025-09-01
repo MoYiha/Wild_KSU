@@ -1008,14 +1008,17 @@ fun MiuixStatusCard(
     
     val workingText = "${stringResource(id = R.string.home_working)}$safeMode"
     
-    CardRow(
-        modifier = Modifier.height(IntrinsicSize.Min)
+    // Square cards layout with centered spacing
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Main status card (left side)
+        // Main status card (full width, square aspect ratio)
         Card(
             modifier = Modifier
-                .weight(2f)
-                .fillMaxHeight(),
+                .fillMaxWidth()
+                .aspectRatio(2.5f), // Wide rectangle for main status
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             )
@@ -1030,7 +1033,7 @@ fun MiuixStatusCard(
                     contentAlignment = Alignment.BottomEnd
                 ) {
                     Icon(
-                        modifier = Modifier.size(170.dp),
+                        modifier = Modifier.size(120.dp), // Reduced size for better proportion
                         imageVector = Icons.Rounded.CheckCircleOutline,
                         tint = Color(0xFF36D167),
                         contentDescription = null
@@ -1083,34 +1086,32 @@ fun MiuixStatusCard(
             }
         }
         
-        // Right column with Superuser and Module cards
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        // Square cards row for Superuser and Module
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING, Alignment.CenterHorizontally)
         ) {
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .weight(1f)
+                    .aspectRatio(1f), // Perfect square
                 onClick = onClickSuperuser
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(16.dp),
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
                         text = stringResource(R.string.superuser),
                         fontWeight = FontWeight.Medium,
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    Spacer(Modifier.height(8.dp))
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
                         text = getSuperuserCount().toString(),
                         fontSize = 26.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -1121,25 +1122,25 @@ fun MiuixStatusCard(
             
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .weight(1f)
+                    .aspectRatio(1f), // Perfect square
                 onClick = onClickModule
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(16.dp),
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
                         text = stringResource(R.string.module),
                         fontWeight = FontWeight.Medium,
                         fontSize = 15.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    Spacer(Modifier.height(8.dp))
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
                         text = getModuleCount().toString(),
                         fontSize = 26.sp,
                         fontWeight = FontWeight.SemiBold,
