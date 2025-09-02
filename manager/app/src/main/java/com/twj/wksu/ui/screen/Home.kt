@@ -1045,11 +1045,11 @@ fun MiuixStatusCard(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .offset(15.dp, 20.dp),
+                            .offset(10.dp, 15.dp),
                         contentAlignment = Alignment.BottomEnd
                     ) {
                         Icon(
-                            modifier = Modifier.size(70.dp),
+                            modifier = Modifier.size(90.dp),
                             imageVector = Icons.Rounded.CheckCircleOutline,
                             tint = Color(0xFF36D167),
                             contentDescription = null
