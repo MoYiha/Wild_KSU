@@ -109,7 +109,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
         verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING)
     ) {
         // Only show StatusCard in STOCK layout, not in MIUIX layouts
-        if (selectedLayoutType != "MIUIX") {
+        if (selectedLayoutType == "STOCK") {
             item {
                 val lkmMode = ksuVersion?.let {
                     if (it >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && kernelVersion.isGKI()) Natives.isLkmMode else null
@@ -135,7 +135,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             item {
                 CardItemsColumn {
                     if (ksuVersion != null && rootAvailable()) {
-                        if (selectedLayoutType == "MIUIX_SQUARE" || selectedLayoutType == "MIUIX_RECTANGLE" || selectedLayoutType == "MIUIX") {
+                        if (selectedLayoutType == "MIUIX_SQUARE" || selectedLayoutType == "MIUIX_RECTANGLE") {
                             // MIUIX Layout: Custom StatusCard design
                             val lkmMode = ksuVersion.let {
                                 if (it >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && kernelVersion.isGKI()) Natives.isLkmMode else null
@@ -1012,8 +1012,8 @@ fun MiuixStatusCard(
     
     // Calculate weights based on layout mode
     val (mainCardWeight, sideCardWeight) = when (layoutMode) {
-        "MIUIX_RECTANGLE" -> 0.75f to 0.25f  // 75% main card, 25% side cards
-        else -> 0.5f to 0.5f  // 50% each (square mode)
+        "MIUIX_RECTANGLE" -> 0.6f to 0.4f  // 60% main card, 40% side cards
+        else -> 0.6f to 0.4f  // 60% main card, 40% side cards for both modes
     }
     
     // Horizontal layout: Main card on left, two smaller cards on right, both sides centered
@@ -1114,7 +1114,7 @@ fun MiuixStatusCard(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f), // Keep square aspect ratio but scale to available width
+                        .height(80.dp), // Fixed height, let width scale naturally
                     onClick = onClickSuperuser
                 ) {
                     Column(
@@ -1145,7 +1145,7 @@ fun MiuixStatusCard(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f), // Keep square aspect ratio but scale to available width
+                        .height(80.dp), // Fixed height, let width scale naturally
                     onClick = onClickModule
                 ) {
                     Column(
