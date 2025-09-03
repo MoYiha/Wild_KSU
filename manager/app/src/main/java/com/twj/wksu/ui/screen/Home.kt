@@ -1012,107 +1012,100 @@ fun MiuixStatusCard(
     
     val workingText = "${stringResource(id = R.string.home_working)}$safeMode"
     
-    // Calculate weights - always 50/50 for proper square layout
-    val (mainCardWeight, sideCardWeight) = 0.5f to 0.5f
-    
-    // Calculate square height based on available width using density-independent measurements
+    // Calculate available space and make left card square, right cards fill remaining space
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     
-    // Use density-independent calculation to ensure perfect square regardless of DPI
-    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
-    val cardSpacingPx = with(density) { (CardConstants.CARD_SPACING * 3).toPx() }
-    val availableWidthPx = screenWidthPx - cardSpacingPx
-    val squareSizePx = (availableWidthPx * 0.5f) - with(density) { (CardConstants.CARD_SPACING * 0.5f).toPx() }
-    val squareSize = with(density) { squareSizePx.toDp() }
+    // Calculate total available width minus spacing
+    val totalAvailableWidth = configuration.screenWidthDp.dp - (CardConstants.CARD_SPACING * 3)
+    
+    // Left card should be square - use height as the limiting factor for a perfect square
+    val squareSize = totalAvailableWidth * 0.45f // Reserve 45% for square card
+    val remainingWidth = totalAvailableWidth - squareSize - CardConstants.CARD_SPACING
+    
+    // Calculate heights for right side cards
     val halfCardHeight = (squareSize - CardConstants.CARD_SPACING) / 2
     
-    // Horizontal layout: Square card on left, two half-height cards on right
+    // Horizontal layout: Perfect square card on left, right cards fill remaining space
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING),
         verticalAlignment = Alignment.Top
     ) {
         // Main status card - perfect square
-        Box(
-            modifier = Modifier.weight(mainCardWeight),
-            contentAlignment = Alignment.TopCenter
+        Card(
+            modifier = Modifier
+                .size(squareSize), // Perfect square with fixed size
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f), // Perfect square - width equals height
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .offset(10.dp, 15.dp),
+                    contentAlignment = Alignment.BottomEnd
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset(10.dp, 15.dp),
-                        contentAlignment = Alignment.BottomEnd
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(90.dp),
-                            imageVector = Icons.Rounded.CheckCircleOutline,
-                            tint = Color(0xFF36D167),
-                            contentDescription = null
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(all = 16.dp)
-                    ) {
-                        val labelStyle = LabelItemDefaults.style
-                        TextRow(
-                            trailingContent = {
-                                LabelItem(
-                                    icon = if (Natives.isSafeMode) {
-                                        {
-                                            Icon(
-                                                tint = labelStyle.contentColor,
-                                                imageVector = Icons.Filled.Security,
-                                                contentDescription = null
-                                            )
-                                        }
-                                    } else {
-                                        null
-                                    },
-                                    text = {
-                                        Text(
-                                            text = workingMode,
-                                            style = labelStyle.textStyle.copy(color = labelStyle.contentColor),
+                    Icon(
+                        modifier = Modifier.size(90.dp),
+                        imageVector = Icons.Rounded.CheckCircleOutline,
+                        tint = Color(0xFF36D167),
+                        contentDescription = null
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(all = 16.dp)
+                ) {
+                    val labelStyle = LabelItemDefaults.style
+                    TextRow(
+                        trailingContent = {
+                            LabelItem(
+                                icon = if (Natives.isSafeMode) {
+                                    {
+                                        Icon(
+                                            tint = labelStyle.contentColor,
+                                            imageVector = Icons.Filled.Security,
+                                            contentDescription = null
                                         )
                                     }
-                                )
-                            }
-                        ) {
-                            Text(
-                                text = workingText,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
+                                } else {
+                                    null
+                                },
+                                text = {
+                                    Text(
+                                        text = workingMode,
+                                        style = labelStyle.textStyle.copy(color = labelStyle.contentColor),
+                                    )
+                                }
                             )
                         }
-                        Spacer(Modifier.height(4.dp))
+                    ) {
                         Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = stringResource(R.string.home_working_version, ksuVersion),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
+                            text = workingText,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.home_working_version, ksuVersion),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
                 }
             }
         }
         
-        // Right side: Two smaller cards stacked vertically - responsive to available space
-        Box(
-            modifier = Modifier.weight(sideCardWeight),
-            contentAlignment = Alignment.TopCenter
+        // Right side: Two cards stacked vertically that fill remaining space
+        Column(
+            modifier = Modifier.width(remainingWidth),
+            verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING),
