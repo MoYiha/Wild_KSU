@@ -351,7 +351,7 @@ jobs:
             curl -F "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
                  -F "document=@${SPOOFED_APK}" \
                  -F "caption=${CAPTION}" \
-                 -F "message_thread_id=${{ secrets.TELEGRAM_TOPIC_ID }}" \
+                 -F "message_thread_id=${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
                  "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument"
           else
             echo "❌ Spoofed APK file not found!"
