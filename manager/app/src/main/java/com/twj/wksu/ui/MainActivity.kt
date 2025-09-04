@@ -790,7 +790,6 @@ private fun UnifiedTopBar(
             PhotoEditorTopBar(
                 navigator = navigator,
                 onSave = { photoEditorSaveCallback?.invoke() ?: run {} },
-                onReset = { photoEditorResetCallback?.invoke() ?: run {} },
                 screenRotationLocked = photoEditorScreenRotationLocked,
                 onScreenRotationToggle = { photoEditorScreenRotationCallback?.invoke() ?: run {} },
                 modifier = modifier
@@ -1070,7 +1069,6 @@ private fun SettingsTopBar(
 fun PhotoEditorTopBar(
     navigator: DestinationsNavigator,
     onSave: () -> Unit = {},
-    onReset: () -> Unit = {},
     screenRotationLocked: Boolean = false,
     onScreenRotationToggle: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -1237,142 +1235,7 @@ fun RegularTopBar(
                 }
             }
             
-            // Show reset button for HomeSettings screen
-            if (currentDestination?.route == HomeSettingsScreenDestination.route) {
-                var showHomeSettingsResetDialog by remember { mutableStateOf(false) }
-                
-                IconButton(
-                    onClick = {
-                        showHomeSettingsResetDialog = true
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = "Reset info card settings"
-                    )
-                }
-                
-                // Confirmation dialog for home settings reset
-                HomeSettingsResetDialog(
-                    showDialog = showHomeSettingsResetDialog,
-                    onDismissRequest = { showHomeSettingsResetDialog = false },
-                    onConfirm = {
-                        showHomeSettingsResetDialog = false
-                        // Reset all InfoCard settings to default
-                        val editor = prefs.edit()
-                        // Reset home icon to seasonal
-                        editor.putString("selected_icon_type", "SEASONAL")
-                        // Enable help card
-                        editor.putBoolean("show_help_card", true)
-                        // Set always expanded to off (false)
-                        editor.putBoolean("info_card_always_expanded", false)
-                        // Reset all info card items to enabled
-                        editor.putBoolean("info_card_show_manager_version", true)
-                        editor.putBoolean("info_card_show_hook_mode", true)
-                        editor.putBoolean("info_card_show_mount_system", true)
-                        editor.putBoolean("info_card_show_susfs_status", true)
-                        editor.putBoolean("info_card_show_zygisk_status", true)
-                        editor.putBoolean("info_card_show_kernel_version", true)
-                        editor.putBoolean("info_card_show_android_version", true)
-                        editor.putBoolean("info_card_show_abi", true)
-                        editor.putBoolean("info_card_show_selinux_status", true)
-                        // Reset to default order
-                        editor.remove("info_card_items_order")
-                        editor.apply()
 
-                        // Navigate back and forward to refresh the screen
-                        navigator.navigateUp()
-                        navigator.navigate(HomeSettingsScreenDestination)
-                    },
-                    prefs = prefs,
-                    navigator = navigator,
-                    context = context
-                )
-            }
-            
-            // Show reset button for ThemeSettings screen
-            if (currentDestination?.route == ThemeSettingsScreenDestination.route) {
-                var showThemeResetDialog by remember { mutableStateOf(false) }
-                
-                IconButton(
-                    onClick = {
-                        showThemeResetDialog = true
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = "Reset theme settings"
-                    )
-                }
-                
-                // Confirmation dialog for theme reset
-                CustomizationResetDialog(
-                    showDialog = showThemeResetDialog,
-                    onDismissRequest = { showThemeResetDialog = false },
-                    onConfirm = {
-                        showThemeResetDialog = false
-                        // Reset all theme settings to default
-                        val editor = prefs.edit()
-                        editor.putString("theme_mode", "system_default")
-                        // Clear background completely
-                        BackgroundCustomization.deleteInternalBackgroundImage(context)
-                        editor.remove("background_image_uri")
-                        editor.remove("background_image_path")
-                        // Set blur and transparency to zero
-                        editor.putFloat("background_blur", 0.0f)
-                        editor.putFloat("ui_transparency", 0.0f)
-                        editor.putFloat("background_transparency", 0.0f)
-                        // Reset DPI to actual system DPI value
-                        val systemDpi = context.resources.displayMetrics.densityDpi
-                        editor.putInt("app_dpi", systemDpi)
-                        editor.apply()
-
-                        // Force activity recreation to apply DPI changes immediately
-                        (context as? ComponentActivity)?.recreate()
-                    },
-                    prefs = prefs,
-                    context = context
-                )
-            }
-            
-
-            
-            // Show reset button for ModuleSettings screen
-            if (currentDestination?.route == ModuleSettingsScreenDestination.route) {
-                var showModuleResetDialog by remember { mutableStateOf(false) }
-                
-                IconButton(
-                    onClick = {
-                        showModuleResetDialog = true
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = "Reset module settings"
-                    )
-                }
-                
-                // Confirmation dialog for module settings reset
-                ModuleSettingsResetDialog(
-                    showDialog = showModuleResetDialog,
-                    onDismissRequest = { showModuleResetDialog = false },
-                    onConfirm = {
-                        showModuleResetDialog = false
-                        // Reset all module settings to default
-                        val editor = prefs.edit()
-                        editor.putBoolean("keep_modules_expanded", false)
-                        editor.putBoolean("use_banner", true)
-                        editor.putBoolean("hide_module_details", false)
-                        editor.apply()
-
-                        // Navigate back and forward to refresh the screen
-                        navigator.navigateUp()
-                        navigator.navigate(ModuleSettingsScreenDestination)
-                    },
-                    prefs = prefs,
-                    navigator = navigator
-                )
-            }
             
             // Show LKM and restart icons only on home screen
             if (isHomeScreen) {
