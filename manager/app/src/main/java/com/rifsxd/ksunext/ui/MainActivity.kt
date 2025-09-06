@@ -406,6 +406,10 @@ class MainActivity : ComponentActivity() {
                 BackHandler {
                     val currentRoute = currentDestination?.route
                     when (currentRoute) {
+                        // Home screen - exit the app
+                        HomeScreenDestination.route -> {
+                            finish()
+                        }
                         // Main screens - navigate to home
                         SuperUserScreenDestination.route,
                         ModuleScreenDestination.route,
