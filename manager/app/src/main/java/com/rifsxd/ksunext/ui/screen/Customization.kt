@@ -78,11 +78,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         // Add system default first
                         locales.add(java.util.Locale.ROOT) // This will represent "System Default"
                         
-                        // Dynamically detect available locales by checking resource directories
+                        // Only English is supported now
                         val resourceDirs = listOf(
-                            "ar", "bg", "de", "fa", "fr", "hu", "in", "it", 
-                            "ja", "ko", "pl", "pt-rBR", "ru", "th", "tr", 
-                            "uk", "vi", "zh-rCN", "zh-rTW"
+                            "en"
                         )
                         
                         resourceDirs.forEach { dir ->
