@@ -72,7 +72,7 @@ object CustomBackup {
             backupFile.parentFile?.mkdirs()
             
             val metadata = BackupMetadata(
-                appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName,
+                appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknown",
                 includesModules = includeModules,
                 includesAllowlist = includeAllowlist,
                 includesManagerSettings = includeManagerSettings,
