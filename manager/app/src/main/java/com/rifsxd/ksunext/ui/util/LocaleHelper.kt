@@ -156,4 +156,80 @@ object LocaleHelper {
             }
         }
     }
+    
+    /**
+     * Dynamically detect available locales by scanning resource directories
+     * This works with Crowdin translations and automatically picks up new languages
+     */
+    fun getAvailableLocales(context: Context): List<Locale> {
+        val locales = mutableListOf<Locale>()
+        
+        // Add system default first
+        locales.add(Locale.ROOT) // This will represent "System Default"
+        
+        try {
+            val availableLocales = mutableSetOf<String>()
+            
+            // Check for values-* directories in resources
+            context.resources.configuration.locales.let { localeList ->
+                for (i in 0 until localeList.size()) {
+                    val locale = localeList[i]
+                    availableLocales.add(locale.language)
+                    if (locale.country.isNotEmpty()) {
+                        availableLocales.add("${locale.language}-r${locale.country}")
+                    }
+                }
+            }
+            
+            // Always include English as fallback
+            availableLocales.add("en")
+            
+            availableLocales.forEach { dir ->
+                try {
+                    val locale = when {
+                        dir.contains("-r") -> {
+                            val parts = dir.split("-r")
+                            Locale.Builder()
+                                .setLanguage(parts[0])
+                                .setRegion(parts[1])
+                                .build()
+                        }
+                        else -> Locale.Builder()
+                            .setLanguage(dir)
+                            .build()
+                    }
+                    
+                    // Test if this locale has translated resources
+                    val config = android.content.res.Configuration()
+                    config.setLocale(locale)
+                    val localizedContext = context.createConfigurationContext(config)
+                    
+                    // Try to get a translated string to verify the locale is supported
+                    val testString = try {
+                        localizedContext.getString(android.R.string.ok) // Use system string as test
+                    } catch (e: Exception) {
+                        context.getString(android.R.string.ok)
+                    }
+                    val defaultString = context.getString(android.R.string.ok)
+                    
+                    // If the string is different or it's English, it's supported
+                    if (testString != defaultString || locale.language == "en") {
+                        locales.add(locale)
+                    }
+                } catch (e: Exception) {
+                    // Skip unsupported locales
+                }
+            }
+        } catch (e: Exception) {
+            // Fallback to English only if detection fails
+            locales.add(Locale.ENGLISH)
+        }
+        
+        // Sort by display name (excluding system default)
+        val sortedLocales = locales.drop(1).sortedBy { it.getDisplayName(it) }
+        return mutableListOf<Locale>().apply {
+            add(locales.first()) // System default first
+            addAll(sortedLocales)
+        }
+    }
 }

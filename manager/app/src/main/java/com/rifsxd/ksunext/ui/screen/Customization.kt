@@ -71,75 +71,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     dismiss()
                 } else {
                     // Android < 13 - Show app language selector
-                    // Dynamically detect supported locales from resources
+                    // Get available locales using LocaleHelper utility
                     val supportedLocales = remember {
-                        val locales = mutableListOf<java.util.Locale>()
-                        
-                        // Add system default first
-                        locales.add(java.util.Locale.ROOT) // This will represent "System Default"
-                        
-                        // Dynamically detect available locales by scanning resource directories
-                        try {
-                            val resDir = context.packageManager.getResourcesForApplication(context.packageName).assets
-                            val availableLocales = mutableSetOf<String>()
-                            
-                            // Check for values-* directories in resources
-                            context.resources.configuration.locales.let { localeList ->
-                                for (i in 0 until localeList.size()) {
-                                    val locale = localeList[i]
-                                    availableLocales.add(locale.language)
-                                    if (locale.country.isNotEmpty()) {
-                                        availableLocales.add("${locale.language}-r${locale.country}")
-                                    }
-                                }
-                            }
-                            
-                            // Always include English as fallback
-                            availableLocales.add("en")
-                            
-                            availableLocales.forEach { dir ->
-                                try {
-                                    val locale = when {
-                                        dir.contains("-r") -> {
-                                            val parts = dir.split("-r")
-                                            java.util.Locale.Builder()
-                                                .setLanguage(parts[0])
-                                                .setRegion(parts[1])
-                                                .build()
-                                        }
-                                        else -> java.util.Locale.Builder()
-                                            .setLanguage(dir)
-                                            .build()
-                                    }
-                                    
-                                    // Test if this locale has translated resources
-                                    val config = android.content.res.Configuration()
-                                    config.setLocale(locale)
-                                    val localizedContext = context.createConfigurationContext(config)
-                                    
-                                    // Try to get a translated string to verify the locale is supported
-                                    val testString = localizedContext.getString(R.string.settings_language)
-                                    val defaultString = context.getString(R.string.settings_language)
-                                    
-                                    // If the string is different or it's English, it's supported
-                                    if (testString != defaultString || locale.language == "en") {
-                                        locales.add(locale)
-                                    }
-                                } catch (e: Exception) {
-                                    // Skip unsupported locales
-                                }
-                            }
-                        } catch (e: Exception) {
-                            // Fallback to English only if detection fails
-                            locales.add(java.util.Locale.ENGLISH)
-                        }
-                        
-                        // Sort by display name
-                        val sortedLocales = locales.drop(1).sortedBy { it.getDisplayName(it) }
-                        mutableListOf<java.util.Locale>().apply {
-                            add(locales.first()) // System default first
-                            addAll(sortedLocales)
-                        }
+                        LocaleHelper.getAvailableLocales(context)
                     }
                     
                     val allOptions = supportedLocales.map { locale ->
