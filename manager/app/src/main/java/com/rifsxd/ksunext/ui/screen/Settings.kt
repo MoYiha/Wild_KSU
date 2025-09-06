@@ -94,10 +94,6 @@ import com.rifsxd.ksunext.ui.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import com.rifsxd.ksunext.BuildConfig
-import com.rifsxd.ksunext.Natives
-import com.rifsxd.ksunext.ksuApp
-import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.AboutDialog
 import com.rifsxd.ksunext.ui.component.ConfirmResult
 import com.rifsxd.ksunext.ui.component.DialogHandle
