@@ -2,6 +2,7 @@ package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
 import androidx.compose.foundation.clickable
+import androidx.core.content.edit
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
