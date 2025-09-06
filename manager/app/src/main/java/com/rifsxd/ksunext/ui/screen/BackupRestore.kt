@@ -1,14 +1,27 @@
 package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Restore
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +55,7 @@ import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.component.rememberLoadingDialog
 import com.rifsxd.ksunext.ui.component.rememberNoRippleInteractionSource
+import com.rifsxd.ksunext.ui.util.CustomBackup
 import com.rifsxd.ksunext.ui.util.allowlistBackup
 import com.rifsxd.ksunext.ui.util.allowlistRestore
 import com.rifsxd.ksunext.ui.util.moduleBackup
@@ -68,6 +82,39 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
     
     var showRebootDialog by remember { mutableStateOf(false) }
     var useOverlayFs by rememberSaveable { mutableStateOf(readMountSystemFile()) }
+    
+    // Custom backup states
+    var customBackupLocation by remember { mutableStateOf(CustomBackup.getCustomBackupLocation(context)) }
+    var includeModules by remember { mutableStateOf(true) }
+    var includeAllowlist by remember { mutableStateOf(true) }
+    var includeManagerSettings by remember { mutableStateOf(true) }
+    
+    // Folder picker launcher
+    val folderPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            val path = it.path?.replace("/tree/primary:", "/sdcard/") ?: CustomBackup.getDefaultBackupLocation()
+            customBackupLocation = path
+            CustomBackup.setCustomBackupLocation(context, path)
+        }
+    }
+    
+    // File picker launcher for restore
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            scope.launch {
+                loadingDialog.withLoading {
+                    val result = CustomBackup.restoreCustomBackup(context, it.path ?: "")
+                    result.onSuccess {
+                        showRebootDialog = true
+                    }
+                }
+            }
+        }
+    }
 
     if (showRebootDialog) {
         AlertDialog(
@@ -200,6 +247,143 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         indication = null
                     )
                 )
+            }
+        }
+        
+        // Custom Backup Section
+        item {
+            StandardCard {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.custom_backup),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Backup location selection
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.backup_location),
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedButton(
+                            onClick = { folderPickerLauncher.launch(null) }
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.FolderOpen,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(R.string.select_folder))
+                        }
+                    }
+                    
+                    Text(
+                        text = customBackupLocation,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    // Backup options
+                    Text(
+                        text = stringResource(R.string.backup_options),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium
+                    )
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
+                    Row(
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = includeModules,
+                            onCheckedChange = { includeModules = it }
+                        )
+                        Text(stringResource(R.string.include_modules))
+                    }
+                    
+                    Row(
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = includeAllowlist,
+                            onCheckedChange = { includeAllowlist = it }
+                        )
+                        Text(stringResource(R.string.include_allowlist))
+                    }
+                    
+                    Row(
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = includeManagerSettings,
+                            onCheckedChange = { includeManagerSettings = it }
+                        )
+                        Text(stringResource(R.string.include_manager_settings))
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    // Custom backup and restore buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    val result = backupDialog.awaitConfirm(
+                                        title = stringResource(R.string.create_custom_backup),
+                                        content = stringResource(R.string.custom_backup_message)
+                                    )
+                                    if (result == ConfirmResult.Confirmed) {
+                                        loadingDialog.withLoading {
+                                            CustomBackup.createCustomBackup(
+                                                context = context,
+                                                backupLocation = customBackupLocation,
+                                                includeModules = includeModules,
+                                                includeAllowlist = includeAllowlist,
+                                                includeManagerSettings = includeManagerSettings
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Backup,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(R.string.backup))
+                        }
+                        
+                        OutlinedButton(
+                            onClick = {
+                                filePickerLauncher.launch(arrayOf("application/zip"))
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Restore,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(R.string.restore))
+                        }
+                    }
+                }
             }
         }
     }
