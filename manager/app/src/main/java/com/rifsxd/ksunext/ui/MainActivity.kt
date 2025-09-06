@@ -1,8 +1,8 @@
 package com.rifsxd.ksunext.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -10,12 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -99,7 +94,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.compositionLocalOf
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -132,6 +126,7 @@ import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.getKernelVersion
 import com.rifsxd.ksunext.ui.screen.BottomBarDestination
+import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.theme.KernelSUTheme
 import com.rifsxd.ksunext.ui.component.BackgroundImageWrapper
 import com.rifsxd.ksunext.ui.component.SearchAppBar
@@ -404,7 +399,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 val navController = rememberNavController()
                 val snackBarHostState = remember { SnackbarHostState() }
-                val currentDestination = navController.currentBackStackEntryAsState()?.value?.destination
+                val currentDestination = navController.currentBackStackEntryAsState().value?.destination
 
                 val navigator = navController.rememberDestinationsNavigator()
                 

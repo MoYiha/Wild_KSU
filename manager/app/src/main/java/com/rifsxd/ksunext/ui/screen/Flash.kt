@@ -57,6 +57,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.dropUnlessResumed
@@ -64,8 +65,15 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.rifsxd.ksunext.R
+import com.rifsxd.ksunext.ui.component.ConfirmResult
+import com.rifsxd.ksunext.ui.component.KeyEventBlocker
+import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
+import com.rifsxd.ksunext.ui.theme.GREEN
+import com.rifsxd.ksunext.ui.theme.ORANGE
+import com.rifsxd.ksunext.ui.theme.RED
+import com.rifsxd.ksunext.ui.util.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -87,8 +95,7 @@ import com.rifsxd.ksunext.ui.viewmodel.FlashingStatus
 import com.rifsxd.ksunext.ui.LocalFlashViewModel
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this

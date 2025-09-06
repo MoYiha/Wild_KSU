@@ -20,9 +20,8 @@ import java.io.File
 
 @SuppressLint("SetJavaScriptEnabled")
 class WebUIActivity : ComponentActivity() {
-    private lateinit var webviewInterface: WebViewInterface
-
-    private var rootShell: Shell? = null
+    private val rootShell by lazy { createRootShell(true) }
+    private var webView = null as WebView?
 
     fun erudaConsole(context: android.content.Context): String {
         return context.assets.open("eruda.min.js").bufferedReader().use { it.readText() }
@@ -38,8 +37,8 @@ class WebUIActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        val moduleId = intent.getStringExtra("id")!!
-        val name = intent.getStringExtra("name")!!
+        val moduleId = intent.getStringExtra("id") ?: finishAndRemoveTask().let { return }
+        val name = intent.getStringExtra("name") ?: finishAndRemoveTask().let { return }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             @Suppress("DEPRECATION")
             setTaskDescription(ActivityManager.TaskDescription("WebUI-Next | $name"))
@@ -56,7 +55,6 @@ class WebUIActivity : ComponentActivity() {
 
         val moduleDir = "/data/adb/modules/${moduleId}"
         val webRoot = File("${moduleDir}/webroot")
-        val rootShell = createRootShell(true).also { this.rootShell = it }
         val webViewAssetLoader = WebViewAssetLoader.Builder()
             .setDomain("mui.kernelsu.org")
             .addPathHandler(
@@ -65,16 +63,9 @@ class WebUIActivity : ComponentActivity() {
             )
             .build()
 
-        val webViewClient = object : WebViewClient() {
-            override fun shouldInterceptRequest(
-                view: WebView,
-                request: WebResourceRequest
-            ): WebResourceResponse? {
-                return webViewAssetLoader.shouldInterceptRequest(request.url)
-            }
-        }
-
         val webView = WebView(this).apply {
+            webView = this
+
             ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
                 val inset = insets.getInsets(WindowInsetsCompat.Type.systemBars())
                 view.updateLayoutParams<MarginLayoutParams> {
@@ -88,8 +79,7 @@ class WebUIActivity : ComponentActivity() {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.allowFileAccess = false
-            webviewInterface = WebViewInterface(this@WebUIActivity, this, moduleDir)
-            addJavascriptInterface(webviewInterface, "ksu")
+            addJavascriptInterface(WebViewInterface(this@WebUIActivity, this, moduleDir), "ksu")
             setWebViewClient(object : WebViewClient() {
                 override fun shouldInterceptRequest(
                     view: WebView,
@@ -131,7 +121,13 @@ class WebUIActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        rootShell.runCatching { close() }
+        webView?.apply {
+            stopLoading()
+            removeAllViews()
+            destroy()
+            webView = null
+        }
         super.onDestroy()
-        runCatching { rootShell?.close() }
     }
 }
