@@ -339,12 +339,16 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        val customBackupTitle = stringResource(R.string.create_custom_backup)
+                        val customBackupMessage = stringResource(R.string.custom_backup_message)
+                        val backupText = stringResource(R.string.backup)
+                        
                         OutlinedButton(
                             onClick = {
                                 scope.launch {
                                     val result = backupDialog.awaitConfirm(
-                                        title = stringResource(R.string.create_custom_backup),
-                                        content = stringResource(R.string.custom_backup_message)
+                                        title = customBackupTitle,
+                                        content = customBackupMessage
                                     )
                                     if (result == ConfirmResult.Confirmed) {
                                         loadingDialog.withLoading {
@@ -366,8 +370,10 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                                 contentDescription = null
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(R.string.backup))
+                            Text(backupText)
                         }
+                        
+                        val restoreText = stringResource(R.string.restore)
                         
                         OutlinedButton(
                             onClick = {
@@ -380,7 +386,7 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                                 contentDescription = null
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(R.string.restore))
+                            Text(restoreText)
                         }
                     }
                 }

@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Environment
-import androidx.documentfile.provider.DocumentFile
+// import androidx.documentfile.provider.DocumentFile // Not needed for this implementation
 import com.rifsxd.ksunext.ksuApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -48,7 +48,7 @@ object CustomBackup {
     
     fun getCustomBackupLocation(context: Context): String {
         val prefs = context.getSharedPreferences("backup_settings", Context.MODE_PRIVATE)
-        return prefs.getString("custom_backup_location", getDefaultBackupLocation()) ?: getDefaultBackupLocation()
+        return prefs.getString("custom_backup_location", null) ?: getDefaultBackupLocation()
     }
     
     fun setCustomBackupLocation(context: Context, location: String) {
@@ -175,8 +175,8 @@ object CustomBackup {
         // Create temporary tar file for modules
         val tempTarFile = File.createTempFile("modules_backup", ".tar")
         try {
-            val tarCmd = "${KsuCli.BUSYBOX} tar -cpf ${tempTarFile.absolutePath} -C /data/adb/modules \$(ls /data/adb/modules)"
-            if (ShellUtils.fastCmdResult(tarCmd)) {
+            val tarCmd = "busybox tar -cpf ${tempTarFile.absolutePath} -C /data/adb/modules \$(ls /data/adb/modules)"
+            if (Runtime.getRuntime().exec(tarCmd).waitFor() == 0) {
                 zipOut.putNextEntry(ZipEntry("modules_backup.tar"))
                 tempTarFile.inputStream().use { it.copyTo(zipOut) }
                 zipOut.closeEntry()
@@ -190,8 +190,8 @@ object CustomBackup {
         // Create temporary tar file for allowlist
         val tempTarFile = File.createTempFile("allowlist_backup", ".tar")
         try {
-            val tarCmd = "${KsuCli.BUSYBOX} tar -cpf ${tempTarFile.absolutePath} -C /data/adb/ksu .allowlist"
-            if (ShellUtils.fastCmdResult(tarCmd)) {
+            val tarCmd = "busybox tar -cpf ${tempTarFile.absolutePath} -C /data/adb/ksu .allowlist"
+            if (Runtime.getRuntime().exec(tarCmd).waitFor() == 0) {
                 zipOut.putNextEntry(ZipEntry("allowlist_backup.tar"))
                 tempTarFile.inputStream().use { it.copyTo(zipOut) }
                 zipOut.closeEntry()
@@ -212,7 +212,7 @@ object CustomBackup {
             backgroundBlur = backgroundPrefs.getFloat("background_blur", 0f),
             selectedIconType = prefs.getString("selected_icon_type", "default"),
             hideBottomBar = prefs.getBoolean("hide_bottom_bar", false),
-            customizations = prefs.all.filterKeys { !it.startsWith("background_") }
+            customizations = prefs.all.filterKeys { !it.startsWith("background_") }.mapValues { it.value ?: "" }
         )
         
         val settingsJson = JSONObject().apply {
@@ -261,8 +261,8 @@ object CustomBackup {
         val tempTarFile = File.createTempFile("modules_restore", ".tar")
         try {
             tempTarFile.outputStream().use { zipIn.copyTo(it) }
-            val extractCmd = "${KsuCli.BUSYBOX} tar -xpf ${tempTarFile.absolutePath} -C /data/adb/modules_update"
-            ShellUtils.fastCmdResult(extractCmd)
+            val extractCmd = "busybox tar -xpf ${tempTarFile.absolutePath} -C /data/adb/modules_update"
+            Runtime.getRuntime().exec(extractCmd).waitFor()
         } finally {
             tempTarFile.delete()
         }
@@ -272,8 +272,8 @@ object CustomBackup {
         val tempTarFile = File.createTempFile("allowlist_restore", ".tar")
         try {
             tempTarFile.outputStream().use { zipIn.copyTo(it) }
-            val extractCmd = "${KsuCli.BUSYBOX} tar -xpf ${tempTarFile.absolutePath} -C /data/adb/ksu"
-            ShellUtils.fastCmdResult(extractCmd)
+            val extractCmd = "busybox tar -xpf ${tempTarFile.absolutePath} -C /data/adb/ksu"
+            Runtime.getRuntime().exec(extractCmd).waitFor()
         } finally {
             tempTarFile.delete()
         }

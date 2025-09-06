@@ -113,6 +113,15 @@
     <string name="select_backup_file">Select Backup File</string>
     <string name="manager_settings_backup">Manager Settings</string>
     <string name="manager_settings_backup_message">Include background image and customization settings in backup.</string>
+    <string name="backup_location">Backup Location</string>
+    <string name="select_folder">Select Folder</string>
+    <string name="backup_options">Backup Options</string>
+    <string name="include_modules">Include Modules</string>
+    <string name="include_allowlist">Include Allowlist</string>
+    <string name="include_manager_settings">Include Manager Settings</string>
+    <string name="create_custom_backup">Create Custom Backup</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
     <string name="warning">Warning</string>
     <string name="warning_message">This feature is still in beta and under development. Please ensure you backup your modules before proceeding. Only use this feature if you understand the potential risks. Proceed with caution.</string>
     <string name="proceed">Proceed</string>
