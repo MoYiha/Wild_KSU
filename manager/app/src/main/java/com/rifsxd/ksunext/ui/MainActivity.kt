@@ -95,6 +95,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.compositionLocalOf
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
@@ -144,8 +145,6 @@ import com.rifsxd.ksunext.ui.util.isSuCompatDisabled
 import com.rifsxd.ksunext.ui.util.reboot
 import com.rifsxd.ksunext.ui.util.BackgroundCustomization
 import com.rifsxd.ksunext.ui.util.readMountSystemFile
-
-import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 import com.rifsxd.ksunext.ui.viewmodel.FlashViewModel

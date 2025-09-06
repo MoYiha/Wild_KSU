@@ -113,7 +113,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             onFinishedRequest = {
                                 if (selectedIndex >= 0 && selectedIndex < allOptions.size) {
                                     val newLocale = allOptions[selectedIndex].first
-                                    prefs.edit { putString("app_locale", newLocale) }
+                                    prefs.edit().putString("app_locale", newLocale).apply()
                                     
                                     // Update local state immediately
                                     currentAppLocale = LocaleHelper.getCurrentAppLocale(context)
