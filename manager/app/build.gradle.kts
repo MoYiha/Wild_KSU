@@ -23,7 +23,11 @@ apksign {
 }
 
 android {
-    namespace = "com.twj.wksu"
+    namespace = "com.rifsxd.ksunext"
+
+    defaultConfig {
+        applicationId = "com.twj.wksu"
+    }
 
     buildTypes {
         release {
