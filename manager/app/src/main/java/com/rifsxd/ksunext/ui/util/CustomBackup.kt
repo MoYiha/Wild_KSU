@@ -214,43 +214,77 @@ object CustomBackup {
     
     private fun addManagerSettingsToZip(zipOut: ZipOutputStream, context: Context) {
         val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        val backgroundPrefs = context.getSharedPreferences("background_settings", Context.MODE_PRIVATE)
         
-        val settings = ManagerSettings(
-            backgroundImageUri = backgroundPrefs.getString("background_image_uri", null),
-            backgroundFitMode = backgroundPrefs.getString("background_fit_mode", "CENTER_CROP"),
-            backgroundTransparency = backgroundPrefs.getFloat("background_transparency", 1.0f),
-            backgroundBlur = backgroundPrefs.getFloat("background_blur", 0f),
-            selectedIconType = prefs.getString("selected_icon_type", "default"),
-            hideBottomBar = prefs.getBoolean("hide_bottom_bar", false),
-            customizations = prefs.all.filterKeys { !it.startsWith("background_") }.mapValues { it.value ?: "" }
-        )
+        // Collect all settings from the customization screens
+        val allSettings = mutableMapOf<String, Any>()
         
-        val settingsJson = JSONObject().apply {
-            put("backgroundImageUri", settings.backgroundImageUri)
-            put("backgroundFitMode", settings.backgroundFitMode)
-            put("backgroundTransparency", settings.backgroundTransparency)
-            put("backgroundBlur", settings.backgroundBlur)
-            put("selectedIconType", settings.selectedIconType)
-            put("hideBottomBar", settings.hideBottomBar)
-            put("customizations", JSONObject(settings.customizations))
+        // Theme Settings preferences
+        prefs.getString("theme_mode", null)?.let { allSettings["theme_mode"] = it }
+        prefs.getString("background_image_uri", null)?.let { allSettings["background_image_uri"] = it }
+        allSettings["background_transparency"] = prefs.getFloat("background_transparency", 0.0f)
+        allSettings["background_blur"] = prefs.getFloat("background_blur", 0.0f)
+        allSettings["ui_transparency"] = prefs.getFloat("ui_transparency", 0.0f)
+        allSettings["hide_bottom_bar"] = prefs.getBoolean("hide_bottom_bar", false)
+        allSettings["app_dpi"] = prefs.getInt("app_dpi", 160)
+        allSettings["original_system_dpi"] = prefs.getInt("original_system_dpi", 160)
+        
+        // Home Settings preferences
+        allSettings["info_card_always_expanded"] = prefs.getBoolean("info_card_always_expanded", false)
+        allSettings["show_help_card"] = prefs.getBoolean("show_help_card", true)
+        prefs.getString("selected_icon_type", null)?.let { allSettings["selected_icon_type"] = it }
+        prefs.getString("home_layout_type", null)?.let { allSettings["home_layout_type"] = it }
+        prefs.getString("info_card_item_order", null)?.let { allSettings["info_card_item_order"] = it }
+        
+        // Superuser Settings preferences
+        allSettings["use_individual_app_cards"] = prefs.getBoolean("use_individual_app_cards", false)
+        allSettings["disable_favorite_button"] = prefs.getBoolean("disable_favorite_button", false)
+        allSettings["show_system_apps"] = prefs.getBoolean("show_system_apps", false)
+        prefs.getString("favorite_apps", null)?.let { allSettings["favorite_apps"] = it }
+        
+        // Module Settings preferences
+        allSettings["keep_modules_expanded"] = prefs.getBoolean("keep_modules_expanded", false)
+        allSettings["use_banner"] = prefs.getBoolean("use_banner", true)
+        allSettings["hide_module_details"] = prefs.getBoolean("hide_module_details", false)
+        
+        // Customization Settings (language, etc.)
+        prefs.getString("language", null)?.let { allSettings["language"] = it }
+        
+        // Add any other preferences that might exist
+        prefs.all.forEach { (key, value) ->
+            if (!allSettings.containsKey(key) && value != null) {
+                allSettings[key] = value
+            }
         }
+        
+        val settingsJson = JSONObject(allSettings)
         
         zipOut.putNextEntry(ZipEntry(MANAGER_SETTINGS_FILE))
         zipOut.write(settingsJson.toString().toByteArray())
         zipOut.closeEntry()
         
         // Add background image if exists
-        settings.backgroundImageUri?.let { uriString ->
+        allSettings["background_image_uri"]?.let { uriString ->
             try {
-                val uri = Uri.parse(uriString)
+                val uri = Uri.parse(uriString.toString())
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     zipOut.putNextEntry(ZipEntry(BACKGROUND_IMAGE_FILE))
                     inputStream.copyTo(zipOut)
                     zipOut.closeEntry()
                 }
             } catch (e: Exception) {
-                // Background image not accessible, skip
+                // Background image not accessible, try internal storage
+                try {
+                    val internalFile = File(context.filesDir, "background_image")
+                    if (internalFile.exists()) {
+                        internalFile.inputStream().use { inputStream ->
+                            zipOut.putNextEntry(ZipEntry(BACKGROUND_IMAGE_FILE))
+                            inputStream.copyTo(zipOut)
+                            zipOut.closeEntry()
+                        }
+                    }
+                } catch (e2: Exception) {
+                    // Background image not accessible from internal storage either, skip
+                }
             }
         }
     }
@@ -294,31 +328,22 @@ object CustomBackup {
         val settingsJson = JSONObject(zipIn.readBytes().toString(Charsets.UTF_8))
         
         val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        val backgroundPrefs = context.getSharedPreferences("background_settings", Context.MODE_PRIVATE)
-        
-        backgroundPrefs.edit().apply {
-            val backgroundUri = settingsJson.optString("backgroundImageUri", "")
-            if (backgroundUri.isNotEmpty()) {
-                putString("background_image_uri", backgroundUri)
-            }
-            putString("background_fit_mode", settingsJson.optString("backgroundFitMode", "CENTER_CROP"))
-            putFloat("background_transparency", settingsJson.optDouble("backgroundTransparency", 1.0).toFloat())
-            putFloat("background_blur", settingsJson.optDouble("backgroundBlur", 0.0).toFloat())
-            apply()
-        }
         
         prefs.edit().apply {
-            putString("selected_icon_type", settingsJson.optString("selectedIconType", "default"))
-            putBoolean("hide_bottom_bar", settingsJson.optBoolean("hideBottomBar", false))
-            
-            // Restore other customizations
-            val customizations = settingsJson.optJSONObject("customizations")
-            customizations?.keys()?.forEach { key ->
-                when (val value = customizations.get(key)) {
+            // Restore all settings from the JSON
+            settingsJson.keys().forEach { key ->
+                when (val value = settingsJson.get(key)) {
                     is String -> putString(key, value)
                     is Boolean -> putBoolean(key, value)
                     is Int -> putInt(key, value)
-                    is Float -> putFloat(key, value)
+                    is Double -> {
+                        // Handle both Float and Double values
+                        if (key.contains("transparency") || key.contains("blur")) {
+                            putFloat(key, value.toFloat())
+                        } else {
+                            putLong(key, value.toLong())
+                        }
+                    }
                     is Long -> putLong(key, value)
                 }
             }
@@ -329,12 +354,12 @@ object CustomBackup {
     private fun restoreBackgroundImageFromZip(zipIn: ZipInputStream, context: Context) {
         try {
             // Save background image to app's private directory
-            val backgroundFile = File(context.filesDir, "restored_background_image")
+            val backgroundFile = File(context.filesDir, "background_image")
             backgroundFile.outputStream().use { zipIn.copyTo(it) }
             
             // Update the background image URI to point to the restored file
-            val backgroundPrefs = context.getSharedPreferences("background_settings", Context.MODE_PRIVATE)
-            backgroundPrefs.edit()
+            val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+            prefs.edit()
                 .putString("background_image_uri", Uri.fromFile(backgroundFile).toString())
                 .apply()
         } catch (e: Exception) {
