@@ -1,6 +1,7 @@
 package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
@@ -94,25 +96,38 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         uri?.let {
-            // Convert content URI to file path
-            val path = when {
-                it.path?.contains("/tree/primary:") == true -> {
-                    "/sdcard/" + it.path?.substringAfter("/tree/primary:")
+            try {
+                // Take persistable URI permission
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                
+                // Convert content URI to file path
+                val path = when {
+                    it.path?.contains("/tree/primary:") == true -> {
+                        "/sdcard/" + it.path?.substringAfter("/tree/primary:")
+                    }
+                    it.path?.contains("/tree/") == true -> {
+                        // Handle other storage locations
+                        it.path?.substringAfter("/tree/")?.let { treePath ->
+                            if (treePath.contains(":")) {
+                                "/sdcard/" + treePath.substringAfter(":")
+                            } else {
+                                "/sdcard/$treePath"
+                            }
+                        } ?: CustomBackup.getDefaultBackupLocation()
+                    }
+                    else -> CustomBackup.getDefaultBackupLocation()
                 }
-                it.path?.contains("/tree/") == true -> {
-                    // Handle other storage locations
-                    it.path?.substringAfter("/tree/")?.let { treePath ->
-                        if (treePath.contains(":")) {
-                            "/sdcard/" + treePath.substringAfter(":")
-                        } else {
-                            "/sdcard/$treePath"
-                        }
-                    } ?: CustomBackup.getDefaultBackupLocation()
-                }
-                else -> CustomBackup.getDefaultBackupLocation()
+                customBackupLocation = path
+                CustomBackup.setCustomBackupLocation(context, path)
+            } catch (e: Exception) {
+                // Fallback to default location if URI handling fails
+                val defaultLocation = CustomBackup.getDefaultBackupLocation()
+                customBackupLocation = defaultLocation
+                CustomBackup.setCustomBackupLocation(context, defaultLocation)
             }
-            customBackupLocation = path
-            CustomBackup.setCustomBackupLocation(context, path)
         }
     }
     
@@ -180,24 +195,44 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                    ) {
+                    Column {
                         Text(
                             text = "Select backup location for all operations",
-                            modifier = Modifier.weight(1f),
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        OutlinedButton(
-                            onClick = { folderPickerLauncher.launch(null) }
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            androidx.compose.material3.Icon(
-                                imageVector = Icons.Filled.FolderOpen,
-                                contentDescription = null
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(R.string.select_folder))
+                            OutlinedButton(
+                                onClick = { folderPickerLauncher.launch(null) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                androidx.compose.material3.Icon(
+                                    imageVector = Icons.Filled.FolderOpen,
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(R.string.select_folder))
+                            }
+                            
+                            OutlinedButton(
+                                onClick = {
+                                    val defaultLocation = CustomBackup.getDefaultBackupLocation()
+                                    customBackupLocation = defaultLocation
+                                    CustomBackup.setCustomBackupLocation(context, defaultLocation)
+                                }
+                            ) {
+                                androidx.compose.material3.Icon(
+                                    imageVector = Icons.Filled.Refresh,
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Reset")
+                            }
                         }
                     }
                     

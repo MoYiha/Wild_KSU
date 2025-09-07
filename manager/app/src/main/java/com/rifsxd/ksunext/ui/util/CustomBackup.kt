@@ -69,7 +69,18 @@ object CustomBackup {
             val backupFile = File(backupLocation, backupFileName)
             
             // Ensure backup directory exists
-            backupFile.parentFile?.mkdirs()
+            val parentDir = backupFile.parentFile
+            if (parentDir != null && !parentDir.exists()) {
+                val created = parentDir.mkdirs()
+                if (!created && !parentDir.exists()) {
+                    return@withContext Result.failure(Exception("Failed to create backup directory: $backupLocation"))
+                }
+            }
+            
+            // Check if we can write to the directory
+            if (parentDir != null && !parentDir.canWrite()) {
+                return@withContext Result.failure(Exception("No write permission for backup directory: $backupLocation"))
+            }
             
             val metadata = BackupMetadata(
                 appVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknown",
