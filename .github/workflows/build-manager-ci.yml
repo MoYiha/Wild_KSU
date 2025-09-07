@@ -60,35 +60,38 @@ jobs:
     secrets: inherit
 
   build-susfsd:
-    needs: [check-cache, build-lkm]
+    needs: [check-cache]
     if: needs.check-cache.outputs.cache-hit != 'true'
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
     uses: ./.github/workflows/susfsd.yml
     with:
-      os: ${{ matrix.os }}
+      os: ubuntu-latest
 
-  build-ksud:
-    needs: [check-cache, build-susfsd]
+  build-ksud-overlayfs:
+    needs: [check-cache]
     if: needs.check-cache.outputs.cache-hit != 'true'
     strategy:
       matrix:
-        include:
-          - target: aarch64-linux-android
-            os: ubuntu-latest
-          - target: armv7-linux-androideabi
-            os: ubuntu-latest
-          - target: x86_64-linux-android
-            os: ubuntu-latest
+        target: [aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android]
     uses: ./.github/workflows/ksud.yml
     with:
-      target: ${{ matrix.target }}
-      os: ${{ matrix.os }}
+      target: overlayfs
+      arch: ${{ matrix.target }}
+      os: ubuntu-latest
+
+  build-ksud-magic:
+    needs: [check-cache]
+    if: needs.check-cache.outputs.cache-hit != 'true'
+    strategy:
+      matrix:
+        target: [aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android]
+    uses: ./.github/workflows/ksud.yml
+    with:
+      target: magic
+      arch: ${{ matrix.target }}
+      os: ubuntu-latest
 
   cache-artifacts:
-    needs: [check-cache, build-ksud]
+    needs: [check-cache, build-susfsd, build-ksud-overlayfs, build-ksud-magic]
     if: needs.check-cache.outputs.cache-hit != 'true'
     runs-on: ubuntu-latest
     steps:
@@ -122,8 +125,8 @@ jobs:
           key: ${{ needs.check-cache.outputs.cache-key }}
 
   build-manager:
-    needs: [check-cache, cache-artifacts]
-    if: always() && needs.check-cache.result == 'success' && (needs.check-cache.outputs.cache-hit == 'true' || needs.cache-artifacts.result == 'success')
+    needs: [check-cache, cache-artifacts, build-lkm]
+    if: always() && needs.check-cache.result == 'success' && (needs.check-cache.outputs.cache-hit == 'true' || needs.cache-artifacts.result == 'success') && (needs.build-lkm.result == 'success' || needs.build-lkm.result == 'skipped')
     runs-on: ubuntu-latest
     strategy:
       matrix:
