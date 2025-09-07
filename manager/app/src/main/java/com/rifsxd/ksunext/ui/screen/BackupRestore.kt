@@ -94,7 +94,23 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         uri?.let {
-            val path = it.path?.replace("/tree/primary:", "/sdcard/") ?: CustomBackup.getDefaultBackupLocation()
+            // Convert content URI to file path
+            val path = when {
+                it.path?.contains("/tree/primary:") == true -> {
+                    "/sdcard/" + it.path?.substringAfter("/tree/primary:")
+                }
+                it.path?.contains("/tree/") == true -> {
+                    // Handle other storage locations
+                    it.path?.substringAfter("/tree/")?.let { treePath ->
+                        if (treePath.contains(":")) {
+                            "/sdcard/" + treePath.substringAfter(":")
+                        } else {
+                            "/sdcard/$treePath"
+                        }
+                    } ?: CustomBackup.getDefaultBackupLocation()
+                }
+                else -> CustomBackup.getDefaultBackupLocation()
+            }
             customBackupLocation = path
             CustomBackup.setCustomBackupLocation(context, path)
         }
@@ -150,128 +166,28 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item {
-            StandardCard {
-
-                val moduleBackup = stringResource(id = R.string.module_backup)
-                val backupMessage = stringResource(id = R.string.module_backup_message)
-                CardRowContent(
-                    icon = Icons.Filled.Backup,
-                    text = moduleBackup,
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            scope.launch {
-                                val result = backupDialog.awaitConfirm(title = moduleBackup, content = backupMessage)
-                                if (result == ConfirmResult.Confirmed) {
-                                    loadingDialog.withLoading {
-                                        moduleBackup()
-                                    }
-                                }
-                            }
-                        },
-                        interactionSource = rememberNoRippleInteractionSource(),
-                        indication = null
-                    )
-                )
-
-                CardItemSpacer()
-
-                val moduleRestore = stringResource(id = R.string.module_restore)
-                val restoreMessage = stringResource(id = R.string.module_restore_message)
-
-                CardRowContent(
-                    icon = Icons.Filled.Restore,
-                    text = moduleRestore,
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            scope.launch {
-                                val result = restoreDialog.awaitConfirm(title = moduleRestore, content = restoreMessage)
-                                if (result == ConfirmResult.Confirmed) {
-                                    loadingDialog.withLoading {
-                                        moduleRestore()
-                                        showRebootDialog = true
-                                    }
-                                }
-                            }
-                        },
-                        interactionSource = rememberNoRippleInteractionSource(),
-                        indication = null
-                    )
-                )
-
-            }
-        }
-        
-        item {
-            StandardCard {
-                val allowlistBackup = stringResource(id = R.string.allowlist_backup)
-                val allowlistBackupMessage = stringResource(id = R.string.allowlist_backup_message)
-                CardRowContent(
-                    icon = Icons.Filled.Backup,
-                    text = allowlistBackup,
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            scope.launch {
-                                val result = backupDialog.awaitConfirm(title = allowlistBackup, content = allowlistBackupMessage)
-                                if (result == ConfirmResult.Confirmed) {
-                                    loadingDialog.withLoading {
-                                        allowlistBackup()
-                                    }
-                                }
-                            }
-                        },
-                        interactionSource = rememberNoRippleInteractionSource(),
-                        indication = null
-                    )
-                )
-
-                CardItemSpacer()
-
-                val allowlistRestore = stringResource(id = R.string.allowlist_restore)
-                val allowlistRestoreMessage = stringResource(id = R.string.allowlist_restore_message)
-                CardRowContent(
-                    icon = Icons.Filled.Restore,
-                    text = allowlistRestore,
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            scope.launch {
-                                val result = restoreDialog.awaitConfirm(title = allowlistRestore, content = allowlistRestoreMessage)
-                                if (result == ConfirmResult.Confirmed) {
-                                    loadingDialog.withLoading {
-                                        allowlistRestore()
-                                    }
-                                }
-                            }
-                        },
-                        interactionSource = rememberNoRippleInteractionSource(),
-                        indication = null
-                    )
-                )
-            }
-        }
-        
-        // Custom Backup Section
+        // Custom Backup Location Section (affects all backups)
         item {
             StandardCard {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.custom_backup),
+                        text = stringResource(R.string.backup_location),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    // Backup location selection
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
                         Text(
-                            text = stringResource(R.string.backup_location),
-                            modifier = Modifier.weight(1f)
+                            text = "Select backup location for all operations",
+                            modifier = Modifier.weight(1f),
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         OutlinedButton(
                             onClick = { folderPickerLauncher.launch(null) }
@@ -290,51 +206,24 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    // Backup options
+                }
+            }
+        }
+        
+        // Customizations Section
+        item {
+            StandardCard {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
                     Text(
-                        text = stringResource(R.string.backup_options),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Medium
+                        text = "Customizations",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
                     
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     
-                    Row(
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = includeModules,
-                            onCheckedChange = { includeModules = it }
-                        )
-                        Text(stringResource(R.string.include_modules))
-                    }
-                    
-                    Row(
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = includeAllowlist,
-                            onCheckedChange = { includeAllowlist = it }
-                        )
-                        Text(stringResource(R.string.include_allowlist))
-                    }
-                    
-                    Row(
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = includeManagerSettings,
-                            onCheckedChange = { includeManagerSettings = it }
-                        )
-                        Text(stringResource(R.string.include_manager_settings))
-                    }
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    // Custom backup and restore buttons
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -348,17 +237,30 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                                 scope.launch {
                                     val result = backupDialog.awaitConfirm(
                                         title = customBackupTitle,
-                                        content = customBackupMessage
+                                        content = "Create backup in: $customBackupLocation"
                                     )
                                     if (result == ConfirmResult.Confirmed) {
                                         loadingDialog.withLoading {
-                                            CustomBackup.createCustomBackup(
+                                            val backupResult = CustomBackup.createCustomBackup(
                                                 context = context,
                                                 backupLocation = customBackupLocation,
-                                                includeModules = includeModules,
-                                                includeAllowlist = includeAllowlist,
-                                                includeManagerSettings = includeManagerSettings
+                                                includeModules = false,
+                                                includeAllowlist = false,
+                                                includeManagerSettings = true
                                             )
+                                            backupResult.onSuccess { filePath ->
+                                                android.widget.Toast.makeText(
+                                                    context,
+                                                    "Backup created: $filePath",
+                                                    android.widget.Toast.LENGTH_LONG
+                                                ).show()
+                                            }.onFailure { error ->
+                                                android.widget.Toast.makeText(
+                                                    context,
+                                                    "Backup failed: ${error.message}",
+                                                    android.widget.Toast.LENGTH_LONG
+                                                ).show()
+                                            }
                                         }
                                     }
                                 }
@@ -387,6 +289,199 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(restoreText)
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Modules Section
+        item {
+            StandardCard {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(
+                        text = "Modules",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val moduleBackup = stringResource(id = R.string.module_backup)
+                        val backupMessage = stringResource(id = R.string.module_backup_message)
+                        
+                        OutlinedButton(
+                             onClick = {
+                                 scope.launch {
+                                     val result = backupDialog.awaitConfirm(
+                                         title = moduleBackup, 
+                                         content = if (customBackupLocation.isNotEmpty()) "Create modules backup in: $customBackupLocation" else backupMessage
+                                     )
+                                     if (result == ConfirmResult.Confirmed) {
+                                         loadingDialog.withLoading {
+                                             if (customBackupLocation.isNotEmpty()) {
+                                                 val backupResult = CustomBackup.createCustomBackup(
+                                                     context = context,
+                                                     backupLocation = customBackupLocation,
+                                                     includeModules = true,
+                                                     includeAllowlist = false,
+                                                     includeManagerSettings = false
+                                                 )
+                                                 backupResult.onSuccess { filePath ->
+                                                     android.widget.Toast.makeText(
+                                                         context,
+                                                         "Modules backup created: $filePath",
+                                                         android.widget.Toast.LENGTH_LONG
+                                                     ).show()
+                                                 }.onFailure { error ->
+                                                     android.widget.Toast.makeText(
+                                                         context,
+                                                         "Modules backup failed: ${error.message}",
+                                                         android.widget.Toast.LENGTH_LONG
+                                                     ).show()
+                                                 }
+                                             } else {
+                                                 moduleBackup()
+                                             }
+                                         }
+                                     }
+                                 }
+                             },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Backup,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(R.string.backup))
+                        }
+                        
+                        val moduleRestore = stringResource(id = R.string.module_restore)
+                        val restoreMessage = stringResource(id = R.string.module_restore_message)
+                        
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    val result = restoreDialog.awaitConfirm(title = moduleRestore, content = restoreMessage)
+                                    if (result == ConfirmResult.Confirmed) {
+                                        loadingDialog.withLoading {
+                                            moduleRestore()
+                                            showRebootDialog = true
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Restore,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(R.string.restore))
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Allowlist Section
+        item {
+            StandardCard {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(
+                        text = "Allowlist",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val allowlistBackup = stringResource(id = R.string.allowlist_backup)
+                        val allowlistBackupMessage = stringResource(id = R.string.allowlist_backup_message)
+                        
+                        OutlinedButton(
+                             onClick = {
+                                 scope.launch {
+                                     val result = backupDialog.awaitConfirm(
+                                         title = allowlistBackup, 
+                                         content = if (customBackupLocation.isNotEmpty()) "Create allowlist backup in: $customBackupLocation" else allowlistBackupMessage
+                                     )
+                                     if (result == ConfirmResult.Confirmed) {
+                                         loadingDialog.withLoading {
+                                             if (customBackupLocation.isNotEmpty()) {
+                                                 val backupResult = CustomBackup.createCustomBackup(
+                                                     context = context,
+                                                     backupLocation = customBackupLocation,
+                                                     includeModules = false,
+                                                     includeAllowlist = true,
+                                                     includeManagerSettings = false
+                                                 )
+                                                 backupResult.onSuccess { filePath ->
+                                                     android.widget.Toast.makeText(
+                                                         context,
+                                                         "Allowlist backup created: $filePath",
+                                                         android.widget.Toast.LENGTH_LONG
+                                                     ).show()
+                                                 }.onFailure { error ->
+                                                     android.widget.Toast.makeText(
+                                                         context,
+                                                         "Allowlist backup failed: ${error.message}",
+                                                         android.widget.Toast.LENGTH_LONG
+                                                     ).show()
+                                                 }
+                                             } else {
+                                                 allowlistBackup()
+                                             }
+                                         }
+                                     }
+                                 }
+                             },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Backup,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(R.string.backup))
+                        }
+                        
+                        val allowlistRestore = stringResource(id = R.string.allowlist_restore)
+                        val allowlistRestoreMessage = stringResource(id = R.string.allowlist_restore_message)
+                        
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    val result = restoreDialog.awaitConfirm(title = allowlistRestore, content = allowlistRestoreMessage)
+                                    if (result == ConfirmResult.Confirmed) {
+                                        loadingDialog.withLoading {
+                                            allowlistRestore()
+                                        }
+                                    }
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Restore,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(R.string.restore))
                         }
                     }
                 }
