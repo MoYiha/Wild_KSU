@@ -85,48 +85,160 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
     var showRebootDialog by remember { mutableStateOf(false) }
     var useOverlayFs by rememberSaveable { mutableStateOf(readMountSystemFile()) }
     
-    // Custom backup states
-    var customBackupLocation by remember { mutableStateOf(CustomBackup.getCustomBackupLocation(context)) }
-    var includeModules by remember { mutableStateOf(true) }
-    var includeAllowlist by remember { mutableStateOf(true) }
-    var includeManagerSettings by remember { mutableStateOf(true) }
+    // Helper function to convert URI to path
+    fun convertUriToPath(uri: android.net.Uri): String {
+        return when {
+            uri.path?.contains("/tree/primary:") == true -> {
+                "/sdcard/" + uri.path?.substringAfter("/tree/primary:")
+            }
+            uri.path?.contains("/tree/") == true -> {
+                // Handle other storage locations
+                uri.path?.substringAfter("/tree/")?.let { treePath ->
+                    if (treePath.contains(":")) {
+                        "/sdcard/" + treePath.substringAfter(":")
+                    } else {
+                        "/sdcard/$treePath"
+                    }
+                } ?: CustomBackup.getDefaultBackupLocation()
+            }
+            else -> CustomBackup.getDefaultBackupLocation()
+        }
+    }
     
-    // Folder picker launcher
-    val folderPickerLauncher = rememberLauncherForActivityResult(
+    // Customizations backup folder picker
+    val customizationsBackupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         uri?.let {
             try {
-                // Take persistable URI permission
                 context.contentResolver.takePersistableUriPermission(
                     it,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
                 
-                // Convert content URI to file path
-                val path = when {
-                    it.path?.contains("/tree/primary:") == true -> {
-                        "/sdcard/" + it.path?.substringAfter("/tree/primary:")
+                val path = convertUriToPath(it)
+                scope.launch {
+                    loadingDialog.withLoading {
+                        val backupResult = CustomBackup.createCustomBackup(
+                            context = context,
+                            backupLocation = path,
+                            includeModules = false,
+                            includeAllowlist = false,
+                            includeManagerSettings = true
+                        )
+                        backupResult.onSuccess { filePath ->
+                            android.widget.Toast.makeText(
+                                context,
+                                "Customizations backup created: $filePath",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }.onFailure { error ->
+                            android.widget.Toast.makeText(
+                                context,
+                                "Customizations backup failed: ${error.message}",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
-                    it.path?.contains("/tree/") == true -> {
-                        // Handle other storage locations
-                        it.path?.substringAfter("/tree/")?.let { treePath ->
-                            if (treePath.contains(":")) {
-                                "/sdcard/" + treePath.substringAfter(":")
-                            } else {
-                                "/sdcard/$treePath"
-                            }
-                        } ?: CustomBackup.getDefaultBackupLocation()
-                    }
-                    else -> CustomBackup.getDefaultBackupLocation()
                 }
-                customBackupLocation = path
-                CustomBackup.setCustomBackupLocation(context, path)
             } catch (e: Exception) {
-                // Fallback to default location if URI handling fails
-                val defaultLocation = CustomBackup.getDefaultBackupLocation()
-                customBackupLocation = defaultLocation
-                CustomBackup.setCustomBackupLocation(context, defaultLocation)
+                android.widget.Toast.makeText(
+                    context,
+                    "Failed to select folder: ${e.message}",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+    
+    // Modules backup folder picker
+    val modulesBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                
+                val path = convertUriToPath(it)
+                scope.launch {
+                    loadingDialog.withLoading {
+                        val backupResult = CustomBackup.createCustomBackup(
+                            context = context,
+                            backupLocation = path,
+                            includeModules = true,
+                            includeAllowlist = false,
+                            includeManagerSettings = false
+                        )
+                        backupResult.onSuccess { filePath ->
+                            android.widget.Toast.makeText(
+                                context,
+                                "Modules backup created: $filePath",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }.onFailure { error ->
+                            android.widget.Toast.makeText(
+                                context,
+                                "Modules backup failed: ${error.message}",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(
+                    context,
+                    "Failed to select folder: ${e.message}",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+    
+    // Allowlist backup folder picker
+    val allowlistBackupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        uri?.let {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                
+                val path = convertUriToPath(it)
+                scope.launch {
+                    loadingDialog.withLoading {
+                        val backupResult = CustomBackup.createCustomBackup(
+                            context = context,
+                            backupLocation = path,
+                            includeModules = false,
+                            includeAllowlist = true,
+                            includeManagerSettings = false
+                        )
+                        backupResult.onSuccess { filePath ->
+                            android.widget.Toast.makeText(
+                                context,
+                                "Allowlist backup created: $filePath",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }.onFailure { error ->
+                            android.widget.Toast.makeText(
+                                context,
+                                "Allowlist backup failed: ${error.message}",
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(
+                    context,
+                    "Failed to select folder: ${e.message}",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -181,69 +293,7 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Custom Backup Location Section (affects all backups)
-        item {
-            StandardCard {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.backup_location),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Column {
-                        Text(
-                            text = "Select backup location for all operations",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedButton(
-                                onClick = { folderPickerLauncher.launch(null) },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                androidx.compose.material3.Icon(
-                                    imageVector = Icons.Filled.FolderOpen,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(R.string.select_folder))
-                            }
-                            
-                            OutlinedButton(
-                                onClick = {
-                                    val defaultLocation = CustomBackup.getDefaultBackupLocation()
-                                    customBackupLocation = defaultLocation
-                                    CustomBackup.setCustomBackupLocation(context, defaultLocation)
-                                }
-                            ) {
-                                androidx.compose.material3.Icon(
-                                    imageVector = Icons.Filled.Refresh,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Reset")
-                            }
-                        }
-                    }
-                    
-                    Text(
-                        text = customBackupLocation,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
+
         
         // Customizations Section
         item {
@@ -269,37 +319,8 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         
                         OutlinedButton(
                             onClick = {
-                                scope.launch {
-                                    val result = backupDialog.awaitConfirm(
-                                        title = customBackupTitle,
-                                        content = "Create backup in: $customBackupLocation"
-                                    )
-                                    if (result == ConfirmResult.Confirmed) {
-                                        loadingDialog.withLoading {
-                                            val backupResult = CustomBackup.createCustomBackup(
-                                                context = context,
-                                                backupLocation = customBackupLocation,
-                                                includeModules = false,
-                                                includeAllowlist = false,
-                                                includeManagerSettings = true
-                                            )
-                                            backupResult.onSuccess { filePath ->
-                                                android.widget.Toast.makeText(
-                                                    context,
-                                                    "Backup created: $filePath",
-                                                    android.widget.Toast.LENGTH_LONG
-                                                ).show()
-                                            }.onFailure { error ->
-                                                android.widget.Toast.makeText(
-                                                    context,
-                                                    "Backup failed: ${error.message}",
-                                                    android.widget.Toast.LENGTH_LONG
-                                                ).show()
-                                            }
-                                        }
-                                    }
-                                }
-                            },
+                            customizationsBackupLauncher.launch(null)
+                        },
                             modifier = Modifier.weight(1f)
                         ) {
                             androidx.compose.material3.Icon(
@@ -352,42 +373,9 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         val backupMessage = stringResource(id = R.string.module_backup_message)
                         
                         OutlinedButton(
-                             onClick = {
-                                 scope.launch {
-                                     val result = backupDialog.awaitConfirm(
-                                         title = moduleBackup, 
-                                         content = if (customBackupLocation.isNotEmpty()) "Create modules backup in: $customBackupLocation" else backupMessage
-                                     )
-                                     if (result == ConfirmResult.Confirmed) {
-                                         loadingDialog.withLoading {
-                                             if (customBackupLocation.isNotEmpty()) {
-                                                 val backupResult = CustomBackup.createCustomBackup(
-                                                     context = context,
-                                                     backupLocation = customBackupLocation,
-                                                     includeModules = true,
-                                                     includeAllowlist = false,
-                                                     includeManagerSettings = false
-                                                 )
-                                                 backupResult.onSuccess { filePath ->
-                                                     android.widget.Toast.makeText(
-                                                         context,
-                                                         "Modules backup created: $filePath",
-                                                         android.widget.Toast.LENGTH_LONG
-                                                     ).show()
-                                                 }.onFailure { error ->
-                                                     android.widget.Toast.makeText(
-                                                         context,
-                                                         "Modules backup failed: ${error.message}",
-                                                         android.widget.Toast.LENGTH_LONG
-                                                     ).show()
-                                                 }
-                                             } else {
-                                                 moduleBackup()
-                                             }
-                                         }
-                                     }
-                                 }
-                             },
+                            onClick = {
+                                modulesBackupLauncher.launch(null)
+                            },
                             modifier = Modifier.weight(1f)
                         ) {
                             androidx.compose.material3.Icon(
@@ -449,42 +437,9 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         val allowlistBackupMessage = stringResource(id = R.string.allowlist_backup_message)
                         
                         OutlinedButton(
-                             onClick = {
-                                 scope.launch {
-                                     val result = backupDialog.awaitConfirm(
-                                         title = allowlistBackup, 
-                                         content = if (customBackupLocation.isNotEmpty()) "Create allowlist backup in: $customBackupLocation" else allowlistBackupMessage
-                                     )
-                                     if (result == ConfirmResult.Confirmed) {
-                                         loadingDialog.withLoading {
-                                             if (customBackupLocation.isNotEmpty()) {
-                                                 val backupResult = CustomBackup.createCustomBackup(
-                                                     context = context,
-                                                     backupLocation = customBackupLocation,
-                                                     includeModules = false,
-                                                     includeAllowlist = true,
-                                                     includeManagerSettings = false
-                                                 )
-                                                 backupResult.onSuccess { filePath ->
-                                                     android.widget.Toast.makeText(
-                                                         context,
-                                                         "Allowlist backup created: $filePath",
-                                                         android.widget.Toast.LENGTH_LONG
-                                                     ).show()
-                                                 }.onFailure { error ->
-                                                     android.widget.Toast.makeText(
-                                                         context,
-                                                         "Allowlist backup failed: ${error.message}",
-                                                         android.widget.Toast.LENGTH_LONG
-                                                     ).show()
-                                                 }
-                                             } else {
-                                                 allowlistBackup()
-                                             }
-                                         }
-                                     }
-                                 }
-                             },
+                            onClick = {
+                                allowlistBackupLauncher.launch(null)
+                            },
                             modifier = Modifier.weight(1f)
                         ) {
                             androidx.compose.material3.Icon(
