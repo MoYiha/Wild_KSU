@@ -5,11 +5,16 @@ import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.SupervisorAccount
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.ViewCarousel
 import androidx.compose.material3.*
@@ -112,7 +117,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             onFinishedRequest = {
                                 if (selectedIndex >= 0 && selectedIndex < allOptions.size) {
                                     val newLocale = allOptions[selectedIndex].first
-                                    prefs.edit { putString("app_locale", newLocale) }
+                                    prefs.edit().putString("app_locale", newLocale).apply()
                                     
                                     // Update local state immediately
                                     currentAppLocale = LocaleHelper.getCurrentAppLocale(context)

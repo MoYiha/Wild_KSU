@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.rifsxd.ksunext.BuildConfig
 import com.rifsxd.ksunext.R
+import com.rifsxd.ksunext.ui.theme.getCardElevation
 
 @Preview
 @Composable
