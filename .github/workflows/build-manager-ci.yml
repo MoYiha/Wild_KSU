@@ -36,8 +36,8 @@ jobs:
       - name: Generate Version and Release Notes
         id: version
         run: |
-          # Get the latest tag that matches v*.*.* pattern
-          LATEST_TAG=$(git tag -l "v*.*.*" | sort -V | tail -n1)
+          # Get the latest valid tag that matches v*.*.* pattern (exclude invalid/negative versions)
+          LATEST_TAG=$(git tag -l "v*.*.*" | sed -n '/^v[0-9]\+\.[0-9]\+\.[0-9]\+$/p' | sort -V | tail -n1)
           
           if [ -z "$LATEST_TAG" ]; then
             # No previous version tags, start with v0.0.0
