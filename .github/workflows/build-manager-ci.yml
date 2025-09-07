@@ -21,7 +21,86 @@ on:
     - cron: "0 12 * * *" # 6 PM UTC+6 | 12 PM UTC
 
 jobs:
+  create-prerelease:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/wild'
+    outputs:
+      release-id: ${{ steps.create-release.outputs.id }}
+      release-tag: ${{ steps.version.outputs.new_version }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Version and Release Notes
+        id: version
+        run: |
+          # Get the latest tag that matches v*.*.* pattern
+          LATEST_TAG=$(git tag -l "v*.*.*" | sort -V | tail -n1)
+          
+          if [ -z "$LATEST_TAG" ]; then
+            # No previous version tags, start with v0.0.0
+            NEW_VERSION="v0.0.1"
+          else
+            # Extract version numbers and increment patch version
+            VERSION_PART=$(echo $LATEST_TAG | sed 's/v//')
+            MAJOR=$(echo $VERSION_PART | cut -d. -f1)
+            MINOR=$(echo $VERSION_PART | cut -d. -f2)
+            PATCH=$(echo $VERSION_PART | cut -d. -f3)
+            
+            # Increment patch version by 1
+            NEW_PATCH=$((PATCH + 1))
+            NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          fi
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $NEW_VERSION"
+          
+          # Generate release notes from recent commits
+          if [ -z "$LATEST_TAG" ]; then
+            # If no previous tag, get last 10 commits
+            RELEASE_NOTES=$(git log --oneline -10 --pretty=format:"- %s (%h)")
+          else
+            # Get commits since last tag
+            RELEASE_NOTES=$(git log ${LATEST_TAG}..HEAD --oneline --pretty=format:"- %s (%h)")
+          fi
+          
+          # Create release notes with header
+          cat > release_notes.md << EOF
+          ## 🚀 Pre-release Build $NEW_VERSION
+          
+          This is an automated pre-release build. Build artifacts will be uploaded once ready.
+          
+          ### 📝 Changes in this release:
+          $RELEASE_NOTES
+          
+          ### 📦 Assets:
+          Build artifacts will be uploaded automatically once the build completes successfully.
+          
+          ### ⚠️ Note:
+          This is a pre-release build for testing purposes. Use at your own risk.
+          
+          **Commit**: ${{ github.sha }}
+          **Workflow**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+          
+          echo "Release notes generated"
+
+      - name: Create Pre-release
+        id: create-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          name: "Pre-release ${{ steps.version.outputs.new_version }}"
+          body_path: release_notes.md
+          prerelease: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   check-cache:
+    needs: [create-prerelease]
     runs-on: ubuntu-latest
     outputs:
       cache-hit: ${{ steps.cache-artifacts.outputs.cache-hit }}
@@ -54,20 +133,20 @@ jobs:
           key: ${{ steps.generate-cache-key.outputs.cache-key }}
 
   build-lkm:
-    needs: check-cache
+    needs: [create-prerelease, check-cache]
     if: needs.check-cache.outputs.cache-hit != 'true'
     uses: ./.github/workflows/build-lkm.yml
     secrets: inherit
 
   build-susfsd:
-    needs: [check-cache]
+    needs: [create-prerelease, check-cache]
     if: needs.check-cache.outputs.cache-hit != 'true'
     uses: ./.github/workflows/susfsd.yml
     with:
       os: ubuntu-latest
 
   build-ksud:
-    needs: [check-cache, build-lkm]
+    needs: [create-prerelease, check-cache, build-lkm]
     if: needs.check-cache.outputs.cache-hit != 'true'
     strategy:
       matrix:
@@ -79,7 +158,7 @@ jobs:
       pack_lkm: true
 
   cache-artifacts:
-    needs: [check-cache, build-susfsd, build-ksud]
+    needs: [create-prerelease, check-cache, build-susfsd, build-ksud]
     if: needs.check-cache.outputs.cache-hit != 'true'
     runs-on: ubuntu-latest
     steps:
@@ -113,7 +192,7 @@ jobs:
           key: ${{ needs.check-cache.outputs.cache-key }}
 
   build-manager:
-    needs: [check-cache, cache-artifacts, build-lkm]
+    needs: [create-prerelease, check-cache, cache-artifacts, build-lkm]
     if: always() && needs.check-cache.result == 'success' && (needs.check-cache.outputs.cache-hit == 'true' || needs.cache-artifacts.result == 'success') && (needs.build-lkm.result == 'success' || needs.build-lkm.result == 'skipped')
     runs-on: ubuntu-latest
     strategy:
@@ -273,16 +352,11 @@ jobs:
           name: Mappings${{ matrix.build_type == 'spoofed' && '-Spoofed' || '' }}
           path: manager/app/build/outputs/mapping/release/
 
-  create-prerelease:
-    needs: [build-manager]
+  upload-to-prerelease:
+    needs: [create-prerelease, build-manager]
     if: always() && needs.build-manager.result == 'success' && github.ref == 'refs/heads/wild'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Download Normal Manager APK
         uses: actions/download-artifact@v4
         with:
@@ -295,69 +369,10 @@ jobs:
           name: Manager-Spoofed
           path: ./spoofed
 
-      - name: Generate version and release notes
-        id: version
-        run: |
-          # Get the latest tag that matches v*.*.* pattern
-          LATEST_TAG=$(git tag -l "v*.*.*" | sort -V | tail -n1)
-          
-          if [ -z "$LATEST_TAG" ]; then
-            # No previous version tags, start with v0.0.0
-            NEW_VERSION="v0.0.1"
-          else
-            # Extract version numbers and increment patch version
-            VERSION_PART=$(echo $LATEST_TAG | sed 's/v//')
-            MAJOR=$(echo $VERSION_PART | cut -d. -f1)
-            MINOR=$(echo $VERSION_PART | cut -d. -f2)
-            PATCH=$(echo $VERSION_PART | cut -d. -f3)
-            
-            # Increment patch version by 1
-            NEW_PATCH=$((PATCH + 1))
-            NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
-          fi
-          
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "Generated version: $NEW_VERSION"
-          
-          # Generate release notes from recent commits
-          if [ -z "$LATEST_TAG" ]; then
-            # If no previous tag, get last 10 commits
-            RELEASE_NOTES=$(git log --oneline -10 --pretty=format:"- %s (%h)")
-          else
-            # Get commits since last tag
-            RELEASE_NOTES=$(git log ${LATEST_TAG}..HEAD --oneline --pretty=format:"- %s (%h)")
-          fi
-          
-          # Create release notes with header
-          cat > release_notes.md << EOF
-          ## 🚀 Pre-release Build $NEW_VERSION
-          
-          This is an automated pre-release build from the latest successful CI run.
-          
-          ### 📝 Changes in this release:
-          $RELEASE_NOTES
-          
-          ### 📦 Assets:
-          - **Manager.apk**: Standard KernelSU Manager
-          - **Manager-Spoofed.apk**: Spoofed package version for compatibility
-          
-          ### ⚠️ Note:
-          This is a pre-release build for testing purposes. Use at your own risk.
-          
-          **Commit**: ${{ github.sha }}
-          **Workflow**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          EOF
-          
-          echo "Release notes generated"
-
-      - name: Create Pre-release
+      - name: Upload APKs to Pre-release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.new_version }}
-          name: "Pre-release ${{ steps.version.outputs.new_version }}"
-          body_path: release_notes.md
-          prerelease: true
-          draft: false
+          tag_name: ${{ needs.create-prerelease.outputs.release-tag }}
           files: |
             normal/*.apk
             spoofed/*.apk
@@ -365,7 +380,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   telegram-upload:
-    needs: [build-manager, create-prerelease]
+    needs: [create-prerelease, build-manager, upload-to-prerelease]
     if: always() && needs.build-manager.result == 'success'
     runs-on: ubuntu-latest
     steps:
@@ -431,3 +446,22 @@ jobs:
           else
             echo "❌ Spoofed APK file not found!"
           fi
+
+  cleanup-release:
+    needs: [create-prerelease, build-lkm, build-susfsd, build-ksud, build-manager]
+    if: always() && needs.create-prerelease.result == 'success' && (needs.build-lkm.result == 'failure' || needs.build-susfsd.result == 'failure' || needs.build-ksud.result == 'failure' || needs.build-manager.result == 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Failed Release
+        run: |
+          echo "Build failed, deleting release ${{ needs.create-prerelease.outputs.release-tag }}"
+          curl -X DELETE \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ needs.create-prerelease.outputs.release-id }}"
+          
+          echo "Deleting tag ${{ needs.create-prerelease.outputs.release-tag }}"
+          curl -X DELETE \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/git/refs/tags/${{ needs.create-prerelease.outputs.release-tag }}"
