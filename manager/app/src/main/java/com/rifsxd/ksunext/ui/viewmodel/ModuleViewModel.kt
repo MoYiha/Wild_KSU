@@ -11,6 +11,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rifsxd.ksunext.ksuApp
+import com.rifsxd.ksunext.ui.util.HanziToPinyin
+import com.rifsxd.ksunext.ui.util.getModuleSize
+import com.rifsxd.ksunext.ui.util.listModules
+import com.rifsxd.ksunext.ui.util.zygiskRequired
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,11 +24,6 @@ import org.json.JSONObject
 import java.io.File
 import java.text.Collator
 import java.util.*
-import com.rifsxd.ksunext.ui.util.HanziToPinyin
-import com.rifsxd.ksunext.ui.util.listModules
-import com.rifsxd.ksunext.ui.util.getModuleSize
-import com.rifsxd.ksunext.ui.util.zygiskRequired
-import com.rifsxd.ksunext.ksuApp
 
 class ModuleViewModel : ViewModel() {
 

@@ -9,14 +9,13 @@ import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import com.twj.wksu.IKsuInterface;
 import com.topjohnwu.superuser.ipc.RootService;
 import rikka.parcelablelist.ParcelableListSlice;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.twj.wksu.IKsuInterface;
 
 /**
  * @author weishu
