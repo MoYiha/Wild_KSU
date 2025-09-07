@@ -282,8 +282,99 @@ jobs:
           name: Mappings${{ matrix.build_type == 'spoofed' && '-Spoofed' || '' }}
           path: manager/app/build/outputs/mapping/release/
 
-  telegram-upload:
+  create-prerelease:
     needs: [build-manager]
+    if: always() && needs.build-manager.result == 'success' && github.ref == 'refs/heads/wild'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Normal Manager APK
+        uses: actions/download-artifact@v4
+        with:
+          name: Manager
+          path: ./normal
+
+      - name: Download Spoofed Manager APK
+        uses: actions/download-artifact@v4
+        with:
+          name: Manager-Spoofed
+          path: ./spoofed
+
+      - name: Generate version and release notes
+        id: version
+        run: |
+          # Get the latest tag that matches v*.*.* pattern
+          LATEST_TAG=$(git tag -l "v*.*.*" | sort -V | tail -n1)
+          
+          if [ -z "$LATEST_TAG" ]; then
+            # No previous version tags, start with v0.0.0
+            NEW_VERSION="v0.0.1"
+          else
+            # Extract version numbers and increment patch version
+            VERSION_PART=$(echo $LATEST_TAG | sed 's/v//')
+            MAJOR=$(echo $VERSION_PART | cut -d. -f1)
+            MINOR=$(echo $VERSION_PART | cut -d. -f2)
+            PATCH=$(echo $VERSION_PART | cut -d. -f3)
+            
+            # Increment patch version by 1
+            NEW_PATCH=$((PATCH + 1))
+            NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          fi
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $NEW_VERSION"
+          
+          # Generate release notes from recent commits
+          if [ -z "$LATEST_TAG" ]; then
+            # If no previous tag, get last 10 commits
+            RELEASE_NOTES=$(git log --oneline -10 --pretty=format:"- %s (%h)")
+          else
+            # Get commits since last tag
+            RELEASE_NOTES=$(git log ${LATEST_TAG}..HEAD --oneline --pretty=format:"- %s (%h)")
+          fi
+          
+          # Create release notes with header
+          cat > release_notes.md << EOF
+          ## 🚀 Pre-release Build $NEW_VERSION
+          
+          This is an automated pre-release build from the latest successful CI run.
+          
+          ### 📝 Changes in this release:
+          $RELEASE_NOTES
+          
+          ### 📦 Assets:
+          - **Manager.apk**: Standard KernelSU Manager
+          - **Manager-Spoofed.apk**: Spoofed package version for compatibility
+          
+          ### ⚠️ Note:
+          This is a pre-release build for testing purposes. Use at your own risk.
+          
+          **Commit**: ${{ github.sha }}
+          **Workflow**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+          
+          echo "Release notes generated"
+
+      - name: Create Pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          name: "Pre-release ${{ steps.version.outputs.new_version }}"
+          body_path: release_notes.md
+          prerelease: true
+          draft: false
+          files: |
+            normal/*.apk
+            spoofed/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  telegram-upload:
+    needs: [build-manager, create-prerelease]
     if: always() && needs.build-manager.result == 'success'
     runs-on: ubuntu-latest
     steps:
