@@ -67,7 +67,7 @@ jobs:
       os: ubuntu-latest
 
   build-ksud:
-    needs: [check-cache]
+    needs: [check-cache, build-lkm]
     if: needs.check-cache.outputs.cache-hit != 'true'
     strategy:
       matrix:
@@ -76,6 +76,7 @@ jobs:
     with:
       target: ${{ matrix.target }}
       os: ubuntu-latest
+      pack_lkm: true
 
   cache-artifacts:
     needs: [check-cache, build-susfsd, build-ksud]
