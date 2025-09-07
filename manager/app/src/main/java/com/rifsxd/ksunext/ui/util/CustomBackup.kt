@@ -286,7 +286,10 @@ object CustomBackup {
         val backgroundPrefs = context.getSharedPreferences("background_settings", Context.MODE_PRIVATE)
         
         backgroundPrefs.edit().apply {
-            putString("background_image_uri", settingsJson.optString("backgroundImageUri", null))
+            val backgroundUri = settingsJson.optString("backgroundImageUri", "")
+            if (backgroundUri.isNotEmpty()) {
+                putString("background_image_uri", backgroundUri)
+            }
             putString("background_fit_mode", settingsJson.optString("backgroundFitMode", "CENTER_CROP"))
             putFloat("background_transparency", settingsJson.optDouble("backgroundTransparency", 1.0).toFloat())
             putFloat("background_blur", settingsJson.optDouble("backgroundBlur", 0.0).toFloat())
