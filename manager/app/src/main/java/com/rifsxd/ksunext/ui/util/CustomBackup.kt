@@ -43,7 +43,7 @@ object CustomBackup {
     )
     
     fun getDefaultBackupLocation(): String {
-        return "${Environment.getExternalStorageDirectory()}/Download/backup/Wild_KSU"
+        return "/sdcard/Android/data/adb/Wild_KSU_backups"
     }
     
     fun getCustomBackupLocation(context: Context): String {
