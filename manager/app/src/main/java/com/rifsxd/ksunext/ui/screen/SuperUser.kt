@@ -181,7 +181,7 @@ private fun AppItem(
                         onClick = { viewModel.toggleFavorite(app.packageName) }
                     ) {
                         Icon(
-                            imageVector = if (app.isFavorite) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                            imageVector = if (app.isFavorite) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                             contentDescription = if (app.isFavorite) "Remove from favorites" else "Add to favorites",
                             tint = if (app.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )

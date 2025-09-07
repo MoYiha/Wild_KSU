@@ -24,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.CheckCircleOutline
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.rounded.CheckCircleOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -954,7 +956,7 @@ private fun IssueReportCardContent(
     Column {
         CardRowContent(
             text = stringResource(R.string.issue_report_body),
-            icon = Icons.AutoMirrored.Filled.HelpOutline,
+            icon = Icons.Outlined.HelpOutline,
             title = stringResource(R.string.issue_report_title),
             subtitle = stringResource(R.string.issue_report_body_2),
             actions = {
@@ -1041,7 +1043,7 @@ fun MiuixStatusCard(
                 ) {
                     Icon(
                         modifier = Modifier.size(90.dp),
-                        imageVector = Icons.Rounded.CheckCircleOutline,
+                        imageVector = Icons.Outlined.CheckCircleOutline,
                         tint = Color(0xFF36D167),
                         contentDescription = null
                     )
