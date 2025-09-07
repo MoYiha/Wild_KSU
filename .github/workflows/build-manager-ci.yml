@@ -66,7 +66,7 @@ jobs:
     with:
       os: ubuntu-latest
 
-  build-ksud-overlayfs:
+  build-ksud:
     needs: [check-cache]
     if: needs.check-cache.outputs.cache-hit != 'true'
     strategy:
@@ -74,24 +74,11 @@ jobs:
         target: [aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android]
     uses: ./.github/workflows/ksud.yml
     with:
-      target: overlayfs
-      arch: ${{ matrix.target }}
-      os: ubuntu-latest
-
-  build-ksud-magic:
-    needs: [check-cache]
-    if: needs.check-cache.outputs.cache-hit != 'true'
-    strategy:
-      matrix:
-        target: [aarch64-linux-android, armv7-linux-androideabi, x86_64-linux-android]
-    uses: ./.github/workflows/ksud.yml
-    with:
-      target: magic
-      arch: ${{ matrix.target }}
+      target: ${{ matrix.target }}
       os: ubuntu-latest
 
   cache-artifacts:
-    needs: [check-cache, build-susfsd, build-ksud-overlayfs, build-ksud-magic]
+    needs: [check-cache, build-susfsd, build-ksud]
     if: needs.check-cache.outputs.cache-hit != 'true'
     runs-on: ubuntu-latest
     steps:
