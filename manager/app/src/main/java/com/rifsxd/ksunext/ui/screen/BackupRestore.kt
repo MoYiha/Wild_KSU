@@ -94,13 +94,9 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
         )
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
-        LazyColumn(
+    LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+                .fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -288,7 +284,6 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                     )
                 )
             }
-        }
         }
     }
 }
