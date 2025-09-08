@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import android.content.Context
 import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 
