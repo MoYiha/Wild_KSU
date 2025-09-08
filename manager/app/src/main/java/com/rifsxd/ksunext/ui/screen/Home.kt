@@ -77,6 +77,7 @@ import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
+import com.rifsxd.ksunext.ui.util.isCurrentManagerSpoofed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -187,7 +188,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                         }
                     }
 
-                    if (debugWarningCard || (isManager && Natives.requireNewKernel())) {
+                    if (isManager && Natives.requireNewKernel()) {
                         WarningCard(
                             stringResource(id = R.string.require_kernel_version).format(
                                 ksuVersion, Natives.MINIMAL_SUPPORTED_KERNEL
@@ -195,7 +196,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                         )
                     }
 
-                    if (debugWarningCard || (ksuVersion != null && !rootAvailable())) {
+                    if (ksuVersion != null && !rootAvailable()) {
                         WarningCard(
                             stringResource(id = R.string.grant_root_failed)
                         )
@@ -274,6 +275,7 @@ fun UpdateCard() {
     val newVersionCode = newVersion.versionCode
     val newVersionUrl = newVersion.downloadUrl
     val changelog = newVersion.changelog
+    val isCurrentSpoofed = isCurrentManagerSpoofed()
 
     val uriHandler = LocalUriHandler.current
     val title = stringResource(id = R.string.module_changelog)
@@ -285,7 +287,8 @@ fun UpdateCard() {
         exit = shrinkVertically() + fadeOut()
     ) {
         val updateDialog = rememberConfirmDialog(onConfirm = { uriHandler.openUri(newVersionUrl) })
-        val message = stringResource(id = R.string.new_version_available).format(newVersionCode)
+        val versionTypeText = if (isCurrentSpoofed) "spoofed" else "standard"
+        val message = stringResource(id = R.string.new_version_available).format(newVersionCode) + " ($versionTypeText)"
         
         WarningCard(
             message = message,

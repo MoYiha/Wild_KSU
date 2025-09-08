@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import android.content.Context
 import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 
@@ -79,6 +80,8 @@ fun checkNewVersion(): LatestVersionInfo {
                 val changelog = json.optString("body")
 
                 val assets = json.getJSONArray("assets")
+                val currentManagerIsSpoofed = isCurrentManagerSpoofed()
+                
                 for (i in 0 until assets.length()) {
                     val asset = assets.getJSONObject(i)
                     val name = asset.getString("name")
@@ -86,8 +89,25 @@ fun checkNewVersion(): LatestVersionInfo {
                         continue
                     }
 
-                    // Match APK naming format: Wild_KSU_${versionName}_${versionCode}-${buildType}.apk
-                    val regex = Regex("Wild_KSU_(.+?)_(\\d+)-")
+                    // Check if APK is spoofed or non-spoofed
+                    // Spoofed APKs have format: Wild_KSU_${versionName}-spoofed_${versionCode}-${buildType}.apk
+                    // Non-spoofed APKs have format: Wild_KSU_${versionName}_${versionCode}-${buildType}.apk
+                    val isSpoofedApk = name.contains("-spoofed_")
+                    
+                    // Only return APK that matches current manager type
+                    if (isSpoofedApk != currentManagerIsSpoofed) {
+                        continue
+                    }
+
+                    // Match APK naming format based on type
+                    val regex = if (isSpoofedApk) {
+                        // For spoofed: Wild_KSU_v0.0.30-spoofed_13785-release.apk
+                        Regex("Wild_KSU_(.+?)-spoofed_(\\d+)-")
+                    } else {
+                        // For non-spoofed: Wild_KSU_v0.0.30_13785-release.apk
+                        Regex("Wild_KSU_(.+?)_(\\d+)-")
+                    }
+                    
                     val matchResult = regex.find(name) ?: continue
                     val versionName = matchResult.groupValues[1]
                     val versionCode = matchResult.groupValues[2].toInt()
@@ -103,6 +123,21 @@ fun checkNewVersion(): LatestVersionInfo {
             }
     }
     return defaultValue
+}
+
+/**
+ * Detects if the current manager version is spoofed by checking the version name
+ */
+fun isCurrentManagerSpoofed(): Boolean {
+    return try {
+        val context = ksuApp.applicationContext
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        val versionName = packageInfo.versionName ?: ""
+        // Check if version name contains "spoofed" indicator
+        versionName.contains("spoofed", ignoreCase = true)
+    } catch (e: Exception) {
+        false // Default to non-spoofed if detection fails
+    }
 }
 
 @Composable
