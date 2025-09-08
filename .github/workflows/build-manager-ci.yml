@@ -326,7 +326,7 @@ jobs:
           git tag -a "$NEW_VERSION" -m "CI Build $NEW_VERSION"
           git push origin "$NEW_VERSION"
 
-  create-prerelease:
+  create-release:
     needs: [build-manager, generate-version]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/wild'
@@ -362,9 +362,12 @@ jobs:
           
           # Create release notes with header
           cat > release_notes.md << EOF
-          ## 🚀 Pre-release Build ${{ needs.generate-version.outputs.version }}
+          ## 🚀 Release Build ${{ needs.generate-version.outputs.version }}
           
-          This is an automated pre-release build from the latest successful CI run.
+          This is an automated release build from the latest successful CI run.
+          
+          ### ⚠️ TESTING WARNING:
+          **This release is still in testing phase. Please use with caution and verify functionality manually.**
           
           ### 📝 Changes in this release:
           $RELEASE_NOTES
@@ -374,7 +377,7 @@ jobs:
           - **Manager-Spoofed.apk**: Spoofed package version for compatibility
           
           ### ⚠️ Note:
-          This is a pre-release build for testing purposes. Use at your own risk.
+          This build is for testing purposes. Use at your own risk.
           
           **Commit**: ${{ github.sha }}
           **Workflow**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -382,13 +385,13 @@ jobs:
           
           echo "Release notes generated"
 
-      - name: Create Pre-release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.generate-version.outputs.version }}
-          name: "Pre-release ${{ needs.generate-version.outputs.version }}"
+          name: "Release ${{ needs.generate-version.outputs.version }}"
           body_path: release_notes.md
-          prerelease: true
+          prerelease: false
           draft: false
           files: |
             normal/*.apk
@@ -397,7 +400,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   telegram-upload:
-    needs: [build-manager, create-prerelease]
+    needs: [build-manager, create-release]
     if: always() && needs.build-manager.result == 'success'
     runs-on: ubuntu-latest
     steps:

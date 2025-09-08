@@ -294,7 +294,7 @@ fun UpdateCard() {
         val message = if (debugUpdateCard && newVersionCode <= currentVersionCode) {
             "Debug: Update card forced to show (current version: $currentVersionCode, latest: $newVersionCode)"
         } else {
-            stringResource(id = R.string.new_version_available).format(newVersionCode)
+            "⚠️ Testing: ${stringResource(id = R.string.new_version_available).format(newVersionCode)}\n\nThis update feature is still in testing phase. Please verify the update manually."
         }
         
         WarningCard(
@@ -954,10 +954,9 @@ private fun IssueReportCardContent(
 ) {
     Column {
         CardRowContent(
-            text = stringResource(R.string.issue_report_body),
+            text = "${stringResource(R.string.issue_report_body)} ${stringResource(R.string.issue_report_body_2)}",
             icon = Icons.Outlined.HelpOutline,
             title = stringResource(R.string.issue_report_title),
-            subtitle = stringResource(R.string.issue_report_body_2),
             actions = {
                 Row(horizontalArrangement = Arrangement.spacedBy(CardConstants.ACTION_SPACING)) {
                     IconButton(onClick = { uriHandler.openUri(githubIssueUrl) }) {
