@@ -17,8 +17,6 @@ on:
       - 'manager/**'
   workflow_call:
   workflow_dispatch:
-  schedule:
-    - cron: "0 12 * * *" # 6 PM UTC+6 | 12 PM UTC
 
 jobs:
   check-cache:
