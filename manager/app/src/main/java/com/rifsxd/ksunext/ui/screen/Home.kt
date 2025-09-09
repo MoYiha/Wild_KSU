@@ -272,16 +272,26 @@ fun UpdateCard() {
     }
 
     val currentVersionCode = getManagerVersion(context).second
+    val currentVersionName = getManagerVersion(context).first
     val newVersionCode = newVersion.versionCode
     val newVersionUrl = newVersion.downloadUrl
     val changelog = newVersion.changelog
+    
+    // Check if current version is spoofed
+    val isCurrentSpoofed = currentVersionName.contains("-spoofed")
+    
+    // Show update if:
+    // 1. New version code is higher than current, OR
+    // 2. Current version is spoofed and there's a spoofed update available (even same version code)
+    val shouldShowUpdate = newVersionCode > currentVersionCode || 
+        (isCurrentSpoofed && newVersionCode > 0 && newVersionUrl.isNotEmpty())
 
     val uriHandler = LocalUriHandler.current
     val title = stringResource(id = R.string.module_changelog)
     val updateText = stringResource(id = R.string.module_update)
 
     AnimatedVisibility(
-        visible = newVersionCode > currentVersionCode,
+        visible = shouldShowUpdate,
         enter = fadeIn() + expandVertically(),
         exit = shrinkVertically() + fadeOut()
     ) {

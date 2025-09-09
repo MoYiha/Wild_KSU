@@ -150,7 +150,7 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                 CardRowContent(
                     icon = Icons.Filled.Backup,
                     text = "Backup Theme",
-                    subtitle = "Save theme settings and background image to a tar file",
+                    subtitle = "Save theme settings and background image to a zip file",
                     modifier = Modifier.clickable(
                         interactionSource = rememberNoRippleInteractionSource(),
                         indication = null
@@ -158,8 +158,8 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         // Launch system file manager for backup location
                         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                             addCategory(Intent.CATEGORY_OPENABLE)
-                            type = "application/x-tar"
-                            putExtra(Intent.EXTRA_TITLE, "theme_backup.tar")
+                            type = "application/zip"
+                            putExtra(Intent.EXTRA_TITLE, "theme_backup.zip")
                         }
                         backupFileLauncher.launch(intent)
                     }
@@ -170,7 +170,7 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                 CardRowContent(
                     icon = Icons.Filled.Restore,
                     text = "Restore Theme",
-                    subtitle = "Restore theme settings from the latest backup tar file",
+                    subtitle = "Restore theme settings from the latest backup zip file",
                     modifier = Modifier.clickable(
                         interactionSource = rememberNoRippleInteractionSource(),
                         indication = null
@@ -178,7 +178,7 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         // Launch system file manager for restore file selection
                         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                             addCategory(Intent.CATEGORY_OPENABLE)
-                            type = "application/x-tar"
+                            type = "application/zip"
                         }
                         restoreFileLauncher.launch(intent)
                     }
