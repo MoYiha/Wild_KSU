@@ -285,7 +285,7 @@ private fun IconThemeItemCard(
             // Name
             Text(
                 text = item.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge.copy(lineHeight = 24.sp),
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),

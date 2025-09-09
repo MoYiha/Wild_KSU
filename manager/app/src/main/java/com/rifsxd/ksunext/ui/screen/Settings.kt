@@ -448,7 +448,7 @@ fun UninstallItem(
         },
         headlineContent = { Text(
             text = uninstall,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge.copy(lineHeight = 24.sp),
             fontWeight = FontWeight.SemiBold
         ) },
         modifier = Modifier.clickable(

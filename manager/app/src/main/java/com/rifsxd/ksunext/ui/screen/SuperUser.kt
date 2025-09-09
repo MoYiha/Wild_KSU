@@ -114,14 +114,14 @@ private fun AppItem(
             modifier = Modifier.clickable(onClick = onClickListener),
             headlineContent = { Text(
                 text = app.label,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge.copy(lineHeight = 24.sp),
                 fontWeight = FontWeight.SemiBold,
             ) },
             supportingContent = {
                 Column {
                     Text(
                         text = app.packageName,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp)
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))

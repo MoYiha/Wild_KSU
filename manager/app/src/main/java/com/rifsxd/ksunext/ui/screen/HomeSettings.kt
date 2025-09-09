@@ -337,7 +337,7 @@ fun HomeSettingsScreen(
                     )
                     Text(
                         text = "Scroll to see more icons",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -412,7 +412,7 @@ fun HomeSettingsScreen(
                                     if (value == "SEASONAL") {
                                         Text(
                                             text = "Currently: ${IconUtils.getSeasonalIconName()}",
-                                            style = MaterialTheme.typography.bodySmall,
+                                            style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
@@ -509,7 +509,7 @@ fun HomeSettingsScreen(
                                     )
                                     Text(
                                         text = if (value == "STOCK") "Current default layout" else "Alternative layout style",
-                                        style = MaterialTheme.typography.bodySmall,
+                                        style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
