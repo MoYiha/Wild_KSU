@@ -289,7 +289,7 @@ fun CardRowContent(
             
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
+                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 16.sp),
                 fontWeight = FontWeight.Normal
             )
             
