@@ -282,7 +282,7 @@ fun CardRowContent(
             if (title != null) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(lineHeight = 24.sp),
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
             }
