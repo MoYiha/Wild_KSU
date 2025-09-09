@@ -102,8 +102,6 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
         ) {
         // Theme Settings Backup & Restore
         item {
-            var isThemeBackupLoading by remember { mutableStateOf(false) }
-            var isThemeRestoreLoading by remember { mutableStateOf(false) }
             var backupPath by rememberSaveable { mutableStateOf("") }
             var restorePath by rememberSaveable { mutableStateOf("") }
             
@@ -137,9 +135,6 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                     }
                 }
             }
-            
-            val themeBackupDialog = rememberLoadingDialog()
-            val themeRestoreDialog = rememberLoadingDialog()
             
 
             

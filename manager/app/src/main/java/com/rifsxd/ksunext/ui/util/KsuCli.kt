@@ -660,11 +660,16 @@ fun themeBackup(context: Context, uri: Uri): Boolean {
         }
         
         // Create zip file
-        val zipCmd = "cd $tempDir && $BUSYBOX zip -r $zipPath ."
+        val zipCmd = "$BUSYBOX zip -r $zipPath -C $tempDir ."
         val zipResult = ShellUtils.fastCmdResult(zipCmd)
         if (!zipResult) {
-            ShellUtils.fastCmdResult("rm -rf $tempDir")
-            return false
+            // Fallback to alternative zip command if the first one fails
+            val fallbackZipCmd = "cd $tempDir && $BUSYBOX zip -r ../$(basename $zipPath) ."
+            val fallbackResult = ShellUtils.fastCmdResult(fallbackZipCmd)
+            if (!fallbackResult) {
+                ShellUtils.fastCmdResult("rm -rf $tempDir")
+                return false
+            }
         }
         
         // Write zip file to selected Uri using ContentResolver
