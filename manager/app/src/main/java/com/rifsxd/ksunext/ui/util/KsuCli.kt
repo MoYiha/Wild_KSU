@@ -531,10 +531,10 @@ fun themeBackup(customPath: String? = null): Boolean {
         val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val tarName = "theme_backup_$timestamp.tar"
-        val tarPath = "/data/local/tmp/$tarName"
+        val zipName = "theme_backup_$timestamp.zip"
+        val zipPath = "/data/local/tmp/$zipName"
         val internalBackupDir = customPath ?: "/data/adb/ksu/backup/theme"
-        val internalBackupPath = "$internalBackupDir/$tarName"
+        val internalBackupPath = "$internalBackupDir/$zipName"
         val tempDir = "/data/local/tmp/theme_backup_$timestamp"
         
         // Create temp directory
@@ -576,26 +576,26 @@ fun themeBackup(customPath: String? = null): Boolean {
             }
         }
         
-        // Create tar file
-        val tarCmd = "$BUSYBOX tar -cpf $tarPath -C $tempDir ."
-        val tarResult = ShellUtils.fastCmdResult(tarCmd)
-        if (!tarResult) {
+        // Create zip file
+        val zipCmd = "cd $tempDir && $BUSYBOX zip -r $zipPath ."
+        val zipResult = ShellUtils.fastCmdResult(zipCmd)
+        if (!zipResult) {
             ShellUtils.fastCmdResult("rm -rf $tempDir")
             return false
         }
         
-        // Create backup directory and copy tar file
+        // Create backup directory and copy zip file
         if (!SuFile(internalBackupDir).mkdirs()) {
             ShellUtils.fastCmdResult("rm -rf $tempDir")
-            SuFile(tarPath).delete()
+            SuFile(zipPath).delete()
             return false
         }
         
-        val cpResult = ShellUtils.fastCmdResult("cp $tarPath $internalBackupPath")
+        val cpResult = ShellUtils.fastCmdResult("cp $zipPath $internalBackupPath")
         
         // Clean up temp files
         ShellUtils.fastCmdResult("rm -rf $tempDir")
-        SuFile(tarPath).delete()
+        SuFile(zipPath).delete()
         
         return cpResult
     } catch (e: Exception) {
@@ -611,7 +611,7 @@ fun themeBackup(context: Context, uri: Uri): Boolean {
         
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val tempDir = "/data/local/tmp/theme_backup_$timestamp"
-        val tarPath = "/data/local/tmp/theme_backup_$timestamp.tar"
+        val zipPath = "/data/local/tmp/theme_backup_$timestamp.zip"
         
         // Create temp directory
         if (!SuFile(tempDir).mkdirs()) return false
@@ -652,24 +652,24 @@ fun themeBackup(context: Context, uri: Uri): Boolean {
             }
         }
         
-        // Create tar file
-        val tarCmd = "$BUSYBOX tar -cpf $tarPath -C $tempDir ."
-        val tarResult = ShellUtils.fastCmdResult(tarCmd)
-        if (!tarResult) {
+        // Create zip file
+        val zipCmd = "cd $tempDir && $BUSYBOX zip -r $zipPath ."
+        val zipResult = ShellUtils.fastCmdResult(zipCmd)
+        if (!zipResult) {
             ShellUtils.fastCmdResult("rm -rf $tempDir")
             return false
         }
         
-        // Write tar file to selected Uri using ContentResolver
+        // Write zip file to selected Uri using ContentResolver
         context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-            SuFile(tarPath).inputStream().use { inputStream ->
+            SuFile(zipPath).inputStream().use { inputStream ->
                 inputStream.copyTo(outputStream)
             }
         }
         
         // Clean up temp files
         ShellUtils.fastCmdResult("rm -rf $tempDir")
-        SuFile(tarPath).delete()
+        SuFile(zipPath).delete()
         
         return true
     } catch (e: Exception) {
@@ -685,25 +685,25 @@ fun themeRestore(context: Context, uri: Uri): Boolean {
         
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val tempDir = "/data/local/tmp/theme_restore_$timestamp"
-        val tarPath = "/data/local/tmp/theme_restore_$timestamp.tar"
+        val zipPath = "/data/local/tmp/theme_restore_$timestamp.zip"
         
-        // Copy tar file from Uri to temp location
+        // Copy zip file from Uri to temp location
         context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            SuFile(tarPath).outputStream().use { outputStream ->
+            SuFile(zipPath).outputStream().use { outputStream ->
                 inputStream.copyTo(outputStream)
             }
         } ?: return false
         
-        // Create temp directory and extract tar
+        // Create temp directory and extract zip
         if (!SuFile(tempDir).mkdirs()) {
-            SuFile(tarPath).delete()
+            SuFile(zipPath).delete()
             return false
         }
         
-        val extractCmd = "$BUSYBOX tar -xpf $tarPath -C $tempDir"
+        val extractCmd = "$BUSYBOX unzip -o $zipPath -d $tempDir"
         if (!ShellUtils.fastCmdResult(extractCmd)) {
             ShellUtils.fastCmdResult("rm -rf $tempDir")
-            SuFile(tarPath).delete()
+            SuFile(zipPath).delete()
             return false
         }
         
@@ -711,7 +711,7 @@ fun themeRestore(context: Context, uri: Uri): Boolean {
         val jsonFile = SuFile("$tempDir/theme_settings.json")
         if (!jsonFile.exists()) {
             ShellUtils.fastCmdResult("rm -rf $tempDir")
-            SuFile(tarPath).delete()
+            SuFile(zipPath).delete()
             return false
         }
         
@@ -780,18 +780,18 @@ fun themeRestore(customPath: String? = null): Boolean {
         
         val backupDir = customPath ?: "/data/adb/ksu/backup/theme"
         
-        // Find the latest theme backup tar file
-        val findTarCmd = "ls -t $backupDir/theme_backup_*.tar 2>/dev/null | head -n 1"
-        val tarPath = ShellUtils.fastCmd(findTarCmd).trim()
-        if (tarPath.isEmpty()) return false
+        // Find the latest theme backup zip file
+        val findZipCmd = "ls -t $backupDir/theme_backup_*.zip 2>/dev/null | head -n 1"
+        val zipPath = ShellUtils.fastCmd(findZipCmd).trim()
+        if (zipPath.isEmpty()) return false
         
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val tempDir = "/data/local/tmp/theme_restore_$timestamp"
         
-        // Create temp directory and extract tar
+        // Create temp directory and extract zip
         if (!SuFile(tempDir).mkdirs()) return false
         
-        val extractCmd = "$BUSYBOX tar -xpf $tarPath -C $tempDir"
+        val extractCmd = "$BUSYBOX unzip -o $zipPath -d $tempDir"
         if (!ShellUtils.fastCmdResult(extractCmd)) {
             ShellUtils.fastCmdResult("rm -rf $tempDir")
             return false
