@@ -577,9 +577,16 @@ fun themeBackup(customPath: String? = null): Boolean {
         }
         
         // Create zip file
-        val zipCmd = "cd $tempDir && $BUSYBOX zip -r $zipPath ."
+        val zipCmd = "cd $tempDir && $BUSYBOX zip -r $zipName ."
         val zipResult = ShellUtils.fastCmdResult(zipCmd)
         if (!zipResult) {
+            ShellUtils.fastCmdResult("rm -rf $tempDir")
+            return false
+        }
+        
+        // Move zip file to final location
+        val moveResult = ShellUtils.fastCmdResult("mv $tempDir/$zipName $zipPath")
+        if (!moveResult) {
             ShellUtils.fastCmdResult("rm -rf $tempDir")
             return false
         }
