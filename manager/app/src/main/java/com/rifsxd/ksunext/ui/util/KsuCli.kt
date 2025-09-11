@@ -675,7 +675,6 @@ fun themeBackup(context: Context, uri: Uri): Boolean {
         
         // Clean up temp files
         ShellUtils.fastCmdResult("rm -rf $tempDir")
-        SuFile(zipPath).delete()
         
         return true
     } catch (e: Exception) {
