@@ -33,7 +33,6 @@
     <string name="home_manager_version">Manager Version</string>
     <string name="home_abi">ABI</string>
     <string name="home_selinux_status">SELinux status</string>
-    <string name="selinux_status_disabled">Disabled</string>
     <string name="selinux_status_enforcing">Enforcing</string>
     <string name="selinux_status_permissive">Permissive</string>
     <string name="selinux_status_unknown">Unknown</string>
@@ -85,7 +84,7 @@
     <string name="home_mount_system">Mount System</string>
     <string name="home_magic_mount">Magic Mount</string>
     <string name="home_overlayfs_mount">OverlayFS</string>
-    <string name="unavailable">Unavailable</string>
+    <string name="status_unavailable">Unavailable</string>
     <string name="use_overlay_fs">Use OverlayFS</string>
     <string name="use_overlay_fs_summary">Toggle between using OverlayFS over Magic Mount for Wild KSU\'s mount system.</string>
     <string name="reboot_required">Reboot required</string>
@@ -105,17 +104,9 @@
     <string name="cancel">Cancel</string>
     <string name="later">Later</string>
     <string name="lkm_warning_message">The LKM patch relies on closed source components. Do you want to continue?</string>
-    <string name="home_next_kernelsu">🔥 Next build</string>
-    <string name="home_next_kernelsu_repo">https://github.com/WildKernels/Wild_KSU</string>
-    <string name="home_next_kernelsu_body">Next experimental branch. Check it out on GitHub!</string>
-    <string name="home_experimental_kernelsu">⚠️ Experimental development warning!</string>
-    <string name="home_experimental_kernelsu_repo">127.0.0.1</string>
-    <string name="home_experimental_kernelsu_body">Wild KSU is a non-official version that is always under active experimental development. It\'s provided as-is, with no guarantees of stability, performance, or reliability.</string>
-    <string name="home_experimental_kernelsu_body_point_1"> • Use at your own risk: crashes, unexpected behavior, or system issues may occur.</string>
-    <string name="home_experimental_kernelsu_body_point_2"> • No warranty: the developers aren\'t responsible for any data loss, system damage, or other consequences resulting from its use.</string>
-    <string name="home_experimental_kernelsu_body_point_3"> • For testing purposes only: intended for users who understand the risks and are comfortable troubleshooting issues.</string>
+
     <string name="about_source_code"><![CDATA[View source code at %1$s]]></string>
-    <string name="profile" translatable="false">App Profile</string>
+    <string name="profile">App Profile</string>
     <string name="profile_default">Default</string>
     <string name="profile_template">Template</string>
     <string name="profile_custom">Custom</string>
@@ -164,17 +155,10 @@
     <string name="app_profile_template_description">Description</string>
     <string name="app_profile_template_save">Save</string>
     <string name="app_profile_template_delete">Delete</string>
-    <string name="app_profile_template_view">View template</string>
     <string name="app_profile_template_readonly">Read only</string>
     <string name="app_profile_template_id_exist">Template ID already exists!</string>
-    <string name="app_profile_import_export">Import/Export</string>
-    <string name="app_profile_import_from_clipboard">Import from clipboard</string>
-    <string name="app_profile_export_to_clipboard">Export to clipboard</string>
-    <string name="app_profile_template_export_empty">Cannot find local template to export!</string>
     <string name="app_profile_template_import_success">Imported successfully</string>
-    <string name="app_profile_template_sync">Sync online templates</string>
     <string name="app_profile_template_save_failed">Failed to save template</string>
-    <string name="app_profile_template_import_empty">Clipboard is empty!</string>
     <string name="module_changelog_failed">Fetch changelog failed: %s</string>
     <string name="settings_check_update">Check for updates</string>
     <string name="settings_check_update_summary">Automatically check for updates when opening the app</string>
@@ -211,10 +195,7 @@
     <string name="settings_disable_su_summary">Temporarily disable the ability of any app to gain root privileges via the ⁠su command (Existing root processes won\'t be affected).</string>
     <string name="settings_language">Language</string>
     <string name="system_default">System default</string>
-    <string name="settings_legacyui">Use legacy UI</string>
-    <string name="settings_legacyui_summary">Switch to the previous user interface style.</string>
-    <string name="settings_banner">Enable banners</string>
-    <string name="settings_banner_summary">Show background banners for modules.</string>
+
     <string name="use_webuix">Use WebUI X</string>
     <string name="use_webuix_summary">Use WebUI X instead of WebUI, which supports more APIs.</string>
     <string name="use_webuix_eruda">Inject Eruda into WebUI X</string>
@@ -266,16 +247,7 @@
     <string name="dpi_scale_settings_summary">Adjust the display density (DPI) of the app interface</string>
     <string name="dpi_change_settings">Change DPI Settings</string>
     <string name="dpi_dialog_description">Adjust the display density to change the size of UI elements. Higher values make elements smaller, lower values make them larger.</string>
-    <!-- InfoCard Customization -->
-    <string name="info_card_customization">Home Settings</string>
-    <string name="info_card_customization_summary">Customize home screen appearance, help card, and system information display</string>
-    <string name="info_card_always_expanded">Always expanded</string>
-    <string name="info_card_always_expanded_summary">Keep the info card expanded at all times</string>
-    
-    <!-- Help Card Customization -->
-    <string name="help_card_customization">Help Card</string>
-    <string name="help_card_customization_summary">Show or hide the help card at the bottom of the home screen</string>
-    <string name="help_card_show">Show help card</string>
+
     
     <!-- Home Screen Icon Style -->
     <string name="home_screen_icon_style">Home Screen Icon Style</string>
@@ -283,9 +255,7 @@
     <string name="home_screen_icon_current">Current: %s</string>
     <string name="home_screen_icon_select_dialog_title">Select Home Screen Icon Style</string>
     
-    <!-- System Info Card Settings -->
-    <string name="system_info_card_settings">System Info Card Settings</string>
-    <string name="system_info_card_settings_summary">Customize system information display and home screen elements</string>
+
     
     <!-- Module Settings Customization -->
     <string name="module_card_customization">Module Settings</string>
@@ -296,11 +266,7 @@
     <string name="app_name_customization_summary">Change the app name displayed in the interface</string>
     <string name="app_name_kernelsu_next">KernelSU Next</string>
     <string name="app_name_wild_ksu">Wild KSU</string>
-    <string name="app_name_custom">Custom</string>
-    <string name="app_name_custom_hint">Enter custom app name</string>
-    <string name="app_name_dialog_title">Select App Name</string>
-    <string name="app_name_custom_dialog_title">Custom App Name</string>
-    <string name="app_name_custom_dialog_message">Enter your custom app name (max 20 characters)</string>
+
     
     <!-- Home Settings Card Layout -->
     <string name="home_screen_settings">Home &amp; Cards</string>
@@ -311,4 +277,21 @@
     <!-- Individual App Cards Settings -->
     <string name="individual_app_cards">Individual App Cards</string>
     <string name="individual_app_cards_summary">Show each app in its own card instead of a list</string>
+    
+    <!-- Season names -->
+    <string name="season_winter">Winter</string>
+    <string name="season_spring">Spring</string>
+    <string name="season_summer">Summer</string>
+    <string name="season_fall">Fall</string>
+    
+    <!-- Icon type names -->
+    <string name="icon_type_off">Off</string>
+    <string name="icon_type_seasonal">Seasonal (%s)</string>
+    <string name="icon_type_winter">Winter</string>
+    <string name="icon_type_spring">Spring</string>
+    <string name="icon_type_summer">Summer</string>
+    <string name="icon_type_fall">Fall</string>
+    <string name="icon_type_ksu_next">KSU Next</string>
+    <string name="icon_type_cannabis">Cannabis</string>
+    <string name="icon_type_amongus">Amongus</string>
 </resources>

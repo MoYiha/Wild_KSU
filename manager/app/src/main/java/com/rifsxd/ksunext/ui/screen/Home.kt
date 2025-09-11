@@ -753,7 +753,7 @@ private fun InfoCardContent(
                             val hookMode =
                                 Natives.getHookMode()
                                     .takeUnless { it.isNullOrBlank() }
-                                    ?: stringResource(R.string.unavailable)
+                                    ?: stringResource(R.string.status_unavailable)
                             if (!isFirst) CardItemSpacer()
                             InfoCardItem(
                                 label   = stringResource(R.string.hook_mode),
@@ -767,7 +767,7 @@ private fun InfoCardContent(
                             if (!isFirst) CardItemSpacer()
                             InfoCardItem(
                                 label = stringResource(R.string.home_mount_system),
-                                content = currentMountSystem().ifEmpty { stringResource(R.string.unavailable) },
+                                content = currentMountSystem().ifEmpty { stringResource(R.string.status_unavailable) },
                                 icon = Icons.Filled.SettingsSuggest,
                             )
                         }

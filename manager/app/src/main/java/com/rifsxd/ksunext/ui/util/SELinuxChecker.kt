@@ -8,7 +8,7 @@ import com.rifsxd.ksunext.R
 @Composable
 fun getSELinuxStatus() = SuFile("/sys/fs/selinux/enforce").run {
     when {
-        !exists() -> stringResource(R.string.selinux_status_disabled)
+        !exists() -> stringResource(R.string.disabled)
         !isFile -> stringResource(R.string.selinux_status_unknown)
         !canRead() -> stringResource(R.string.selinux_status_enforcing)
         else -> when (runCatching { newInputStream() }.getOrNull()?.bufferedReader()
