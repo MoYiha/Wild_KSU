@@ -27,7 +27,7 @@
 
 ## ✨ What is Wild KSU?
 
-Wild KSU is an advanced, kernel-based root solution that provides seamless superuser access management for Android devices. Built upon the foundation of KernelSU, Wild KSU offers enhanced features, improved compatibility, and a more robust architecture for power users and developers.
+Wild KSU is a customization and root hiding focused fork of KernelSU Next that provides seamless superuser access management for Android devices. Built upon the foundation of KernelSU Next, Wild KSU offers enhanced features, improved compatibility, and specialized root hiding capabilities for power users and developers.
 
 ---
 
@@ -77,7 +77,7 @@ Wild KSU supports a wide range of Android kernel versions from **4.4 up to 6.6**
 curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
 ```
 
-> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support. Make sure you have the necessary build dependencies installed before running the integration script.
+> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
 
 ---
 
@@ -104,16 +104,17 @@ Wild KSU is open-source software distributed under multiple licenses:
 
 If Wild KSU has been helpful to you, consider supporting our development efforts:
 
-### 💰 **Cryptocurrency Donations**
+### 💰 **Donations**
 
-| 💱 **Currency** | 🏦 **Network** | 📍 **Address** |
-|-----------------|----------------|----------------|
-| **USDT** | BEP20, ERC20 | `0x12b5224b7aca0121c2f003240a901e1d064371c1` |
-| **USDT** | TRC20 | `TYUVMWGTcnR5svnDoX85DWHyqUAeyQcdjh` |
-| **USDT** | Solana | `A4wqBXYd6Ey4nK4SJ2bmjeMgGyaLKT9TwDLh8BEo8Zu6` |
-| **ETH** | ERC20 | `0x12b5224b7aca0121c2f003240a901e1d064371c1` |
-| **LTC** | Litecoin | `Ld238uYBuRQdZB5YwdbkuU6ektBAAUByoL` |
-| **BTC** | Bitcoin | `19QgifcjMjSr1wB2DJcea5cxitvWVcXMT6` |
+| 💱 **Method** | 📍 **Address/Link** |
+|---------------|--------------------|
+| **PayPal** | `bauhd@outlook.com` |
+| **Card** | [`https://buy.stripe.com/5kQ28sdi08Nr0Xc2fU5os00`](https://buy.stripe.com/5kQ28sdi08Nr0Xc2fU5os00) |
+| **LTC** | `MVaN1ToSuks2cdK9mB3M8EHCfzQSyEMf6h` |
+| **BTC** | `3BBXAMS4ZuCZwfbTXxWGczxHF4isymeyxG` |
+| **ETH** | `0x2b9C846c84d58717e784458406235C09a834274e` |
+
+> 💡 **Support the original project:** For donations to KernelSU Next, visit [`https://github.com/KernelSU-Next/KernelSU-Next`](https://github.com/KernelSU-Next/KernelSU-Next)
 
 ---
 
@@ -125,7 +126,8 @@ Wild KSU stands on the shoulders of giants. We extend our gratitude to:
 - 🎭 **[Magisk](https://github.com/topjohnwu/Magisk)** - Core root implementation techniques
 - 🔍 **[Genuine](https://github.com/brevent/genuine/)** - APK v2 signature validation
 - 💎 **[Diamorphine](https://github.com/m0nad/Diamorphine)** - Advanced rootkit techniques
-- 🌟 **[KernelSU](https://github.com/tiann/KernelSU)** - The foundational base that made Wild KSU possible
+- 🚀 **[KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next)** - The direct fork base that made Wild KSU possible
+- 🌟 **[KernelSU](https://github.com/tiann/KernelSU)** - The original foundational project
 - 🪄 **[Magic Mount Port](https://github.com/5ec1cff/KernelSU/blob/main/userspace/ksud/src/magic_mount.rs)** - Magic mount implementation
 
 ---
