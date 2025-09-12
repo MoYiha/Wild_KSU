@@ -145,6 +145,9 @@ For detailed installation instructions and comprehensive documentation, please r
 
 This documentation covers installation procedures, usage guidelines, and technical details that apply to Wild KSU as well.
 
+**Quick Installation:**
+Make sure to use our curl command for the latest Wild KSU installation script.
+
 ---
 
 ## 🙏 Acknowledgments
