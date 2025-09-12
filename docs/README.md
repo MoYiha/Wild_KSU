@@ -137,6 +137,16 @@ If Wild KSU has been helpful to you, consider supporting our development efforts
 
 ---
 
+## 📚 Documentation & Installation
+
+For detailed installation instructions and comprehensive documentation, please refer to the original KernelSU project:
+
+🔗 **[KernelSU Official Documentation](https://kernelsu.org/guide/what-is-kernelsu.html)**
+
+This documentation covers installation procedures, usage guidelines, and technical details that apply to Wild KSU as well.
+
+---
+
 ## 🙏 Acknowledgments
 
 Wild KSU stands on the shoulders of giants. We extend our gratitude to:
@@ -145,7 +155,7 @@ Wild KSU stands on the shoulders of giants. We extend our gratitude to:
 - 🎭 **[Magisk](https://github.com/topjohnwu/Magisk)** - Core root implementation techniques
 - 🔍 **[Genuine](https://github.com/brevent/genuine/)** - APK v2 signature validation
 - 💎 **[Diamorphine](https://github.com/m0nad/Diamorphine)** - Advanced rootkit techniques
-- 🚀 **[KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next)** - The direct fork base that made Wild KSU possible
+- 🚀 **[KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next)** - The fork base that made Wild KSU possible
 - 🌟 **[KernelSU](https://github.com/tiann/KernelSU)** - The original foundational project
 - 🪄 **[Magic Mount Port](https://github.com/5ec1cff/KernelSU/blob/main/userspace/ksud/src/magic_mount.rs)** - Magic mount implementation
 
