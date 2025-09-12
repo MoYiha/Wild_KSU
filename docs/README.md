@@ -48,6 +48,16 @@
 
 Wild KSU is a fork of KernelSU Next focused on customization and root hiding.
 
+**What is KernelSU?**
+KernelSU is a root solution for Android GKI devices, it works in kernel mode and grants root permission to userspace apps directly in kernel space.
+
+**Features**
+The main feature of KernelSU is that it's kernel-based. KernelSU works in 2 modes:
+- **GKI**: Replace the original kernel of the device with the Generic Kernel Image (GKI) provided by KernelSU.
+- **LKM**: Load the Loadable Kernel Module (LKM) into the device kernel without replacing the original kernel.
+
+These two modes are suitable for different scenarios, and you can choose the one according to your needs.
+
 ---
 
 ## 🔧 Kernel Integration
