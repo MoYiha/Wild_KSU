@@ -16,10 +16,16 @@
   
   <p align="center">
     <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">
-      <img src="https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu&style=for-the-badge" alt="License">
+      <img src="https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu&style=for-the-badge" alt="GPL v2 License">
     </a>
+    <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">
+      <img src="https://img.shields.io/badge/License-GPL%20v3-red.svg?logo=gnu&style=for-the-badge" alt="GPL v3 License">
+    </a>
+  </p>
+  
+  <p align="center">
     <a href="https://crowdin.com/project/wild-ksu">
-      <img src="https://badges.crowdin.net/wild-ksu/localized.svg" alt="Crowdin">
+      <img src="https://img.shields.io/badge/Crowdin-Translate-green?logo=crowdin&logoColor=white&style=for-the-badge" alt="Crowdin Translations">
     </a>
   </p>
   
