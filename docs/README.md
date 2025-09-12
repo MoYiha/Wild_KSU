@@ -72,7 +72,13 @@ curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/se
 
 > 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
 
-#
+### 📚 Documentation
+
+For detailed documentation, please refer to the original KernelSU project:
+
+🔗 **[KernelSU Official Documentation](https://kernelsu.org/guide/what-is-kernelsu.html)**
+
+This documentation covers installation procedures, usage guidelines, and technical details that apply to Wild KSU as well.
 
 ---
 
@@ -109,16 +115,6 @@ Wild KSU supports a wide range of Android kernel versions from **4.4 up to 6.6**
 - `arm64-v8a` - 64-bit ARM
 - `armeabi-v7a` - 32-bit ARM
 - `x86_64` - 64-bit x86
-
----
-
-## 📚 Documentation & Installation
-
-For detailed installation instructions and comprehensive documentation, please refer to the original KernelSU project:
-
-🔗 **[KernelSU Official Documentation](https://kernelsu.org/guide/what-is-kernelsu.html)**
-
-This documentation covers installation procedures, usage guidelines, and technical details that apply to Wild KSU as well.
 
 ---
 
