@@ -86,6 +86,30 @@ Wild KSU supports a wide range of Android kernel versions from **4.4 up to 6.6**
 
 ---
 
+## 📚 Documentation & Installation
+
+### 🔧 **Kernel Integration**
+
+> 🚀 **Ready to integrate Wild KSU into your kernel?** 
+> 
+> Use our automated setup script to integrate Wild KSU into your kernel source:
+
+```bash
+curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
+```
+
+> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
+
+### 📖 **Complete Documentation**
+
+For detailed installation instructions and comprehensive documentation, please refer to the original KernelSU project:
+
+🔗 **[KernelSU Official Documentation](https://kernelsu.org/guide/what-is-kernelsu.html)**
+
+This documentation covers installation procedures, usage guidelines, and technical details that apply to Wild KSU as well.
+
+---
+
 ## 🔐 Security & Reporting
 
 Security is our top priority. If you discover any security vulnerabilities or issues:
@@ -120,30 +144,6 @@ If Wild KSU has been helpful to you, consider supporting our development efforts
 | **ETH** | `0x2b9C846c84d58717e784458406235C09a834274e` |
 
 > 💡 **Support the original project:** For donations to KernelSU Next, visit [`https://github.com/KernelSU-Next/KernelSU-Next`](https://github.com/KernelSU-Next/KernelSU-Next)
-
----
-
-## 📚 Documentation & Installation
-
-### 🔧 **Kernel Integration**
-
-> 🚀 **Ready to integrate Wild KSU into your kernel?** 
-> 
-> Use our automated setup script to integrate Wild KSU into your kernel source:
-
-```bash
-curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
-```
-
-> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
-
-### 📖 **Complete Documentation**
-
-For detailed installation instructions and comprehensive documentation, please refer to the original KernelSU project:
-
-🔗 **[KernelSU Official Documentation](https://kernelsu.org/guide/what-is-kernelsu.html)**
-
-This documentation covers installation procedures, usage guidelines, and technical details that apply to Wild KSU as well.
 
 ---
 
