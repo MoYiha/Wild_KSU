@@ -1,91 +1,271 @@
-**English** | [简体中文](README_CN.md) | [繁體中文](README_TW.md) | [Türkçe](README_TR.md) | [Português (Brasil)](README_PT-BR.md) | [한국어](README_KO.md) | [Français](README_FR.md) | [Bahasa Indonesia](README_ID.md) | [Русский](README_RU.md) | [Українська](README_UA.md) | [ภาษาไทย](README_TH.md) | [Tiếng Việt](README_VI.md) | [Italiano](README_IT.md) | [Polski](README_PL.md) | [Български](README_BG.md) | [日本語](README_JA.md) | [Español](README_ES.md)
-
----
-
 <div align="center">
-  <img src="/assets/kernelsu_next.png" width="96" alt="Wild KSU Logo">
-
-  <h2>Wild KSU</h2>
-  <p><strong>A kernel-based root solution for Android devices.</strong></p>
-
+  <img src="./assets/kernelsu_next.png" width="150" alt="Wild KSU Logo">
+  
+  # 🌟 Wild KSU 🌟
+  
+  <h3>🔥 <em>A powerful kernel-based root solution for Android devices</em> 🔥</h3>
+  
   <p>
     <a href="https://github.com/WildKernels/Wild_KSU/releases/latest">
-      <img src="https://img.shields.io/github/v/release/WildKernels/Wild_KSU?label=Release&logo=github" alt="Latest Release">
+      <img src="https://img.shields.io/github/v/release/WildKernels/Wild_KSU?label=🚀%20Release&logo=github&style=for-the-badge&color=brightgreen" alt="Latest Release">
     </a>
     <a href="https://nightly.link/WildKernels/Wild_KSU/workflows/build-manager-ci/wild/Manager">
-      <img src="https://img.shields.io/badge/Nightly%20Release-gray?logo=hackthebox&logoColor=fff" alt="Nightly Build">
+      <img src="https://img.shields.io/badge/🌙%20Nightly%20Build-purple?logo=hackthebox&logoColor=fff&style=for-the-badge" alt="Nightly Build">
     </a>
-    <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">
-      <img src="https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu" alt="License: GPL v2">
-    </a>
-    <a href="/LICENSE">
-      <img src="https://img.shields.io/github/license/WildKernels/Wild_KSU?logo=gnu" alt="GitHub License">
-    </a>
-    <a title="Crowdin" target="_blank" href="https://crowdin.com/project/wild-ksu"><img src="https://badges.crowdin.net/wild-ksu/localized.svg"></a>
   </p>
+  
+  <p>
+    <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">
+      <img src="https://img.shields.io/badge/📜%20License-GPL%20v2-orange.svg?logo=gnu&style=for-the-badge" alt="License">
+    </a>
+    <a href="https://crowdin.com/project/wild-ksu">
+      <img src="https://badges.crowdin.net/wild-ksu/localized.svg" alt="Crowdin">
+    </a>
+  </p>
+  
+  <br>
+  
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; margin: 20px 0;">
+    <h3>🌍 ✨ Languages & Translations ✨ 🌍</h3>
+    
+    <p><strong>🇺🇸 English</strong> (Current)</p>
+    
+    <blockquote>
+      <p>🌐 <strong>Translation contributions are welcome!</strong><br>
+      Help us make Wild KSU accessible to more users worldwide:</p>
+      <ul>
+        <li>📝 <strong>Pull Requests</strong> - Submit translation files directly</li>
+        <li>🔗 <strong><a href="https://crowdin.com/project/wild-ksu">Crowdin Platform</a></strong> - Collaborative translation</li>
+      </ul>
+    </blockquote>
+  </div>
+  
+</div>
+
+<br>
+
+<div align="center">
+  <h2>✨ What is Wild KSU? ✨</h2>
+</div>
+
+<div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 25px; border-radius: 20px; margin: 20px 0; text-align: center;">
+  <p><strong>Wild KSU is a customization and root hiding focused fork of KernelSU Next</strong> that provides seamless superuser access management for Android devices. Built upon the foundation of KernelSU Next, Wild KSU offers enhanced features, improved compatibility, and specialized root hiding capabilities for power users and developers.</p>
+</div>
+
+<br>
+
+<div align="center">
+  <h2>🚀 ✨ Key Features ✨ 🚀</h2>
+</div>
+
+<table align="center" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+  <tr>
+    <td style="padding: 20px; border: 2px solid #4CAF50; border-radius: 15px; margin: 10px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+      <h3>🔐 <strong>Advanced Root Management</strong></h3>
+      <ul>
+        <li><strong>Kernel-based <code>su</code></strong> - Direct kernel-level superuser implementation</li>
+        <li><strong>Granular root access control</strong> - Fine-tuned permission management</li>
+        <li><strong>Secure privilege escalation</strong> - Safe and controlled root access</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 20px; border: 2px solid #2196F3; border-radius: 15px; margin: 10px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+      <h3>📦 <strong>Powerful Module System</strong></h3>
+      <ul>
+        <li><strong><a href="https://topjohnwu.github.io/Magisk/details.html#magic-mount">Magic Mount</a></strong> - Seamless file system modifications</li>
+        <li><strong><a href="https://en.wikipedia.org/wiki/OverlayFS">OverlayFS</a></strong> - Advanced overlay file system support</li>
+        <li><strong>Dynamic module loading</strong> - Hot-swappable functionality</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 20px; border: 2px solid #FF9800; border-radius: 15px; margin: 10px; background: linear-gradient(135deg, #a8caba 0%, #5d4e75 100%);">
+      <h3>🎯 <strong>App Profile System</strong></h3>
+      <ul>
+        <li><strong><a href="https://kernelsu.org/guide/app-profile.html">Per-app root control</a></strong> - Limit root privileges on a per-application basis</li>
+        <li><strong>Granular permissions</strong> - Fine-grained access control</li>
+        <li><strong>Security profiles</strong> - Customizable security policies</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<div align="center">
+  <h2>✅ 🎯 Compatibility Matrix 🎯 ✅</h2>
+  <p><em>Wild KSU supports a wide range of Android kernel versions from <strong>4.4 up to 6.6</strong></em></p>
+</div>
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 20px; margin: 20px 0;">
+  <table align="center" style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.9); border-radius: 15px; overflow: hidden;">
+    <thead>
+      <tr style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+        <th style="padding: 15px; text-align: center; font-size: 16px;">🔧 <strong>Kernel Version</strong></th>
+        <th style="padding: 15px; text-align: center; font-size: 16px;">📱 <strong>Support Level</strong></th>
+        <th style="padding: 15px; text-align: center; font-size: 16px;">📝 <strong>Implementation Notes</strong></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background: rgba(76, 175, 80, 0.1);">
+        <td style="padding: 15px; text-align: center; font-weight: bold;">5.10+ (GKI 2.0)</td>
+        <td style="padding: 15px; text-align: center;">✅ <strong>Full Support</strong></td>
+        <td style="padding: 15px; text-align: center;">Pre-built images, LKM/KMI support</td>
+      </tr>
+      <tr style="background: rgba(33, 150, 243, 0.1);">
+        <td style="padding: 15px; text-align: center; font-weight: bold;">4.19 – 5.4 (GKI 1.0)</td>
+        <td style="padding: 15px; text-align: center;">✅ <strong>Supported</strong></td>
+        <td style="padding: 15px; text-align: center;">Requires built-in KernelSU driver</td>
+      </tr>
+      <tr style="background: rgba(255, 152, 0, 0.1);">
+        <td style="padding: 15px; text-align: center; font-weight: bold;">< 4.14 (EOL)</td>
+        <td style="padding: 15px; text-align: center;">⚠️ <strong>Limited</strong></td>
+        <td style="padding: 15px; text-align: center;">Requires driver (3.18+ experimental, may need backports)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div align="center" style="margin: 30px 0;">
+  <div style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); padding: 20px; border-radius: 15px; display: inline-block;">
+    <h3>🏗️ ✨ <strong>Supported Architectures</strong> ✨ 🏗️</h3>
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; margin-top: 15px;">
+      <div style="background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 25px; border: 2px solid #4CAF50;">
+        <strong>📱 <code>arm64-v8a</code></strong><br><em>64-bit ARM</em>
+      </div>
+      <div style="background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 25px; border: 2px solid #2196F3;">
+        <strong>📱 <code>armeabi-v7a</code></strong><br><em>32-bit ARM</em>
+      </div>
+      <div style="background: rgba(255,255,255,0.8); padding: 10px 20px; border-radius: 25px; border: 2px solid #FF9800;">
+        <strong>💻 <code>x86_64</code></strong><br><em>64-bit x86</em>
+      </div>
+    </div>
+  </div>
 </div>
 
 ---
 
-## 🚀 Features
+## 🔧 Kernel Integration
 
-- Kernel-based `su` and root access management.
-- Module system based on [Magic Mount](https://topjohnwu.github.io/Magisk/details.html#magic-mount) and [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
-- [App Profile](https://kernelsu.org/guide/app-profile.html): Limit root privileges per app.
+> 🚀 **Ready to integrate Wild KSU into your kernel?** 
+> 
+> Use our automated setup script to integrate Wild KSU into your kernel source:
 
----
+```bash
+curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
+```
 
-## ✅ Compatibility
-
-Wild KSU supports Android kernels from **4.4 up to 6.6**:
-
-| Kernel version       | Support notes                                                           |
-|----------------------|-------------------------------------------------------------------------|
-| 5.10+ (GKI 2.0)      | Supports pre-built images and LKM/KMI                                   |
-| 4.19 – 5.4 (GKI 1.0) | Requires KernelSU driver built-in                                       |
-| < 4.14 (EOL)         | Requires KernelSU driver (3.18+ is experimental and may need backports) |
-
-**Supported architectures:** `arm64-v8a`, `armeabi-v7a` and `x86_64`
+> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
 
 ---
 
-## 📦 Installation
+## 🔐 Security & Reporting
 
-Please refer to the [Installation](https://wildkernels.github.io/Wild_KSU/pages/installation.html) guide for setup instructions.
+Security is our top priority. If you discover any security vulnerabilities or issues:
 
----
-
-## 🔐 Security
-
-To report security issues, please see [SECURITY.md](/SECURITY.md).
+📋 **Please review our [Security Policy](SECURITY.md)** for responsible disclosure guidelines.
 
 ---
 
-## 📜 License
+## 📜 License Information
 
-- **`/kernel` directory:** [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
-- **All other files:** [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html).
+Wild KSU is open-source software distributed under multiple licenses:
 
----
-
-## 💸 Donations
-
-If you’d like to support the project:
-
-- **USDT (BEP20, ERC20)**: `0x12b5224b7aca0121c2f003240a901e1d064371c1`
-- **USDT (TRC20)**: `TYUVMWGTcnR5svnDoX85DWHyqUAeyQcdjh`
-- **USDT (SOL)**: `A4wqBXYd6Ey4nK4SJ2bmjeMgGyaLKT9TwDLh8BEo8Zu6`
-- **ETH (ERC20)**: `0x12b5224b7aca0121c2f003240a901e1d064371c1`
-- **LTC**: `Ld238uYBuRQdZB5YwdbkuU6ektBAAUByoL`
-- **BTC**: `19QgifcjMjSr1wB2DJcea5cxitvWVcXMT6`
+| 📁 **Directory** | ⚖️ **License** | 📄 **Details** |
+|------------------|----------------|----------------|
+| `/kernel` | [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) | Kernel components |
+| **All other files** | [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html) | Userspace components |
 
 ---
 
-## 🙏 Credits
+<div align="center">
+  <h2>💝 ✨ Support the Project ✨ 💝</h2>
+  <p><em>If Wild KSU has been helpful to you, consider supporting our development efforts</em></p>
+</div>
 
-- [Kernel-Assisted Superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/) – Concept inspiration
-- [Magisk](https://github.com/topjohnwu/Magisk) – Core root implementation
-- [Genuine](https://github.com/brevent/genuine/) – APK v2 signature validation
-- [Diamorphine](https://github.com/m0nad/Diamorphine) – Rootkit techniques
-- [KernelSU](https://github.com/tiann/KernelSU) – The original base that made Wild KSU possible
-- [Magic Mount Port](https://github.com/5ec1cff/KernelSU/blob/main/userspace/ksud/src/magic_mount.rs) – For magic mount support
+<div style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); padding: 30px; border-radius: 20px; margin: 20px 0;">
+  <div align="center">
+    <h3>💰 ✨ <strong>Donations</strong> ✨ 💰</h3>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 20px;">
+    <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; border: 2px solid #4CAF50; text-align: center;">
+      <strong>💳 PayPal</strong><br>
+      <code style="background: #f0f0f0; padding: 5px 10px; border-radius: 5px;">bauhd@outlook.com</code>
+    </div>
+    
+    <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; border: 2px solid #2196F3; text-align: center;">
+      <strong>💳 Card Payment</strong><br>
+      <a href="https://buy.stripe.com/5kQ28sdi08Nr0Xc2fU5os00" style="color: #2196F3; text-decoration: none;">🔗 Stripe Link</a>
+    </div>
+    
+    <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; border: 2px solid #FF9800; text-align: center;">
+      <strong>🪙 LTC</strong><br>
+      <code style="background: #f0f0f0; padding: 5px; border-radius: 5px; font-size: 12px;">MVaN1ToSuks2cdK9mB3M8EHCfzQSyEMf6h</code>
+    </div>
+    
+    <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; border: 2px solid #FFC107; text-align: center;">
+      <strong>₿ BTC</strong><br>
+      <code style="background: #f0f0f0; padding: 5px; border-radius: 5px; font-size: 12px;">3BBXAMS4ZuCZwfbTXxWGczxHF4isymeyxG</code>
+    </div>
+    
+    <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 15px; border: 2px solid #9C27B0; text-align: center;">
+      <strong>⟠ ETH</strong><br>
+      <code style="background: #f0f0f0; padding: 5px; border-radius: 5px; font-size: 12px;">0x2b9C846c84d58717e784458406235C09a834274e</code>
+    </div>
+  </div>
+  
+  <div align="center" style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 10px;">
+    <p>💡 <strong>Support the original project:</strong> For donations to KernelSU Next, visit <a href="https://github.com/KernelSU-Next/KernelSU-Next">🔗 KernelSU-Next Repository</a></p>
+  </div>
+</div>
+
+---
+
+## 🙏 Acknowledgments
+
+Wild KSU stands on the shoulders of giants. We extend our gratitude to:
+
+- 🔬 **[Kernel-Assisted Superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/)** - Original concept and inspiration
+- 🎭 **[Magisk](https://github.com/topjohnwu/Magisk)** - Core root implementation techniques
+- 🔍 **[Genuine](https://github.com/brevent/genuine/)** - APK v2 signature validation
+- 💎 **[Diamorphine](https://github.com/m0nad/Diamorphine)** - Advanced rootkit techniques
+- 🚀 **[KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next)** - The direct fork base that made Wild KSU possible
+- 🌟 **[KernelSU](https://github.com/tiann/KernelSU)** - The original foundational project
+- 🪄 **[Magic Mount Port](https://github.com/5ec1cff/KernelSU/blob/main/userspace/ksud/src/magic_mount.rs)** - Magic mount implementation
+
+---
+
+<br><br>
+
+<div align="center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 25px; margin: 30px 0;">
+  
+  <div style="background: rgba(255,255,255,0.95); padding: 30px; border-radius: 20px; margin: 20px 0;">
+    <h2>🌟 ✨ <strong>Star this repository if Wild KSU helped you!</strong> ✨ 🌟</h2>
+    
+    <p style="font-size: 18px; margin: 20px 0;"><strong>Made with ❤️ by the Wild Kernels Team</strong></p>
+    
+    <div style="margin: 25px 0;">
+      <a href="https://github.com/WildKernels/Wild_KSU/stargazers" style="margin: 0 10px;">
+        <img src="https://img.shields.io/github/stars/WildKernels/Wild_KSU?style=for-the-badge&logo=github&color=gold" alt="GitHub stars">
+      </a>
+      <a href="https://github.com/WildKernels/Wild_KSU/network/members" style="margin: 0 10px;">
+        <img src="https://img.shields.io/github/forks/WildKernels/Wild_KSU?style=for-the-badge&logo=github&color=blue" alt="GitHub forks">
+      </a>
+      <a href="https://github.com/WildKernels/Wild_KSU/watchers" style="margin: 0 10px;">
+        <img src="https://img.shields.io/github/watchers/WildKernels/Wild_KSU?style=for-the-badge&logo=github&color=green" alt="GitHub watchers">
+      </a>
+    </div>
+    
+    <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 15px;">
+      <p style="margin: 0; font-size: 16px;">🚀 <strong>Join our community and help make Wild KSU even better!</strong> 🚀</p>
+      <p style="margin: 10px 0 0 0; font-size: 14px;">⭐ Star • 🍴 Fork • 👀 Watch • 🐛 Report Issues • 💡 Contribute</p>
+    </div>
+  </div>
+  
+</div>
+
+<div align="center" style="margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 10px;">
+  <p style="margin: 0; color: #666; font-size: 14px;">© 2024 Wild Kernels Team • Licensed under GPL-2.0 & GPL-3.0 • Built with 💜 for the Android community</p>
+</div>
