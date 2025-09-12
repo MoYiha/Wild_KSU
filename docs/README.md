@@ -46,7 +46,21 @@
 
 ## ✨ What is Wild KSU?
 
-Wild KSU is a specialized fork of KernelSU Next that excels in advanced customizations and sophisticated root hiding techniques. Crafted for users who demand seamless stealth and extensive personalization options for their Android devices.
+Wild KSU is a fork of KernelSU Next focused on customization and root hiding.
+
+---
+
+## 🔧 Kernel Integration
+
+> 🚀 **Ready to integrate Wild KSU into your kernel?** 
+> 
+> Use our automated setup script to integrate Wild KSU into your kernel source:
+
+```bash
+curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
+```
+
+> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
 
 ---
 
@@ -87,20 +101,6 @@ Wild KSU supports a wide range of Android kernel versions from **4.4 up to 6.6**
 ---
 
 ## 📚 Documentation & Installation
-
-### 🔧 **Kernel Integration**
-
-> 🚀 **Ready to integrate Wild KSU into your kernel?** 
-> 
-> Use our automated setup script to integrate Wild KSU into your kernel source:
-
-```bash
-curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
-```
-
-> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
-
-### 📖 **Complete Documentation**
 
 For detailed installation instructions and comprehensive documentation, please refer to the original KernelSU project:
 
