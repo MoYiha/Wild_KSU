@@ -132,10 +132,10 @@ Security is our top priority. If you discover any security vulnerabilities or is
 
 Wild KSU is open-source software distributed under multiple licenses:
 
-| 📁 **Directory** | ⚖️ **License** | 📄 **Details** |
-|------------------|----------------|----------------|
-| `/kernel` | [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) | Kernel components |
-| **All other files** | [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html) | Userspace components |
+| 📁 **Directory** | ⚖️ **License** |
+|------------------|----------------|
+| `/kernel` | [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) |
+| **All other files** | [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html) |
 
 ---
 
