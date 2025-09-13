@@ -52,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -202,11 +203,13 @@ class MainActivity : ComponentActivity() {
             val isFirstRun = prefs.getBoolean("is_first_run", true)
             if (isFirstRun) {
                 // Try to restore customizations from backup if available
-                 try {
-                     CustomizationBackup.restoreCustomizationSettings(this)
-                 } catch (e: Exception) {
-                     // Backup restore failed, this is expected on first install
-                 }
+                lifecycleScope.launch {
+                    try {
+                        CustomizationBackup.restoreCustomizationSettings(this@MainActivity)
+                    } catch (e: Exception) {
+                        // Backup restore failed, this is expected on first install
+                    }
+                }
                 // Mark that the app has been run at least once
                 prefs.edit().putBoolean("is_first_run", false).apply()
             }
