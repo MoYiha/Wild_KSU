@@ -31,11 +31,7 @@
     </a>
   </p>
   
-  ---
-  
   ![cat](../assets/gray0_ctp_on_line.svg)
-  
-  ---
   
   ### 🌍 Languages & Translations
   

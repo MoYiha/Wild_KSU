@@ -31,6 +31,7 @@ import com.rifsxd.ksunext.ui.component.ConfirmResult
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.component.rememberLoadingDialog
 import com.rifsxd.ksunext.ui.util.*
+import com.rifsxd.ksunext.ui.util.CustomizationBackup
 import kotlinx.coroutines.launch
 
 /**
@@ -240,6 +241,62 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         if (result == ConfirmResult.Confirmed) {
                             loadingDialog.withLoading {
                                 allowlistRestore()
+                            }
+                        }
+                    }
+                }
+            )
+
+            HorizontalDivider(thickness = Dp.Hairline)
+
+            // Customization Backup
+            val customizationBackup = "Customization Backup"
+            val customizationBackupMessage = "Backup all customization settings including themes, layouts, and preferences?"
+            ListItem(
+                leadingContent = {
+                    Icon(
+                        Icons.Filled.Backup,
+                        customizationBackup
+                    )
+                },
+                headlineContent = { Text(
+                    text = customizationBackup,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                ) },
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        val result = backupDialog.awaitConfirm(title = customizationBackup, content = customizationBackupMessage)
+                        if (result == ConfirmResult.Confirmed) {
+                            loadingDialog.withLoading {
+                                CustomizationBackup.backupCustomizations(context)
+                            }
+                        }
+                    }
+                }
+            )
+
+            // Customization Restore
+            val customizationRestore = "Customization Restore"
+            val customizationRestoreMessage = "Restore all customization settings from backup? This will overwrite current settings."
+            ListItem(
+                leadingContent = {
+                    Icon(
+                        Icons.Filled.Restore,
+                        customizationRestore
+                    )
+                },
+                headlineContent = { Text(
+                    text = customizationRestore,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                ) },
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        val result = restoreDialog.awaitConfirm(title = customizationRestore, content = customizationRestoreMessage)
+                        if (result == ConfirmResult.Confirmed) {
+                            loadingDialog.withLoading {
+                                CustomizationBackup.restoreCustomizations(context)
                             }
                         }
                     }

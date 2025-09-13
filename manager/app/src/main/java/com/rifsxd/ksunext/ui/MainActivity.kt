@@ -93,6 +93,7 @@ import com.rifsxd.ksunext.ui.theme.KernelSUTheme
 import com.rifsxd.ksunext.ui.component.BackgroundImageWrapper
 import com.rifsxd.ksunext.ui.component.SearchAppBar
 import com.rifsxd.ksunext.ui.util.*
+import com.rifsxd.ksunext.ui.util.CustomizationBackup
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 import com.rifsxd.ksunext.ui.viewmodel.FlashViewModel
@@ -195,6 +196,19 @@ class MainActivity : ComponentActivity() {
             // If there's a mismatch, update the preference to match the actual state
             if (actualOverlayFsState != preferenceOverlayFsState) {
                 prefs.edit().putBoolean("use_overlay_fs", actualOverlayFsState).apply()
+            }
+            
+            // Check if this is a fresh install or settings were cleared
+            val isFirstRun = prefs.getBoolean("is_first_run", true)
+            if (isFirstRun) {
+                // Try to restore customizations from backup if available
+                try {
+                    CustomizationBackup.restoreCustomizations(this)
+                } catch (e: Exception) {
+                    // Backup restore failed, this is expected on first install
+                }
+                // Mark that the app has been run at least once
+                prefs.edit().putBoolean("is_first_run", false).apply()
             }
         }
 
