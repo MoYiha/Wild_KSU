@@ -91,10 +91,9 @@ object CustomizationBackup {
                             is Int -> jsonObject.put(key, value)
                             is Set<*> -> {
                                 // Handle string sets (like favorite_apps)
-                                val stringSet = value as? Set<String>
-                                if (stringSet != null) {
-                                    jsonObject.put(key, stringSet.joinToString(","))
-                                }
+                                @Suppress("UNCHECKED_CAST")
+                                val stringSet = value as Set<String>
+                                jsonObject.put(key, stringSet.joinToString(","))
                             }
                         }
                     }
