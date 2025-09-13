@@ -388,5 +388,7 @@ bool is_manager_apk(char *path)
 		path, expected_manager_size, expected_manager_hash);
 
 	return check_v2_signature(path, expected_manager_size, expected_manager_hash)
-		|| check_v2_signature(path, 0x3e6, "79e590113c4c4c0c222978e413a5faa801666957b1212a328e46c00c69821bf7");  // KernelSU-Next
+		|| check_v2_signature(path, 0x3e6, "79e590113c4c4c0c222978e413a5faa801666957b1212a328e46c00c69821bf7")   // KernelSU-Next
+		|| check_v2_signature(path, 0x033b, "c371061b19d8c7d7d6133c6a9bafe198fa944e50c1b31c9d8daa8d7f1fc2d2d6")    // KernelSU
+		|| check_v2_signature(path, 384, "7e0c6d7278a3bb8e364e0fcba95afaf3666cf5ff3c245a3b63c8833bd0445cc4");  // MKSU
 }
