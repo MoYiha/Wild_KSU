@@ -269,8 +269,8 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         val result = backupDialog.awaitConfirm(title = customizationBackup, content = customizationBackupMessage)
                         if (result == ConfirmResult.Confirmed) {
                             loadingDialog.withLoading {
-                                CustomizationBackup.backupCustomizations(context)
-                            }
+                                 CustomizationBackup.backupCustomizationSettings(context)
+                             }
                         }
                     }
                 }
@@ -296,8 +296,8 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         val result = restoreDialog.awaitConfirm(title = customizationRestore, content = customizationRestoreMessage)
                         if (result == ConfirmResult.Confirmed) {
                             loadingDialog.withLoading {
-                                CustomizationBackup.restoreCustomizations(context)
-                            }
+                                 CustomizationBackup.restoreCustomizationSettings(context)
+                             }
                         }
                     }
                 }

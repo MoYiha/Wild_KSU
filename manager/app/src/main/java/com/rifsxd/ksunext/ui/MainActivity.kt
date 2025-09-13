@@ -202,11 +202,11 @@ class MainActivity : ComponentActivity() {
             val isFirstRun = prefs.getBoolean("is_first_run", true)
             if (isFirstRun) {
                 // Try to restore customizations from backup if available
-                try {
-                    CustomizationBackup.restoreCustomizations(this)
-                } catch (e: Exception) {
-                    // Backup restore failed, this is expected on first install
-                }
+                 try {
+                     CustomizationBackup.restoreCustomizationSettings(this)
+                 } catch (e: Exception) {
+                     // Backup restore failed, this is expected on first install
+                 }
                 // Mark that the app has been run at least once
                 prefs.edit().putBoolean("is_first_run", false).apply()
             }
