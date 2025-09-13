@@ -33,8 +33,10 @@
   
   ---
   
-  ![Stats](../assets/gray0_ctp_on_line.svg)
-
+  ![cat](../assets/gray0_ctp_on_line.svg)
+  
+  ---
+  
   ### 🌍 Languages & Translations
   
   **English** (Current)
