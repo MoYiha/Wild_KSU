@@ -292,4 +292,15 @@
     <!-- Individual App Cards Settings -->
     <string name="individual_app_cards">Індивідуальні картки додатків</string>
     <string name="individual_app_cards_summary">Показувати кожну програму в окремій картці, а не у списку</string>
+    <!-- Next KernelSU -->
+    <string name="home_next_kernelsu">🔥 Наступна збірка</string>
+    <string name="home_next_kernelsu_repo">https://github.com/WildKernels/wild-ksu</string>
+    <string name="home_next_kernelsu_body">Наступна експериментальна гілка. Подивіться на GitHub!</string>
+    <!-- Experimental KernelSU Warning -->
+    <string name="home_experimental_kernelsu">⚠️ Попередження про експериментальну розробку!</string>
+    <string name="home_experimental_kernelsu_repo">127.0.0.1</string>
+    <string name="home_experimental_kernelsu_body">Wild KSU — це неофіційна версія, яка завжди перебуває у стадії активної експериментальної розробки. Вона надається як є, без гарантій стабільності, продуктивності чи надійності.</string>
+    <string name="home_experimental_kernelsu_body_point_1"> •  Використовуйте на свій страх і ризик: можуть виникати збої, несподівана поведінка або проблеми з системою.</string>
+    <string name="home_experimental_kernelsu_body_point_2"> •  Попередження: розробники не несуть відповідальності за втрату даних, пошкодження системи або інші наслідки, викликані використанням.</string>
+    <string name="home_experimental_kernelsu_body_point_3"> • Лише для тестування: призначено для користувачів, які розуміють ризики і готові вирішувати виникаючі проблеми.</string>
 </resources>
