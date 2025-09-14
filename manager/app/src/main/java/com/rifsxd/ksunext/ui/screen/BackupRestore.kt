@@ -96,7 +96,8 @@ fun BackupRestoreScreen(navigator: DestinationsNavigator) {
                         TextButton(onClick = { showRebootDialog = false }) {
                             Text(stringResource(R.string.later))
                         }
-                    }
+                    },
+                    tonalElevation = 0.dp
                 )
             }
 
