@@ -436,7 +436,7 @@ private fun TopBar(
                 }
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_ksu_next),
+                    painter = painterResource(R.drawable.ic_cannabis),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(end = 8.dp)
@@ -447,7 +447,7 @@ private fun TopBar(
                 Text(
                     text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Black,
+                    fontWeight = FontWeight.Black
                 )
             }
         },

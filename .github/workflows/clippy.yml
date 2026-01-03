@@ -3,13 +3,13 @@ name: Clippy check
 on:
   push:
     branches:
-      - next
+      - wild-stable
     paths:
       - '.github/workflows/clippy.yml'
       - 'userspace/**'
   pull_request:
     branches:
-      - next
+      - wild-stable
     paths:
       - '.github/workflows/clippy.yml'
       - 'userspace/**'

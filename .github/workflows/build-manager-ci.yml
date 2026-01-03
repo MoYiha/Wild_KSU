@@ -2,7 +2,7 @@ name: Build Manager CI
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "wild" ]
     paths:
       - '.github/workflows/build-manager.yml'
       - '.github/workflows/build-lkm.yml'
@@ -11,7 +11,7 @@ on:
       - 'kernel/**'
       - 'userspace/**'
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "wild" ]
     paths:
       - '.github/workflows/build-manager.yml'
       - '.github/workflows/build-lkm.yml'
@@ -105,7 +105,7 @@ jobs:
               echo KEY_PASSWORD='${{ secrets.KEY_PASSWORD }}'
               echo KEYSTORE_FILE='key.jks'
             } >> gradle.properties
-            echo ${{ secrets.KEYSTORE }} | base64 -d > key.jks
+            echo "${{ secrets.KEYSTORE }}" | base64 -d > key.jks
           fi
 
       - name: Setup Java

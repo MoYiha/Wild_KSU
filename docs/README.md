@@ -1,92 +1,168 @@
-**English** | [简体中文](README_CN.md) | [繁體中文](README_TW.md) | [Türkçe](README_TR.md) | [Português (Brasil)](README_PT-BR.md) | [한국어](README_KO.md) | [Français](README_FR.md) | [Bahasa Indonesia](README_ID.md) | [Русский](README_RU.md) | [Українська](README_UA.md) | [ภาษาไทย](README_TH.md) | [Tiếng Việt](README_VI.md) | [Italiano](README_IT.md) | [Polski](README_PL.md) | [Български](README_BG.md) | [日本語](README_JA.md) | [Español](README_ES.md)
-
----
-
 <div align="center">
-  <img src="/assets/kernelsu_next.png" width="96" alt="KernelSU Next Logo">
-
-  <h2>KernelSU Next</h2>
-  <p><strong>A kernel-based root solution for Android devices.</strong></p>
-
-  <p>
-    <a href="https://github.com/KernelSU-Next/KernelSU-Next/releases/latest">
-      <img src="https://img.shields.io/github/v/release/KernelSU-Next/KernelSU-Next?label=Release&logo=github" alt="Latest Release">
+  <img src="../assets/wksu.png" width="120" alt="Wild KSU Logo">
+  
+  # Wild KSU OLD
+  
+  **🔥 A customization and root hiding focused fork 🔥**
+  
+  > ⚠️ **IMPORTANT NOTICE**: This project is currently in testing mode. All releases should be considered unstable and may be unstable until version 1.0.0 is released. Use at your own risk.
+  
+  <p align="center">
+    <a href="https://github.com/WildKernels/Wild_KSU/releases/latest">
+      <img src="https://img.shields.io/github/v/release/WildKernels/Wild_KSU?label=Release&logo=github&style=for-the-badge&color=blue" alt="Latest Release">
     </a>
-    <a href="https://nightly.link/KernelSU-Next/KernelSU-Next/workflows/build-manager-ci/next/Manager">
-      <img src="https://img.shields.io/badge/Nightly%20Release-gray?logo=hackthebox&logoColor=fff" alt="Nightly Build">
+    <a href="https://nightly.link/WildKernels/Wild_KSU/workflows/build-manager-ci/wild/Manager">
+      <img src="https://img.shields.io/badge/Nightly-Build-purple?logo=hackthebox&logoColor=fff&style=for-the-badge" alt="Nightly Build">
     </a>
-    <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">
-      <img src="https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu" alt="License: GPL v2">
-    </a>
-    <a href="/LICENSE">
-      <img src="https://img.shields.io/github/license/KernelSU-Next/KernelSU-Next?logo=gnu" alt="GitHub License">
-    </a>
-    <a title="Crowdin" target="_blank" href="https://crowdin.com/project/kernelsu-next"><img src="https://badges.crowdin.net/kernelsu-next/localized.svg"></a>
   </p>
+  
+  <p align="center">
+    <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html">
+      <img src="https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu&style=for-the-badge" alt="GPL v2 License">
+    </a>
+    <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">
+      <img src="https://img.shields.io/badge/License-GPL%20v3-red.svg?logo=gnu&style=for-the-badge" alt="GPL v3 License">
+    </a>
+  </p>
+  
+  <p align="center">
+    <a href="https://crowdin.com/project/wild-ksu">
+      <img src="https://img.shields.io/badge/Crowdin-Translate-green?logo=crowdin&logoColor=white&style=for-the-badge" alt="Crowdin Translations">
+    </a>
+  </p>
+  
+  ---
+  
+  ![cat](../assets/gray0_ctp_on_line.svg)
+  
+  ---
+  
+  ### 🌍 Languages & Translations
+  
+  **English** (Current)
+  
+  > 🌐 **Translation contributions are welcome!**  
+  > Help us make Wild KSU accessible to more users worldwide by contributing translations via:  
+  > - 📝 **Pull Requests** - Submit translation files directly  
+  > - 🔗 **[Crowdin](https://crowdin.com/project/wild-ksu)** - Collaborative translation platform
+  
 </div>
 
 ---
 
-## 🚀 Features
+## ✨ What is Wild KSU?
 
-- Kernel-based `su` and root access management.
-- Module system based on [Magic Mount](https://topjohnwu.github.io/Magisk/details.html#magic-mount) and [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
-- [App Profile](https://kernelsu.org/guide/app-profile.html): Limit root privileges per app.
+Wild KSU is a fork of KernelSU Next focused on customization and root hiding.
 
----
+**What is KernelSU?**
+KernelSU is a root solution for Android GKI devices, it works in kernel mode and grants root permission to userspace apps directly in kernel space.
 
-## ✅ Compatibility
+**Features**
+The main feature of KernelSU is that it's kernel-based. KernelSU works in 2 modes:
+- **GKI**: Replace the original kernel of the device with the Generic Kernel Image (GKI) provided by KernelSU.
+- **LKM**: Load the Loadable Kernel Module (LKM) into the device kernel without replacing the original kernel.
 
-KernelSU Next supports Android kernels from **4.4 up to 6.6**.
-
-| Kernel version       | Support notes                                                           |
-|----------------------|-------------------------------------------------------------------------|
-| 5.10+ (GKI 2.0)      | Supports pre-built images and LKM/KMI                                   |
-| 4.19 – 5.4 (GKI 1.0) | Requires KernelSU driver built-in                                       |
-| < 4.14 (EOL)         | Requires KernelSU driver (3.18+ is experimental and may need backports) |
-
-**Supported architectures:** `arm64-v8a`, `armeabi-v7a` and `x86_64`
+These two modes are suitable for different scenarios, and you can choose the one according to your needs.
 
 ---
 
-## 📦 Installation
+## 🔧 Kernel Integration / GKI Mode
 
-Please refer to the [Installation](https://kernelsu-next.github.io/webpage/pages/installation.html) guide for setup instructions.
+> 🚀 **Ready to integrate Wild KSU into your kernel?** 
+> 
+> Use our automated setup script to integrate Wild KSU into your kernel source:
 
----
+```bash
+curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
+```
 
-## 🏅 Contribution
+> 📋 **Note:** This script will automatically configure your kernel source tree with Wild KSU support.
 
-- Go to our [Crowdin](https://crowdin.com/project/kernelsu-next) to submit a translation for the manager!
-- To report security issues, please see [SECURITY.md](/SECURITY.md).
+### 📚 Documentation
 
----
+For detailed documentation, please refer to the original KernelSU project:
 
-## 📜 License
+🔗 **[KernelSU Official Documentation](https://kernelsu.org/guide/what-is-kernelsu.html)**
 
-- **`/kernel` directory:** [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
-- **All other files:** [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html).
-
----
-
-## 💸 Donations
-
-If you'd like to support the project:
-
-- **USDT (BEP20, ERC20)**: `0x12b5224b7aca0121c2f003240a901e1d064371c1`
-- **USDT (TRC20)**: `TYUVMWGTcnR5svnDoX85DWHyqUAeyQcdjh`
-- **USDT (SOL)**: `A4wqBXYd6Ey4nK4SJ2bmjeMgGyaLKT9TwDLh8BEo8Zu6`
-- **ETH (ERC20)**: `0x12b5224b7aca0121c2f003240a901e1d064371c1`
-- **LTC**: `Ld238uYBuRQdZB5YwdbkuU6ektBAAUByoL`
-- **BTC**: `19QgifcjMjSr1wB2DJcea5cxitvWVcXMT6`
+This documentation covers installation procedures, usage guidelines, and technical details that apply to Wild KSU as well.
 
 ---
 
-## 🙏 Credits
+## ✅ Compatibility Matrix
 
-- [Kernel-Assisted Superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/) – Concept inspiration
-- [Magisk](https://github.com/topjohnwu/Magisk) – Core root implementation
-- [Genuine](https://github.com/brevent/genuine/) – APK v2 signature validation
-- [Diamorphine](https://github.com/m0nad/Diamorphine) – Rootkit techniques
-- [KernelSU](https://github.com/tiann/KernelSU) – The original base that made KernelSU Next possible
-- [Magic Mount Port](https://github.com/5ec1cff/KernelSU/blob/main/userspace/ksud/src/magic_mount.rs) – For Magic Mount support
+Wild KSU supports a wide range of Android kernel versions from **4.4 up to 6.6**:
+
+| 🔧 Kernel Version | 📱 Support Level | 📝 Implementation Notes |
+|-------------------|------------------|-------------------------|
+| **5.10+ (GKI 2.0)** | ✅ **Full Support** | Pre-built images, LKM/KMI support |
+| **4.19 – 5.4 (GKI 1.0)** | ✅ **Supported** | Requires built-in KernelSU driver |
+| **< 4.14 (EOL)** | ⚠️ **Limited** | Requires driver (3.18+ experimental, may need backports) |
+
+### 🏗️ **Supported Architectures**
+- `arm64-v8a` - 64-bit ARM
+- `armeabi-v7a` - 32-bit ARM
+- `x86_64` - 64-bit x86
+
+---
+
+## 🔐 Security & Reporting
+
+Security is our top priority. If you discover any security vulnerabilities or issues:
+
+📋 **Please review our [Security Policy](SECURITY.md)** for responsible disclosure guidelines.
+
+---
+
+## 📜 License Information
+
+Wild KSU is open-source software distributed under multiple licenses:
+
+| 📁 **Directory** | ⚖️ **License** |
+|------------------|----------------|
+| `/kernel` | [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) |
+| **All other files** | [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html) |
+
+---
+
+## 💝 Support the Project
+
+If Wild KSU has been helpful to you, consider supporting our development efforts:
+
+### 💰 **Donations**
+
+| 💱 **Method** | 📍 **Address/Link** |
+|---------------|--------------------|
+| **PayPal** | `bauhd@outlook.com` |
+| **Card** | [`https://buy.stripe.com/5kQ28sdi08Nr0Xc2fU5os00`](https://buy.stripe.com/5kQ28sdi08Nr0Xc2fU5os00) |
+| **LTC** | `MVaN1ToSuks2cdK9mB3M8EHCfzQSyEMf6h` |
+| **BTC** | `3BBXAMS4ZuCZwfbTXxWGczxHF4isymeyxG` |
+| **ETH** | `0x2b9C846c84d58717e784458406235C09a834274e` |
+
+> 💡 **Support the original project:** For donations to KernelSU Next, visit [`https://github.com/KernelSU-Next/KernelSU-Next`](https://github.com/KernelSU-Next/KernelSU-Next)
+
+---
+
+## 🙏 Acknowledgments
+
+Wild KSU stands on the shoulders of giants. We extend our gratitude to:
+
+- 🚀 **[KernelSU Next](https://github.com/KernelSU-Next/KernelSU-Next)** - The fork base that made Wild KSU possible
+- 🌟 **[KernelSU](https://github.com/tiann/KernelSU)** - The original foundational project
+
+---
+
+<div align="center">
+  
+  ### 🌟 **Star this repository if Wild KSU helped you!** 🌟
+  
+  **Made with ❤️ by the Wild Kernels Team**
+  
+  ---
+  
+  [![GitHub stars](https://img.shields.io/github/stars/WildKernels/Wild_KSU?style=social)](https://github.com/WildKernels/Wild_KSU/stargazers)
+  [![GitHub forks](https://img.shields.io/github/forks/WildKernels/Wild_KSU?style=social)](https://github.com/WildKernels/Wild_KSU/network/members)
+  [![GitHub watchers](https://img.shields.io/github/watchers/WildKernels/Wild_KSU?style=social)](https://github.com/WildKernels/Wild_KSU/watchers)
+  
+  ![Stats](../assets/gray0_ctp_on_line.svg)
+  
+</div>
