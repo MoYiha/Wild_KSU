@@ -1,12 +1,8 @@
-import asyncio
 import os
 import sys
-from telethon import TelegramClient
-from telethon.tl.functions.help import GetConfigRequest
+import requests
 
 # Environment Variables
-API_ID = os.environ.get("API_ID")
-API_HASH = os.environ.get("API_HASH")
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 MESSAGE_THREAD_ID = os.environ.get("MESSAGE_THREAD_ID")
@@ -15,6 +11,7 @@ COMMIT_MESSAGE = os.environ.get("COMMIT_MESSAGE")
 RUN_URL = os.environ.get("RUN_URL")
 TITLE = os.environ.get("TITLE")
 VERSION = os.environ.get("VERSION")
+
 MSG_TEMPLATE = """
 **{title}**
 #ci_{version}
@@ -47,8 +44,11 @@ def check_environ():
     if CHAT_ID is None:
         print("[-] Invalid CHAT_ID")
         exit(1)
-    else:
-        CHAT_ID = int(CHAT_ID)
+    
+    if MESSAGE_THREAD_ID is None or MESSAGE_THREAD_ID == "":
+        MESSAGE_THREAD_ID = None
+        print("[*] MESSAGE_THREAD_ID not set, using default")
+    
     if COMMIT_URL is None:
         print("[-] Invalid COMMIT_URL")
         exit(1)
@@ -64,14 +64,9 @@ def check_environ():
     if VERSION is None:
         print("[-] Invalid VERSION")
         exit(1)
-    if MESSAGE_THREAD_ID is None:
-        print("[-] Invaild MESSAGE_THREAD_ID")
-        exit(1)
-    else:
-        MESSAGE_THREAD_ID = int(MESSAGE_THREAD_ID)
 
 
-async def main():
+def main():
     print("[+] Uploading to telegram")
     check_environ()
     files = sys.argv[1:]
@@ -79,25 +74,35 @@ async def main():
     if len(files) <= 0:
         print("[-] No files to upload")
         exit(1)
-    print("[+] Logging in Telegram with bot")
-    script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    session_dir = os.path.join(script_dir, "ksunextbot")
-    async with await TelegramClient(session=session_dir, api_id=API_ID, api_hash=API_HASH).start(bot_token=BOT_TOKEN) as bot:
-        caption = [""] * len(files)
-        caption[-1] = get_caption()
-        print("[+] Caption: ")
-        print("---")
-        print(caption)
-        print("---")
-        print("[+] Sending")
-        await bot.send_file(
-            entity=CHAT_ID,
-            file=files,
-            caption=caption,
-            reply_to=MESSAGE_THREAD_ID,
-            parse_mode="markdown"
-        )
-        print("[+] Done!")
+    
+    caption = get_caption()
+    print("[+] Caption: ")
+    print("---")
+    print(caption)
+    print("---")
+    print("[+] Sending")
+
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+    
+    for file_path in files:
+        with open(file_path, 'rb') as f:
+            data = {
+                'chat_id': CHAT_ID,
+                'caption': caption,
+                'parse_mode': 'Markdown',
+            }
+            if MESSAGE_THREAD_ID:
+                data['message_thread_id'] = MESSAGE_THREAD_ID
+                
+            files_data = {'document': f}
+            
+            response = requests.post(url, data=data, files=files_data)
+            print(f"[+] Response for {file_path}: {response.json()}")
+            
+    print("[+] Done!")
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     try:
