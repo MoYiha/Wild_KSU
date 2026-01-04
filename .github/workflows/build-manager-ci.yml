@@ -181,35 +181,47 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           REPO: ${{ github.repository }}
         run: |
-          # 1. Send Info Message
-          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-             -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-             -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
-             -F text="
-             🌽 *New Wild KSU CI Build Finished*
-             📦 *Repository:* https://github.com/${REPO}
-             ✏️ *Commit:* https://github.com/${REPO}/commit/${COMMIT_SHA}
-             📝 *Message:* ${COMMIT_MESSAGE}
-             https://github.com/${REPO}/actions/runs/${RUN_ID} " \
-             -F parse_mode="Markdown"
+          set -euo pipefail
 
-          # 2. Upload Normal APK
-          find ./manager -name "*.apk" -print0 | while IFS= read -r -d '' apk; do
-             echo "Uploading Normal APK: $apk..."
-             curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
-               -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-               -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
-               -F document=@"$apk"
+          MESSAGE=$(cat <<EOF
+          🌽 *New Wild KSU CI Build Finished*
+          📦 *Repository:* https://github.com/${REPO}
+          ✏️ *Commit:* https://github.com/${REPO}/commit/${COMMIT_SHA}
+          📝 *Message:* ${COMMIT_MESSAGE}
+          https://github.com/${REPO}/actions/runs/${RUN_ID}
+          EOF
+          )
+
+          echo "Sending Telegram message..."
+          RESPONSE=$(curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
+            -F text="$MESSAGE" \
+            -F parse_mode="Markdown")
+
+          echo "$RESPONSE" | grep -q '"ok":true'
+          echo "Message sent successfully."
+
+          for apk in ./manager/*.apk; do
+            [ -e "$apk" ] || continue
+            echo "Uploading normal APK: $apk"
+            curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
+              -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
+              -F document=@"$apk"
+            echo "Uploaded: $apk"
           done
 
-          # 3. Upload Spoofed APK
-          find ./manager-spoofed -name "*.apk" -print0 | while IFS= read -r -d '' apk; do
-             echo "Uploading Spoofed APK: $apk..."
-             curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
-               -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-               -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
-               -F document=@"$apk" \
+          for apk in ./manager-spoofed/*.apk; do
+            [ -e "$apk" ] || continue
+            echo "Uploading spoofed APK: $apk"
+            curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
+              -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+              -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
+              -F document=@"$apk"
+            echo "Uploaded: $apk"
           done
+
 
 
 
