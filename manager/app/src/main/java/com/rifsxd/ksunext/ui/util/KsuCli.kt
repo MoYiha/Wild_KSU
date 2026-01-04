@@ -627,6 +627,39 @@ fun getSuSFSVersion(): String? {
     }
 }
 
+fun getBootId(): String {
+    return runCatching {
+        File("/proc/sys/kernel/random/boot_id").readText().trim()
+    }.getOrDefault("unknown")
+}
+
+fun getBBGVersion(): String? {
+    // 1. Check cache first
+    val prefs = ksuApp.getSharedPreferences("bbg_cache", Context.MODE_PRIVATE)
+    val cachedBootId = prefs.getString("boot_id", null)
+    val currentBootId = getBootId()
+    
+    if (cachedBootId == currentBootId) {
+        val cachedVersion = prefs.getString("version", null)
+        if (cachedVersion != null) return cachedVersion
+    }
+
+    // 2. Scan dmesg if cache miss or invalid
+    val result = ShellUtils.fastCmd("dmesg | grep 'baseband_guard version:' | tail -n 1").trim()
+    
+    return if (result.isNotBlank()) {
+        val version = result.substringAfter("baseband_guard version: ").trim()
+        // 3. Update cache
+        prefs.edit()
+            .putString("boot_id", currentBootId)
+            .putString("version", version)
+            .apply()
+        version
+    } else {
+        null
+    }
+}
+
 fun currentMountSystem(): String {
     val result = ShellUtils.fastCmd("${getKsuDaemonPath()} module mount").trim()
     return result.substringAfter(":").substringAfter(" ").trim()

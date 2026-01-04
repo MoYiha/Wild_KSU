@@ -807,6 +807,15 @@ private fun InfoCard(autoExpand: Boolean = false) {
                         )
                     }
 
+                    if (bbgVersion != null) {
+                        Spacer(Modifier.height(16.dp))
+                        InfoCardItem(
+                            label = stringResource(R.string.home_bbg_version),
+                            content = "${stringResource(R.string.bbg_supported)} | $bbgVersion",
+                            icon = Icons.Filled.Security,
+                        )
+                    }
+
                     if (Natives.isZygiskEnabled()) {
                         Spacer(Modifier.height(16.dp))
                         InfoCardItem(

@@ -27,6 +27,8 @@
     <string name="disabled">Disabled</string>
     <string name="susfs_supported">Supported</string>
     <string name="home_susfs_version">SuSFS version</string>
+    <string name="bbg_supported">Supported</string>
+    <string name="home_bbg_version">BBG version</string>
     <string name="home_android">Android version</string>
     <string name="home_manager_version">Manager version</string>
     <string name="home_abi">ABI list</string>
