@@ -97,6 +97,22 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                var uiOverlaySettings by remember {
+                    mutableStateOf(
+                        UiOverlaySettings(
+                            cardAlpha = run {
+                                val transparencyPercent = if (prefs.contains("ui_card_transparency")) {
+                                    prefs.getInt("ui_card_transparency", 0)
+                                } else {
+                                    100 - prefs.getInt("ui_card_alpha", 100)
+                                }
+                                (1f - (transparencyPercent.coerceIn(0, 100) / 100f))
+                            },
+                            dimAlpha = prefs.getInt("background_dim", 0) / 100f,
+                        )
+                    )
+                }
+
                 DisposableEffect(prefs) {
                     val listener =
                         android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -104,6 +120,19 @@ class MainActivity : ComponentActivity() {
                                 backgroundSettings = BackgroundSettings(
                                     uri = prefs.getString("background_uri", null),
                                     fillScreen = prefs.getBoolean("background_fill_screen", false),
+                                )
+                            }
+                            if (key == "ui_card_alpha" || key == "ui_card_transparency" || key == "background_dim") {
+                                uiOverlaySettings = UiOverlaySettings(
+                                    cardAlpha = run {
+                                        val transparencyPercent = if (prefs.contains("ui_card_transparency")) {
+                                            prefs.getInt("ui_card_transparency", 0)
+                                        } else {
+                                            100 - prefs.getInt("ui_card_alpha", 100)
+                                        }
+                                        (1f - (transparencyPercent.coerceIn(0, 100) / 100f))
+                                    },
+                                    dimAlpha = prefs.getInt("background_dim", 0) / 100f,
                                 )
                             }
                         }
@@ -143,74 +172,95 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(
                     LocalSnackbarHost provides snackBarHostState,
                     LocalBackgroundSettings provides backgroundSettings,
+                    LocalUiOverlaySettings provides uiOverlaySettings,
                 ) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        AppBackground(modifier = Modifier.fillMaxSize())
+                    val baseScheme = MaterialTheme.colorScheme
+                    val cardAlpha = uiOverlaySettings.cardAlpha.coerceIn(0f, 1f)
+                    val scheme = remember(baseScheme, cardAlpha) {
+                        baseScheme.copy(
+                            surface = baseScheme.surface.copy(alpha = cardAlpha),
+                            surfaceVariant = baseScheme.surfaceVariant.copy(alpha = cardAlpha),
+                            surfaceContainerLowest = baseScheme.surfaceContainerLowest.copy(alpha = cardAlpha),
+                            surfaceContainerLow = baseScheme.surfaceContainerLow.copy(alpha = cardAlpha),
+                            surfaceContainer = baseScheme.surfaceContainer.copy(alpha = cardAlpha),
+                            surfaceContainerHigh = baseScheme.surfaceContainerHigh.copy(alpha = cardAlpha),
+                            surfaceContainerHighest = baseScheme.surfaceContainerHighest.copy(alpha = cardAlpha),
+                        )
+                    }
 
-                        Scaffold(
-                            containerColor = Color.Transparent,
-                            contentWindowInsets = WindowInsets(0, 0, 0, 0)
-                        ) { innerPadding ->
-                            DestinationsNavHost(
-                                modifier = Modifier
-                                    .padding(innerPadding)
-                                    .windowInsetsPadding(WindowInsets.navigationBars),
-                                navGraph = NavGraphs.root,
-                                navController = navController,
-                                defaultTransitions = object : NavHostAnimatedDestinationStyle() {
-                                    override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
-                                        {
-                                            slideInHorizontally(
-                                                initialOffsetX = { it },
-                                                animationSpec = tween(
-                                                    durationMillis = 300,
-                                                    easing = FastOutSlowInEasing
-                                                )
-                                            ) + fadeIn(
-                                                animationSpec = tween(300, easing = LinearOutSlowInEasing)
-                                            )
-                                        }
+                    MaterialTheme(
+                        colorScheme = scheme,
+                        typography = MaterialTheme.typography,
+                        shapes = MaterialTheme.shapes,
+                    ) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            AppBackground(modifier = Modifier.fillMaxSize())
 
-                                    override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
-                                        {
-                                            slideOutHorizontally(
-                                                targetOffsetX = { -it / 3 },
-                                                animationSpec = tween(
-                                                    durationMillis = 300,
-                                                    easing = FastOutSlowInEasing
+                            Scaffold(
+                                containerColor = Color.Transparent,
+                                contentWindowInsets = WindowInsets(0, 0, 0, 0)
+                            ) { innerPadding ->
+                                DestinationsNavHost(
+                                    modifier = Modifier
+                                        .padding(innerPadding)
+                                        .windowInsetsPadding(WindowInsets.navigationBars),
+                                    navGraph = NavGraphs.root,
+                                    navController = navController,
+                                    defaultTransitions = object : NavHostAnimatedDestinationStyle() {
+                                        override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
+                                            {
+                                                slideInHorizontally(
+                                                    initialOffsetX = { it },
+                                                    animationSpec = tween(
+                                                        durationMillis = 300,
+                                                        easing = FastOutSlowInEasing
+                                                    )
+                                                ) + fadeIn(
+                                                    animationSpec = tween(300, easing = LinearOutSlowInEasing)
                                                 )
-                                            ) + fadeOut(
-                                                animationSpec = tween(250, easing = LinearOutSlowInEasing)
-                                            )
-                                        }
+                                            }
 
-                                    override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
-                                        {
-                                            slideInHorizontally(
-                                                initialOffsetX = { -it / 3 },
-                                                animationSpec = tween(
-                                                    durationMillis = 280,
-                                                    easing = FastOutSlowInEasing
+                                        override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
+                                            {
+                                                slideOutHorizontally(
+                                                    targetOffsetX = { -it / 3 },
+                                                    animationSpec = tween(
+                                                        durationMillis = 300,
+                                                        easing = FastOutSlowInEasing
+                                                    )
+                                                ) + fadeOut(
+                                                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
                                                 )
-                                            ) + fadeIn(
-                                                animationSpec = tween(280, easing = LinearOutSlowInEasing)
-                                            )
-                                        }
+                                            }
 
-                                    override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
-                                        {
-                                            slideOutHorizontally(
-                                                targetOffsetX = { it / 3 },
-                                                animationSpec = tween(
-                                                    durationMillis = 280,
-                                                    easing = FastOutSlowInEasing
+                                        override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
+                                            {
+                                                slideInHorizontally(
+                                                    initialOffsetX = { -it / 3 },
+                                                    animationSpec = tween(
+                                                        durationMillis = 280,
+                                                        easing = FastOutSlowInEasing
+                                                    )
+                                                ) + fadeIn(
+                                                    animationSpec = tween(280, easing = LinearOutSlowInEasing)
                                                 )
-                                            ) + fadeOut(
-                                                animationSpec = tween(250, easing = LinearOutSlowInEasing)
-                                            )
-                                        }
-                                }
-                            )
+                                            }
+
+                                        override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
+                                            {
+                                                slideOutHorizontally(
+                                                    targetOffsetX = { it / 3 },
+                                                    animationSpec = tween(
+                                                        durationMillis = 280,
+                                                        easing = FastOutSlowInEasing
+                                                    )
+                                                ) + fadeOut(
+                                                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                                                )
+                                            }
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -255,6 +305,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun AppBackground(modifier: Modifier = Modifier) {
     val backgroundSettings = LocalBackgroundSettings.current
+    val uiOverlaySettings = LocalUiOverlaySettings.current
     val context = androidx.compose.ui.platform.LocalContext.current
     val baseColor = MaterialTheme.colorScheme.background
 
@@ -280,14 +331,16 @@ private fun AppBackground(modifier: Modifier = Modifier) {
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = contentScale,
-                alpha = 0.55f,
             )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(baseColor.copy(alpha = 0.82f))
-            )
+            val dimAlpha = uiOverlaySettings.dimAlpha.coerceIn(0f, 1f)
+            if (dimAlpha > 0f) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = dimAlpha))
+                )
+            }
         }
     }
 }

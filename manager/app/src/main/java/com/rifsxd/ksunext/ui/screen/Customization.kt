@@ -50,6 +50,7 @@ import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.LocaleHelper
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.roundToInt
 
 /**
  * @author rifsxd
@@ -333,6 +334,71 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 },
                 modifier = Modifier.clickable {
                     backgroundPickerLauncher.launch("image/*")
+                }
+            )
+
+            if (backgroundUri != null) {
+                var backgroundDimPercent by rememberSaveable {
+                    mutableStateOf(prefs.getInt("background_dim", 0))
+                }
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_background_dim),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    },
+                    supportingContent = {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text("$backgroundDimPercent%")
+                            Slider(
+                                value = backgroundDimPercent / 100f,
+                                onValueChange = { v ->
+                                    val next = (v * 100).roundToInt().coerceIn(0, 100)
+                                    backgroundDimPercent = next
+                                    prefs.edit {
+                                        putInt("background_dim", next)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                )
+            }
+
+            var cardTransparencyPercent by rememberSaveable {
+                mutableStateOf(
+                    if (prefs.contains("ui_card_transparency")) {
+                        prefs.getInt("ui_card_transparency", 0)
+                    } else {
+                        100 - prefs.getInt("ui_card_alpha", 100)
+                    }
+                )
+            }
+            ListItem(
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.settings_ui_card_transparency),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
+                supportingContent = {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("$cardTransparencyPercent%")
+                        Slider(
+                            value = cardTransparencyPercent / 100f,
+                            onValueChange = { v ->
+                                val next = (v * 100).roundToInt().coerceIn(0, 100)
+                                cardTransparencyPercent = next
+                                prefs.edit {
+                                    putInt("ui_card_transparency", next)
+                                }
+                            }
+                        )
+                    }
                 }
             )
 

@@ -231,4 +231,6 @@
   <string name="settings_background_scale_photo">Scale photo</string>
   <string name="settings_background_scale_fit">Fit</string>
   <string name="settings_background_scale_zoom">Zoom to fill</string>
+  <string name="settings_background_dim">Background dim</string>
+  <string name="settings_ui_card_transparency">Card transparency</string>
 </resources>

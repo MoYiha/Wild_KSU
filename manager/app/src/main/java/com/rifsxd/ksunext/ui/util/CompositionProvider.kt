@@ -17,3 +17,13 @@ data class BackgroundSettings(
 val LocalBackgroundSettings = compositionLocalOf {
     BackgroundSettings(uri = null, fillScreen = false)
 }
+
+@Immutable
+data class UiOverlaySettings(
+    val cardAlpha: Float,
+    val dimAlpha: Float,
+)
+
+val LocalUiOverlaySettings = compositionLocalOf {
+    UiOverlaySettings(cardAlpha = 1f, dimAlpha = 0f)
+}
