@@ -162,13 +162,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Normal Manager
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: manager
           path: manager
 
       - name: Download Spoofed Manager
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: manager-spoofed
           path: manager-spoofed
