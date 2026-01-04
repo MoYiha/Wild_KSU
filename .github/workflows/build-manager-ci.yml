@@ -164,7 +164,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          COMMIT_URL: ${{ github.event.head_commit.url }}
+          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           TITLE: ${{ matrix.spoofed && 'Dev Manager Build (Spoofed)' || 'Dev Manager Build (Normal)' }}
           BRANCH: ${{ github.ref_name }}
