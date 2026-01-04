@@ -224,4 +224,11 @@
   <string name="settings_restore_stock_image_message">（バックアップが存在する場合）工場出荷時のイメージを復元します。通常は OTA の前に使用します。KernelSU Next をアンインストールする必要がある場合は、「完全にアンインストール」を使用してください。</string>
   <string name="settings_disable_su_summary">su コマンドを使用してアプリが Root 権限を取得する機能を一時的に無効にします（既存の Root プロセスは影響を受けません）。</string>
   <string name="settings_global_namespace_mode">グローバル名前空間モード</string>
+  <string name="settings_background">Background</string>
+  <string name="settings_background_choose">Choose a photo</string>
+  <string name="settings_background_selected">Selected</string>
+  <string name="settings_background_clear">Clear background</string>
+  <string name="settings_background_scale_photo">Scale photo</string>
+  <string name="settings_background_scale_fit">Fit</string>
+  <string name="settings_background_scale_zoom">Zoom to fill</string>
 </resources>

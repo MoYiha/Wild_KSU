@@ -21,9 +21,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import com.ramcosta.composedestinations.generated.NavGraphs
@@ -78,6 +82,35 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val snackBarHostState = remember { SnackbarHostState() }
                 val navigator = navController.rememberDestinationsNavigator()
+                val context = androidx.compose.ui.platform.LocalContext.current
+                val prefs = remember {
+                    context.getSharedPreferences("settings", MODE_PRIVATE)
+                }
+
+                var backgroundSettings by remember {
+                    mutableStateOf(
+                        BackgroundSettings(
+                            uri = prefs.getString("background_uri", null),
+                            fillScreen = prefs.getBoolean("background_fill_screen", false),
+                        )
+                    )
+                }
+
+                DisposableEffect(prefs) {
+                    val listener =
+                        android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                            if (key == "background_uri" || key == "background_fill_screen") {
+                                backgroundSettings = BackgroundSettings(
+                                    uri = prefs.getString("background_uri", null),
+                                    fillScreen = prefs.getBoolean("background_fill_screen", false),
+                                )
+                            }
+                        }
+                    prefs.registerOnSharedPreferenceChangeListener(listener)
+                    onDispose {
+                        prefs.unregisterOnSharedPreferenceChangeListener(listener)
+                    }
+                }
 
                 LaunchedEffect(zipUri, navigateLoc) {
                     if (!zipUri.isNullOrEmpty()) {
@@ -106,72 +139,78 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                Scaffold(
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0)
-                ) { innerPadding ->
-                    CompositionLocalProvider(
-                        LocalSnackbarHost provides snackBarHostState,
-                    ) {
-                        DestinationsNavHost(
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .windowInsetsPadding(WindowInsets.navigationBars),
-                            navGraph = NavGraphs.root,
-                            navController = navController,
-                            defaultTransitions = object : NavHostAnimatedDestinationStyle() {
-                                // smooth forward enter
-                                override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-                                    slideInHorizontally(
-                                        initialOffsetX = { it }, // slide from right
-                                        animationSpec = tween(
-                                            durationMillis = 300,
-                                            easing = FastOutSlowInEasing
-                                        )
-                                    ) + fadeIn(
-                                        animationSpec = tween(300, easing = LinearOutSlowInEasing)
-                                    )
-                                }
+                CompositionLocalProvider(
+                    LocalSnackbarHost provides snackBarHostState,
+                    LocalBackgroundSettings provides backgroundSettings,
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        AppBackground(modifier = Modifier.fillMaxSize())
 
-                                // smooth forward exit
-                                override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-                                    slideOutHorizontally(
-                                        targetOffsetX = { -it / 3 }, // subtle slide left
-                                        animationSpec = tween(
-                                            durationMillis = 300,
-                                            easing = FastOutSlowInEasing
-                                        )
-                                    ) + fadeOut(
-                                        animationSpec = tween(250, easing = LinearOutSlowInEasing)
-                                    )
-                                }
+                        Scaffold(
+                            containerColor = Color.Transparent,
+                            contentWindowInsets = WindowInsets(0, 0, 0, 0)
+                        ) { innerPadding ->
+                            DestinationsNavHost(
+                                modifier = Modifier
+                                    .padding(innerPadding)
+                                    .windowInsetsPadding(WindowInsets.navigationBars),
+                                navGraph = NavGraphs.root,
+                                navController = navController,
+                                defaultTransitions = object : NavHostAnimatedDestinationStyle() {
+                                    override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
+                                        {
+                                            slideInHorizontally(
+                                                initialOffsetX = { it },
+                                                animationSpec = tween(
+                                                    durationMillis = 300,
+                                                    easing = FastOutSlowInEasing
+                                                )
+                                            ) + fadeIn(
+                                                animationSpec = tween(300, easing = LinearOutSlowInEasing)
+                                            )
+                                        }
 
-                                // pop back enter (backward navigation)
-                                override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
-                                    slideInHorizontally(
-                                        initialOffsetX = { -it / 3 }, // subtle from left
-                                        animationSpec = tween(
-                                            durationMillis = 280,
-                                            easing = FastOutSlowInEasing
-                                        )
-                                    ) + fadeIn(
-                                        animationSpec = tween(280, easing = LinearOutSlowInEasing)
-                                    )
-                                }
+                                    override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
+                                        {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { -it / 3 },
+                                                animationSpec = tween(
+                                                    durationMillis = 300,
+                                                    easing = FastOutSlowInEasing
+                                                )
+                                            ) + fadeOut(
+                                                animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                                            )
+                                        }
 
-                                // pop back exit
-                                override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
-                                    slideOutHorizontally(
-                                        targetOffsetX = { it / 3 }, // subtle slide right
-                                        animationSpec = tween(
-                                            durationMillis = 280,
-                                            easing = FastOutSlowInEasing
-                                        )
-                                    ) + fadeOut(
-                                        animationSpec = tween(250, easing = LinearOutSlowInEasing)
-                                    )
+                                    override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
+                                        {
+                                            slideInHorizontally(
+                                                initialOffsetX = { -it / 3 },
+                                                animationSpec = tween(
+                                                    durationMillis = 280,
+                                                    easing = FastOutSlowInEasing
+                                                )
+                                            ) + fadeIn(
+                                                animationSpec = tween(280, easing = LinearOutSlowInEasing)
+                                            )
+                                        }
+
+                                    override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
+                                        {
+                                            slideOutHorizontally(
+                                                targetOffsetX = { it / 3 },
+                                                animationSpec = tween(
+                                                    durationMillis = 280,
+                                                    easing = FastOutSlowInEasing
+                                                )
+                                            ) + fadeOut(
+                                                animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                                            )
+                                        }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
@@ -210,4 +249,26 @@ class MainActivity : ComponentActivity() {
             "com.rifsxd.ksunext.ACTION_MODULES" -> navigateLoc = "modules"
         }
     }
+}
+
+@Composable
+private fun AppBackground(modifier: Modifier = Modifier) {
+    val backgroundSettings = LocalBackgroundSettings.current
+    val uri = backgroundSettings.uri ?: return
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    val contentScale = if (backgroundSettings.fillScreen) {
+        ContentScale.Crop
+    } else {
+        ContentScale.Fit
+    }
+
+    AsyncImage(
+        model = ImageRequest.Builder(context)
+            .data(android.net.Uri.parse(uri))
+            .build(),
+        contentDescription = null,
+        modifier = modifier,
+        contentScale = contentScale,
+    )
 }

@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.platform.LocalContext
@@ -93,6 +94,7 @@ fun ExecuteModuleActionScreen(navigator: DestinationsNavigator, moduleId: String
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopBar(
                 isActionRunning = isActionRunning,

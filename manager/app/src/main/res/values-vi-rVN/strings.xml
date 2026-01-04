@@ -224,4 +224,11 @@
   <string name="settings_restore_stock_image_message">Khôi phục lại image gốc (nếu có bản sao lưu), thường được sử dụng trước OTA; nếu bạn cần gỡ hẳn KernelSU Next, hãy sử dụng \"Gỡ cài đặt vĩnh viễn\"</string>
   <string name="settings_disable_su_summary">Vô hiệu hoá khả năng thực thi lệnh SU để lấy quyền root (những app đã cấp trước đó không bị ảnh hưởng)</string>
   <string name="settings_global_namespace_mode">Không gian tên toàn cục</string>
+  <string name="settings_background">Background</string>
+  <string name="settings_background_choose">Choose a photo</string>
+  <string name="settings_background_selected">Selected</string>
+  <string name="settings_background_clear">Clear background</string>
+  <string name="settings_background_scale_photo">Scale photo</string>
+  <string name="settings_background_scale_fit">Fit</string>
+  <string name="settings_background_scale_zoom">Zoom to fill</string>
 </resources>

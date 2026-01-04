@@ -2,6 +2,8 @@ package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -10,12 +12,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.ViewCarousel
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -57,6 +62,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
     val ksuVersion = if (isManager) Natives.version else null
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopBar(
                 onBack = dropUnlessResumed {
@@ -240,6 +246,105 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     languageDialog.show()
                 }
             )
+
+            var backgroundUri by rememberSaveable {
+                mutableStateOf(prefs.getString("background_uri", null))
+            }
+            var backgroundFillScreen by rememberSaveable {
+                mutableStateOf(prefs.getBoolean("background_fill_screen", false))
+            }
+
+            val backgroundPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.OpenDocument()
+            ) { uri ->
+                if (uri == null) return@rememberLauncherForActivityResult
+                try {
+                    context.contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (_: Exception) {
+                }
+                prefs.edit {
+                    putString("background_uri", uri.toString())
+                }
+                backgroundUri = uri.toString()
+            }
+
+            ListItem(
+                leadingContent = {
+                    Icon(Icons.Filled.Wallpaper, null)
+                },
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.settings_background),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
+                supportingContent = {
+                    val subtitle = if (backgroundUri == null) {
+                        stringResource(R.string.settings_background_choose)
+                    } else {
+                        val mode = if (backgroundFillScreen) {
+                            stringResource(R.string.settings_background_scale_zoom)
+                        } else {
+                            stringResource(R.string.settings_background_scale_fit)
+                        }
+                        "${stringResource(R.string.settings_background_selected)} • $mode"
+                    }
+                    Text(subtitle)
+                },
+                modifier = Modifier.clickable {
+                    backgroundPickerLauncher.launch(arrayOf("image/*"))
+                }
+            )
+
+            if (backgroundUri != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    FilledTonalButton(
+                        onClick = {
+                            val uriString = backgroundUri
+                            if (uriString != null) {
+                                try {
+                                    context.contentResolver.releasePersistableUriPermission(
+                                        android.net.Uri.parse(uriString),
+                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    )
+                                } catch (_: Exception) {
+                                }
+                            }
+                            prefs.edit {
+                                remove("background_uri")
+                            }
+                            backgroundUri = null
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Filled.Delete, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.settings_background_clear))
+                    }
+
+                    FilledTonalButton(
+                        onClick = {
+                            val next = !backgroundFillScreen
+                            prefs.edit {
+                                putBoolean("background_fill_screen", next)
+                            }
+                            backgroundFillScreen = next
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.settings_background_scale_photo))
+                    }
+                }
+            }
 
             var useBanner by rememberSaveable {
                 mutableStateOf(

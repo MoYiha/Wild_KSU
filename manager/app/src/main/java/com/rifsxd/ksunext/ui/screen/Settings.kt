@@ -75,6 +75,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
     val ksuVersion = if (isManager) Natives.version else null
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopBar(
                 onBack = dropUnlessResumed { navigator.popBackStack() },

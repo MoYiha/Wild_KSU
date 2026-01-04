@@ -59,6 +59,7 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             SearchAppBar(
                 title = {

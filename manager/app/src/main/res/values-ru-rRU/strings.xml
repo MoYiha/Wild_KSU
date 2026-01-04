@@ -224,4 +224,11 @@
   <string name="settings_restore_stock_image_message">Восстанавливает исходный образ, если резервная копия доступна. Обычно используется перед OTA-обновлением. Если Вы хотите удалить KernelSU Next, пожалуйста, воспользуйтесь опцией \"Полное удаление\".</string>
   <string name="settings_disable_su_summary">Временно отключить возможность приложениям получать root доступ через команду su (запущенные процессы не будут затронуты).</string>
   <string name="settings_global_namespace_mode">Общее пространство имён</string>
+  <string name="settings_background">Background</string>
+  <string name="settings_background_choose">Choose a photo</string>
+  <string name="settings_background_selected">Selected</string>
+  <string name="settings_background_clear">Clear background</string>
+  <string name="settings_background_scale_photo">Scale photo</string>
+  <string name="settings_background_scale_fit">Fit</string>
+  <string name="settings_background_scale_zoom">Zoom to fill</string>
 </resources>

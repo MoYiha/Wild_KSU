@@ -224,4 +224,11 @@
   <string name="settings_restore_stock_image_message">Restaure a imagem de fábrica (se existir um backup), geralmente usada antes do OTA. Se você precisar desinstalar o KernelSU Next, use \"Desinstalar permanentemente\".</string>
   <string name="settings_disable_su_summary">Desative temporariamente a capacidade de qualquer app obter privilégios root por meio do comando ⁠su (processos root existentes não serão afetados).</string>
   <string name="settings_global_namespace_mode">Modo de namespace global</string>
+  <string name="settings_background">Background</string>
+  <string name="settings_background_choose">Choose a photo</string>
+  <string name="settings_background_selected">Selected</string>
+  <string name="settings_background_clear">Clear background</string>
+  <string name="settings_background_scale_photo">Scale photo</string>
+  <string name="settings_background_scale_fit">Fit</string>
+  <string name="settings_background_scale_zoom">Zoom to fill</string>
 </resources>

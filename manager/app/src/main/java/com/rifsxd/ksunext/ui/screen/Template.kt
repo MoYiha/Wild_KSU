@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
@@ -96,6 +97,7 @@ fun AppProfileTemplateScreen(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             val clipboard = LocalClipboard.current
             val context = LocalContext.current

@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
@@ -64,6 +65,7 @@ fun TemplateEditorScreen(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             val author =
                 if (initialTemplate.author.isNotEmpty()) "@${initialTemplate.author}" else ""

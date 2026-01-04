@@ -83,6 +83,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopBar(
                 kernelVersion,

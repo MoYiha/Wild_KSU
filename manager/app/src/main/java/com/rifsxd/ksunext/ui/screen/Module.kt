@@ -141,6 +141,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             SearchAppBar(
                 title = {
