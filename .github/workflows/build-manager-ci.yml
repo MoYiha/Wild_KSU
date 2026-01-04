@@ -172,7 +172,6 @@ jobs:
           name: mappings-spoofed
 
       - name: Send Notification
-        if: ${{ secrets.TELEGRAM_BOT_TOKEN != '' }}
         env:
           COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
           COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
