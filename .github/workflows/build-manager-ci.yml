@@ -157,21 +157,16 @@ jobs:
           name: ${{ matrix.spoofed && 'mappings-spoofed' || 'mappings' }}
           path: "manager/app/build/outputs/mapping/release/"
 
-      - name: Upload to telegram
+      - name: Send Telegram Notification
         if: github.event_name != 'pull_request' && steps.need_upload.outputs.UPLOAD == 'true'
-        env:
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          TITLE: ${{ matrix.spoofed && 'Dev Manager Build (Spoofed)' || 'Dev Manager Build (Normal)' }}
-          BRANCH: ${{ github.ref_name }}
         run: |
-          if [ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
-            export VERSION=$(git rev-list --count HEAD)
-            APK=$(find ./app/build/outputs/apk/release -name "*.apk")
-            pip3 install requests
-            python3 $GITHUB_WORKSPACE/scripts/ksunextbot.py $APK
-          fi
+          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
+            -F text="
+            🌱 *New Wild KSU CI Build Finished*
+            📦 *Repository:* \`https://github.com/${{ github.repository }}\`
+            ✏️ *Commit:* \`https://github.com/${{ github.repository }}/commit/${{ github.sha }}\`
+            📝 *Message:* ${{ github.event.head_commit.message }}
+            \`https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\` " \
+            -F parse_mode="Markdown"
