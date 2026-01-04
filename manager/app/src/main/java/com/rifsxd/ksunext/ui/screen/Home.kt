@@ -695,6 +695,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
     val isManager = Natives.isManager
     val ksuVersion = if (isManager) Natives.version else null
     val susfsVersion = if (isManager) getSuSFSVersion() else null
+    val bbgVersion = if (isManager) getBBGVersion() else null
 
     var expanded by rememberSaveable { mutableStateOf(false) }
 
