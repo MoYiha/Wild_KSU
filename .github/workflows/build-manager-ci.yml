@@ -271,8 +271,7 @@ jobs:
               curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
                   -F chat_id="${{ secrets.TELEGRAM_USER_ID }}" \
                   -F document=@"$apk" \
-                  -F caption="📦 **Build**: $(basename "$apk")" \
-                  -F parse_mode="Markdown"
+                  -F caption="📦 Build: $(basename "$apk")"
             fi
           done
 
