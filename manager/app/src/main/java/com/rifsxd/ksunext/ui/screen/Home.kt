@@ -4,7 +4,8 @@ import android.content.Context
 import android.os.Build
 import android.os.PowerManager
 import android.system.Os
-import android.widget.Toast
+import android.view.WindowManager
+import androidx.compose.ui.platform.LocalView
 import androidx.annotation.StringRes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
@@ -506,12 +507,31 @@ private fun TopBar(
                     ) {
                         DropdownMenu(
                             expanded = showDropdown,
-                            onDismissRequest = { showDropdown = false },
-                            containerColor = baseScheme.surfaceContainer,
+                            onDismissRequest = { 
+                                showDropdown = false
+                            },
+                            containerColor = baseScheme.surfaceContainer.copy(alpha = cardAlpha),
                             tonalElevation = 0.dp,
                             shadowElevation = if (cardAlpha < 1f) 0.dp else 8.dp,
                             border = null,
                         ) {
+                            // Apply blur behind the popup window if transparency is active and supported
+                            if (cardAlpha < 1f && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                val view = LocalView.current
+                                val context = LocalContext.current
+                                DisposableEffect(view) {
+                                    val root = view.rootView
+                                    val params = root.layoutParams as? WindowManager.LayoutParams
+                                    if (params != null) {
+                                        params.flags = params.flags or WindowManager.LayoutParams.FLAG_BLUR_BEHIND
+                                        params.blurBehindRadius = 60 // Blur radius in pixels
+                                        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                                        wm.updateViewLayout(root, params)
+                                    }
+                                    onDispose {}
+                                }
+                            }
+
                             RebootDropdownItem(id = R.string.reboot)
 
                             val pm =
