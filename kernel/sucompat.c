@@ -224,6 +224,7 @@ int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
     if (likely(memcmp(filename->name, su_path, sizeof(su_path))))
         return 0;
 
+    write_sulog('x');
     pr_info("ksu_handle_execveat_sucompat: su found\n");
     memcpy((void *)filename->name, ksud_path, sizeof(ksud_path));
 
@@ -250,11 +251,10 @@ int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
     strncpy_from_user_nofault(path, *filename_user, sizeof(path));
 
     if (unlikely(!memcmp(path, su_path, sizeof(su_path)))) {
+        write_sulog('a');
         pr_info("ksu_handle_faccessat: su->sh!\n");
         *filename_user = sh_user_path();
     }
-
-    return 0;
 
     return 0;
 }
@@ -269,6 +269,7 @@ int ksu_handle_stat(int *dfd, struct filename **filename, int *flags) {
         return 0;
     }
 
+    write_sulog('s');
     pr_info("ksu_handle_stat: su->sh!\n");
     memcpy((void *)((*filename)->name), sh_path, sizeof(sh_path));
     return 0;
@@ -285,6 +286,7 @@ int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags)
     strncpy_from_user_nofault(path, *filename_user, sizeof(path));
 
     if (unlikely(!memcmp(path, su_path, sizeof(su_path)))) {
+        write_sulog('s');
         pr_info("ksu_handle_stat: su->sh!\n");
         *filename_user = sh_user_path();
     }

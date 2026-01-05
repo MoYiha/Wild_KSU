@@ -11,6 +11,7 @@
 #include <linux/task_work.h>
 #include <linux/uaccess.h>
 #include <linux/version.h>
+#include <linux/utsname.h> // utsname() and uts_sem
 #ifdef CONFIG_KSU_SUSFS
 #include <linux/namei.h>
 #include <linux/susfs.h>
@@ -872,6 +873,68 @@ static int reboot_handler_pre(struct kprobe *p, struct pt_regs *regs)
 		return 0;
 	}
 
+	if (magic2 == CHANGE_SPOOF_UNAME) {
+		// only root is allowed for this command 
+		if (!ksu_require_root())
+			return 0;
+
+		char release_buf[65];
+		char version_buf[65];
+		static char original_release_buf[65] = {0};
+		static char original_version_buf[65] = {0};
+
+		// user pointer storage
+		// init this as zero so this works on 32-on-64 compat (LE)
+		uint64_t u_pptr = 0;
+		uint64_t u_ptr = 0;
+
+		// arg4 corresponds to *ppptr in the snippet
+		if (copy_from_user(&u_pptr, (void __user *)arg4, sizeof(u_pptr)))
+			return 0;
+
+		// now we got the __user **
+		// we cannot dereference this as this is __user
+		// we just do another copy_from_user to get it
+		if (copy_from_user(&u_ptr, (void __user *)u_pptr, sizeof(u_ptr)))
+			return 0;
+
+		// for release
+		if (strncpy_from_user(release_buf, (char __user *)u_ptr, sizeof(release_buf)) < 0)
+			return 0;
+		release_buf[sizeof(release_buf) - 1] = '\0'; 
+
+		// for version
+		if (strncpy_from_user(version_buf, (char __user *)(u_ptr + strlen(release_buf) + 1), sizeof(version_buf)) < 0)
+			return 0;
+		version_buf[sizeof(version_buf) - 1] = '\0'; 
+
+		if (original_release_buf[0] == '\0') {
+			struct new_utsname *u_curr = utsname();
+			// we save current version as the original before modifying
+			strncpy(original_release_buf, u_curr->release, sizeof(original_release_buf));
+			strncpy(original_version_buf, u_curr->version, sizeof(original_version_buf));
+			pr_info("sys_reboot: original uname saved: %s %s\n", original_release_buf, original_version_buf);
+		}
+
+		// so user can reset
+		if (!strcmp(release_buf, "default") || !strcmp(version_buf, "default") ) {
+			memcpy(release_buf, original_release_buf, sizeof(release_buf));
+			memcpy(version_buf, original_version_buf, sizeof(version_buf));
+		}
+
+		pr_info("sys_reboot: spoofing kernel to: %s - %s\n", release_buf, version_buf);
+
+		struct new_utsname *u = utsname();
+
+		down_write(&uts_sem);
+		strncpy(u->release, release_buf, sizeof(u->release));
+		strncpy(u->version, version_buf, sizeof(u->version));
+		up_write(&uts_sem);
+
+		ksu_copy_reply_user(user_ptr, reply);
+		return 0;
+	}
+
 	return 0;
 }
 
@@ -1028,6 +1091,68 @@ int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd, void __user 
 
 		pr_info("sys_reboot: ksu_change_ksuver to: %d\n", cmd);
 		ksuver_override = cmd;
+
+		ksu_copy_reply_user(user_ptr, reply);
+		return 0;
+	}
+
+	if (magic2 == CHANGE_SPOOF_UNAME) {
+		// only root is allowed for this command 
+		if (!ksu_require_root())
+			return 0;
+
+		char release_buf[65];
+		char version_buf[65];
+		static char original_release_buf[65] = {0};
+		static char original_version_buf[65] = {0};
+
+		// user pointer storage
+		// init this as zero so this works on 32-on-64 compat (LE)
+		uint64_t u_pptr = 0;
+		uint64_t u_ptr = 0;
+
+		// *arg is the user pointer value
+		if (copy_from_user(&u_pptr, (void __user *)(*arg), sizeof(u_pptr)))
+			return 0;
+
+		// now we got the __user **
+		// we cannot dereference this as this is __user
+		// we just do another copy_from_user to get it
+		if (copy_from_user(&u_ptr, (void __user *)u_pptr, sizeof(u_ptr)))
+			return 0;
+
+		// for release
+		if (strncpy_from_user(release_buf, (char __user *)u_ptr, sizeof(release_buf)) < 0)
+			return 0;
+		release_buf[sizeof(release_buf) - 1] = '\0'; 
+
+		// for version
+		if (strncpy_from_user(version_buf, (char __user *)(u_ptr + strlen(release_buf) + 1), sizeof(version_buf)) < 0)
+			return 0;
+		version_buf[sizeof(version_buf) - 1] = '\0'; 
+
+		if (original_release_buf[0] == '\0') {
+			struct new_utsname *u_curr = utsname();
+			// we save current version as the original before modifying
+			strncpy(original_release_buf, u_curr->release, sizeof(original_release_buf));
+			strncpy(original_version_buf, u_curr->version, sizeof(original_version_buf));
+			pr_info("sys_reboot: original uname saved: %s %s\n", original_release_buf, original_version_buf);
+		}
+
+		// so user can reset
+		if (!strcmp(release_buf, "default") || !strcmp(version_buf, "default") ) {
+			memcpy(release_buf, original_release_buf, sizeof(release_buf));
+			memcpy(version_buf, original_version_buf, sizeof(version_buf));
+		}
+
+		pr_info("sys_reboot: spoofing kernel to: %s - %s\n", release_buf, version_buf);
+
+		struct new_utsname *u = utsname();
+
+		down_write(&uts_sem);
+		strncpy(u->release, release_buf, sizeof(u->release));
+		strncpy(u->version, version_buf, sizeof(u->version));
+		up_write(&uts_sem);
 
 		ksu_copy_reply_user(user_ptr, reply);
 		return 0;
