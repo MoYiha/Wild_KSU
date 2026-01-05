@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Build
 import android.os.PowerManager
 import android.system.Os
-import android.view.WindowManager
-import androidx.compose.ui.platform.LocalView
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toUri
+import com.rifsxd.ksunext.ui.webui.WebUIActivity
 import androidx.annotation.StringRes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
@@ -14,15 +16,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import android.view.WindowManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -448,6 +451,10 @@ private fun TopBar(
         rotationTarget += 360f * 6
     }
 
+    val webUILauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { }
+
     TopAppBar(
         title = {
             Row(
@@ -480,6 +487,28 @@ private fun TopBar(
         },
         actions = {
             if (ksuVersion != null) {
+                // Check for ksu_toolkit module and if it has a WebUI
+                val moduleViewModel: ModuleViewModel = viewModel()
+                val toolkitModule = moduleViewModel.moduleList.find { it.id == "ksu_toolkit" }
+                
+                if (toolkitModule != null && toolkitModule.hasWebUi) {
+                    val context = LocalContext.current
+                    IconButton(onClick = {
+                        webUILauncher.launch(
+                            Intent(context, WebUIActivity::class.java)
+                                .setData("kernelsu://webui/${toolkitModule.id}".toUri())
+                                .putExtra("id", toolkitModule.id)
+                                .putExtra("name", toolkitModule.name)
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.HomeRepairService,
+                            contentDescription = "Toolkit",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
                 IconButton(onClick = onInstallClick) {
                     Icon(
                         imageVector = Icons.Filled.Archive,
