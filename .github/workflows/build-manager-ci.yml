@@ -275,9 +275,28 @@ jobs:
             fi
           done
 
+  create-release:
+    if: needs.prepare-tag.result == 'success'
+    needs: [prepare-tag, build-manager, build-lkm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare-tag.outputs.tag_name }}
+          body: ${{ github.event.head_commit.message }}
+          files: |
+            manager/*.apk
+            manager-spoofed/*.apk
+
   cleanup-tag:
-    if: failure() && needs.prepare-tag.result == 'success' && needs.build-lkm.result == 'failure'
-    needs: [prepare-tag, build-lkm]
+    if: failure() && needs.prepare-tag.result == 'success' && (needs.build-lkm.result == 'failure' || needs.build-manager.result == 'failure')
+    needs: [prepare-tag, build-lkm, build-manager]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -287,7 +306,7 @@ jobs:
         run: |
           TAG_NAME="${{ needs.prepare-tag.outputs.tag_name }}"
           if [ ! -z "$TAG_NAME" ]; then
-             echo "Deleting tag $TAG_NAME due to kernel build failure"
+             echo "Deleting tag $TAG_NAME due to build failure"
              git push --delete origin "$TAG_NAME"
           fi
 
