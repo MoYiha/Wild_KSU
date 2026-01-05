@@ -288,7 +288,7 @@ jobs:
       - name: Rename Spoofed APKs
         run: |
           for file in manager-spoofed/*.apk; do
-            mv "$file" "manager-spoofed/spoofed-$(basename "$file")"
+            mv "$file" "manager-spoofed/$(basename "$file" | sed 's/Wild_KSU/Wild_KSU_Spoofed/')"
           done
 
       - name: Create Release
@@ -301,19 +301,21 @@ jobs:
             manager-spoofed/*.apk
 
   cleanup-tag:
-    if: failure() && needs.prepare-tag.result == 'success' && (needs.build-lkm.result == 'failure' || needs.build-manager.result == 'failure')
-    needs: [prepare-tag, build-lkm, build-manager]
+    if: failure() && needs.prepare-tag.result == 'success'
+    needs: [prepare-tag, build-lkm, build-manager, create-release]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Delete Tag
+      - name: Delete Tag and Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG_NAME="${{ needs.prepare-tag.outputs.tag_name }}"
           if [ ! -z "$TAG_NAME" ]; then
-             echo "Deleting tag $TAG_NAME due to build failure"
-             git push --delete origin "$TAG_NAME"
+             echo "Deleting tag and release for $TAG_NAME due to failure"
+             gh release delete "$TAG_NAME" --cleanup-tag --yes || git push --delete origin "$TAG_NAME"
           fi
 
 
