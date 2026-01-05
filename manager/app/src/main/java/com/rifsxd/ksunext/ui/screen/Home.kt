@@ -167,10 +167,17 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 private fun SuperuserCard(onClick: (() -> Unit)? = null) {
     val count = getSuperuserCount()
     val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = cardAlpha)
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = cardAlpha),
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ),
+        elevation = cardElevation,
         modifier = Modifier
             .height(IntrinsicSize.Min)
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
@@ -208,6 +215,11 @@ private fun ModuleCard(onClick: (() -> Unit)? = null) {
     val count = getModuleCount()
     val moduleViewModel: ModuleViewModel = viewModel()
     val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
 
     val moduleUpdateCount = moduleViewModel.moduleList.count {
         moduleViewModel.checkUpdate(it).first.isNotEmpty()
@@ -228,8 +240,10 @@ private fun ModuleCard(onClick: (() -> Unit)? = null) {
 
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = cardAlpha)
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = cardAlpha),
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ),
+        elevation = cardElevation,
         modifier = Modifier
             .height(IntrinsicSize.Min)
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
@@ -314,6 +328,11 @@ fun UpdateCard() {
     val context = LocalContext.current
     val latestVersionInfo = LatestVersionInfo()
     val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
     val newVersion by produceState(initialValue = latestVersionInfo) {
         value = withContext(Dispatchers.IO) {
             checkNewVersion()
@@ -338,8 +357,10 @@ fun UpdateCard() {
         val updateDialog = rememberConfirmDialog(onConfirm = { uriHandler.openUri(newVersionUrl) })
         ElevatedCard(
             colors = CardDefaults.elevatedCardColors(
-                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = cardAlpha)
-            )
+                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = cardAlpha),
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            elevation = cardElevation,
         ) {
             Row(
                 modifier = Modifier
@@ -519,14 +540,25 @@ private fun StatusCard(
     val context = LocalContext.current
     var tapCount by remember { mutableStateOf(0) }
     val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
+
+    val baseContainerColor =
+        if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.errorContainer
+    val baseContentColor =
+        if (ksuVersion != null) MaterialTheme.colorScheme.onPrimaryContainer
+        else MaterialTheme.colorScheme.onErrorContainer
 
     ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(containerColor = run {
-            val base =
-                if (ksuVersion != null) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.errorContainer
-            base.copy(alpha = cardAlpha)
-        })
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = baseContainerColor.copy(alpha = cardAlpha),
+            contentColor = baseContentColor,
+        ),
+        elevation = cardElevation,
     ) {
         Row(
             modifier = Modifier
@@ -671,10 +703,17 @@ fun WarningCard(
     message: String, color: Color = MaterialTheme.colorScheme.error, onClick: (() -> Unit)? = null
 ) {
     val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = color.copy(alpha = cardAlpha)
-        )
+            containerColor = color.copy(alpha = cardAlpha),
+            contentColor = MaterialTheme.colorScheme.onError,
+        ),
+        elevation = cardElevation,
     ) {
         Row(
             modifier = Modifier
@@ -698,6 +737,12 @@ fun WarningCard(
 @Composable
 private fun InfoCard(autoExpand: Boolean = false) {
     val context = LocalContext.current
+    val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
 
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
@@ -716,7 +761,7 @@ private fun InfoCard(autoExpand: Boolean = false) {
         }
     }   
 
-    ElevatedCard {
+    ElevatedCard(elevation = cardElevation) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -896,8 +941,14 @@ private fun InfoCard(autoExpand: Boolean = false) {
 fun NextCard() {
     val uriHandler = LocalUriHandler.current
     val url = stringResource(R.string.home_next_kernelsu_repo)
+    val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
 
-    ElevatedCard {
+    ElevatedCard(elevation = cardElevation) {
 
         Row(
             modifier = Modifier
@@ -927,7 +978,14 @@ fun EXperimentalCard() {
     val url = stringResource(R.string.home_experimental_kernelsu_repo)
     */
 
-    ElevatedCard {
+    val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
+
+    ElevatedCard(elevation = cardElevation) {
 
         Row(
             modifier = Modifier
@@ -973,8 +1031,14 @@ fun IssueReportCard() {
     val uriHandler = LocalUriHandler.current
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
+    val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+    val cardElevation = if (cardAlpha < 1f) {
+        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+    } else {
+        CardDefaults.elevatedCardElevation()
+    }
 
-    ElevatedCard {
+    ElevatedCard(elevation = cardElevation) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
