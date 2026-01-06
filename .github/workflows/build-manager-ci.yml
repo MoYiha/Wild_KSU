@@ -296,10 +296,12 @@ upload-telegram-manager:
               curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
                 -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
                 -F text="$MESSAGE"
+
               echo "Sending $apk to Telegram DM..."
               curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
                   -F chat_id="${{ secrets.TELEGRAM_USER_ID }}" \
-                  -F document=@"$apk"
+                  -F document=@"$apk" \
+                  -F caption="📦 Build: $(basename "$apk")"
             fi
           done
 
