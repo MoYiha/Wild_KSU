@@ -327,14 +327,16 @@ private fun SelectInstallMethod(onSelected: (InstallMethod) -> Unit = {}) {
                         text = stringResource(id = option.label),
                         fontSize = MaterialTheme.typography.titleMedium.fontSize,
                         fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
-                        fontStyle = MaterialTheme.typography.titleMedium.fontStyle
+                        fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+                        color = Color.White
                     )
                     option.summary?.let {
                         Text(
                             text = it,
                             fontSize = MaterialTheme.typography.bodySmall.fontSize,
                             fontFamily = MaterialTheme.typography.bodySmall.fontFamily,
-                            fontStyle = MaterialTheme.typography.bodySmall.fontStyle
+                            fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
+                            color = Color.White
                         )
                     }
                 }

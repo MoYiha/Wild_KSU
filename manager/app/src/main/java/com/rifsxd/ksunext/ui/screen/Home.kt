@@ -577,7 +577,7 @@ private fun TopBar(
                             ) {
                                 Box {
                                     Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                                        Spacer(modifier = Modifier.height(24.dp))
+                                        Spacer(modifier = Modifier.height(8.dp))
                                         RebootDropdownItem(id = R.string.reboot)
 
                                         val pm =
@@ -603,22 +603,6 @@ private fun TopBar(
                                                 )
                                             },
                                             onClick = { showDropdown = false }
-                                        )
-                                    }
-
-                                    IconButton(
-                                        onClick = { showDropdown = false },
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                            .padding(8.dp)
-                                            .background(Color.Red, CircleShape)
-                                            .size(32.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Close,
-                                            contentDescription = "Close",
-                                            tint = Color.White,
-                                            modifier = Modifier.size(20.dp)
                                         )
                                     }
                                 }
