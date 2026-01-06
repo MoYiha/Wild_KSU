@@ -293,17 +293,16 @@ upload-telegram-manager:
           for apk in ./manager/*.apk; do
             if [ -f "$apk" ]; then
               echo "Sending Telegram message..."
-              RESPONSE=$(curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+              curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
                 -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-                -F message_thread_id="${{ secrets.TELEGRAM_TOPIC_ID_WKSU }}" \
-                -F text="$MESSAGE")
+                -F text="$MESSAGE"
               echo "Sending $apk to Telegram DM..."
               curl -sS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
                   -F chat_id="${{ secrets.TELEGRAM_USER_ID }}" \
-                  -F document=@"$apk" \
+                  -F document=@"$apk"
             fi
           done
-          
+
   cleanup-tag:
     if: failure() && needs.prepare-tag.result == 'success'
     needs: [prepare-tag, build-lkm, build-manager, create-release]
