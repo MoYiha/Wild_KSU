@@ -266,7 +266,13 @@ class MainActivity : ComponentActivity() {
                                 DestinationsNavHost(
                                     modifier = Modifier
                                         .padding(innerPadding)
-                                        .windowInsetsPadding(WindowInsets.navigationBars),
+                                        .let {
+                                            if (enableBottomBar) {
+                                                it.windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
+                                            } else {
+                                                it.windowInsetsPadding(WindowInsets.navigationBars)
+                                            }
+                                        },
                                     navGraph = NavGraphs.root,
                                     navController = navController,
                                     defaultTransitions = object : NavHostAnimatedDestinationStyle() {
