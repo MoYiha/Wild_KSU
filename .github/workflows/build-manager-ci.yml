@@ -215,7 +215,7 @@ jobs:
             manager/*.apk
             manager-spoofed/*.apk
 
-upload-telegram-manager:
+  upload-telegram-manager:
     if: ${{ ( github.event_name != 'pull_request' && (github.ref == 'refs/heads/wild' )) || github.ref_type == 'tag' }}
     needs: build-manager
     runs-on: ubuntu-latest
