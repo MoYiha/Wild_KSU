@@ -11,6 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import com.rifsxd.ksunext.ui.webui.WebUIActivity
 import androidx.annotation.StringRes
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -67,6 +69,7 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.theme.ORANGE
 import com.rifsxd.ksunext.ui.util.*
+import com.rifsxd.ksunext.ui.webui.WebUIActivity
 import com.rifsxd.ksunext.ui.util.restartActivity
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
@@ -74,6 +77,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.util.*
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>(start = true)
@@ -456,14 +460,20 @@ private fun TopBar(
         }
     )
 
+    val moduleViewModel: ModuleViewModel = viewModel()
+    
+    val kpatchNext = moduleViewModel.moduleList.find { it.id == "KPatch-Next" }
+    
+    val webUILauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { }
+
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         isSpinning = true
         rotationTarget += 360f * 6
     }
-
-    val webUILauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { }
 
     TopAppBar(
         title = {
@@ -476,6 +486,15 @@ private fun TopBar(
                     if (!isSpinning) {
                         isSpinning = true
                         rotationTarget += 360f * 6
+                    }
+
+                    if (kpatchNext != null && kpatchNext.hasWebUi) {
+                        webUILauncher.launch(
+                            Intent(context, WebUIActivity::class.java)
+                                .setData("kernelsu://webui/${kpatchNext.id}".toUri())
+                                .putExtra("id", kpatchNext.id)
+                                .putExtra("name", kpatchNext.name)
+                        )
                     }
                 }
             ) {
