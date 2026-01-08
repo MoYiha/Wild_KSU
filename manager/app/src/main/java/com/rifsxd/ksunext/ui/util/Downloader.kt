@@ -86,7 +86,7 @@ fun checkNewVersion(): LatestVersionInfo {
                     val name = asset.getString("name")
                     val isApk = name.endsWith(".apk")
                     val isSpoofed = name.contains("spoofed", ignoreCase = true)
-                    val shouldDownload = if (pkgId == "com.rifsxd.ksunext") {
+                    val shouldDownload = if (pkgId == "com.twj.wksu") {
                         isApk && !isSpoofed
                     } else {
                         isApk && isSpoofed
