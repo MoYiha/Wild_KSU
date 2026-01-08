@@ -647,15 +647,21 @@ private fun TopBar(
     onBack: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val enableBottomBar = prefs.getBoolean("enable_bottom_bar", false)
+
     TopAppBar(
         title = { Text(
                 text = stringResource(R.string.settings),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Black,
             ) }, navigationIcon = {
-            IconButton(
-                onClick = onBack
-            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+            if (!enableBottomBar) {
+                IconButton(
+                    onClick = onBack
+                ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+            }
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         scrollBehavior = scrollBehavior

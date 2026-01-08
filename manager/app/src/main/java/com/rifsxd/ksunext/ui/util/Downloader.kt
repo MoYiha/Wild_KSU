@@ -65,7 +65,7 @@ fun download(
 
 fun checkNewVersion(): LatestVersionInfo {
     // Next version updates
-    val url = "https://api.github.com/repos/KernelSU-Next/KernelSU-Next/releases/latest"
+    val url = "https://api.github.com/repos/WildKernels/Wild_KSU/releases/latest"
     // default null value if failed
     val defaultValue = LatestVersionInfo()
     runCatching {

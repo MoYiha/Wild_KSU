@@ -51,6 +51,10 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
 
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val enableBottomBar = prefs.getBoolean("enable_bottom_bar", false)
+
     LaunchedEffect(navigator) {
         viewModel.search = ""
         if (viewModel.appList.isEmpty()) {
@@ -64,13 +68,15 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
             SearchAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = dropUnlessResumed { navigator.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = null
-                            )
+                        if (!enableBottomBar) {
+                            IconButton(onClick = dropUnlessResumed { navigator.popBackStack() }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = null
+                                )
+                            }
+                            Spacer(Modifier.width(8.dp))
                         }
-                        Spacer(Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.superuser),
                             style = MaterialTheme.typography.titleLarge,
