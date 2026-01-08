@@ -15,14 +15,16 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Flip
-import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.ViewCarousel
 import androidx.compose.material.icons.filled.ViewStream
+import androidx.compose.material.icons.filled.Wallpaper
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -42,14 +44,11 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.R
-import com.rifsxd.ksunext.ksuApp
-import com.rifsxd.ksunext.ui.component.SwitchItem
-import com.rifsxd.ksunext.ui.component.rememberCustomDialog
-import com.rifsxd.ksunext.ui.util.refreshActivity
-import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
-import com.rifsxd.ksunext.ui.util.LocaleHelper
+import com.rifsxd.ksunext.ui.component.*
+import com.rifsxd.ksunext.ui.util.*
 import java.io.File
 import java.io.FileOutputStream
 import android.webkit.MimeTypeMap
@@ -74,7 +73,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
         topBar = {
             TopBar(
                 onBack = dropUnlessResumed {
-                    navigator.popBackStack()
+                    if (!navigator.popBackStack()) {
+                        navigator.navigate(SettingScreenDestination)
+                    }
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -82,7 +83,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
         snackbarHost = { SnackbarHost(snackBarHost) },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { paddingValues ->
-    
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -97,7 +98,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
             // Track language state with current app locale
             var currentAppLocale by remember { mutableStateOf(LocaleHelper.getCurrentAppLocale(context)) }
-            
+
             // Listen for preference changes
             LaunchedEffect(Unit) {
                 currentAppLocale = LocaleHelper.getCurrentAppLocale(context)
@@ -230,31 +231,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             }
 
-            val language = stringResource(id = R.string.settings_language)
-            
-            // Compute display name based on current app locale (similar to the reference implementation)
-            val currentLanguageDisplay = remember(currentAppLocale) {
-                val locale = currentAppLocale
-                if (locale != null) {
-                    locale.getDisplayName(locale)
-                } else {
-                    context.getString(R.string.system_default)
-                }
-            }
-            
-            ListItem(
-                leadingContent = { Icon(Icons.Filled.Translate, language) },
-                headlineContent = { Text(
-                    text = language,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
-                supportingContent = { Text(currentLanguageDisplay) },
-                modifier = Modifier.clickable {
-                    languageDialog.show()
-                }
-            )
-
             var backgroundUri by rememberSaveable {
                 mutableStateOf(prefs.getString("background_uri", null))
             }
@@ -281,105 +257,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 backgroundIsVideo = isVideo
             }
 
-            ListItem(
-                leadingContent = {
-                    Icon(Icons.Filled.Wallpaper, null)
-                },
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.settings_background),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                supportingContent = {
-                    val subtitle = if (backgroundUri == null) {
-                        stringResource(R.string.settings_background_choose_media)
-                    } else {
-                        val mode = if (backgroundFillScreen) {
-                            stringResource(R.string.settings_background_scale_zoom)
-                        } else {
-                            stringResource(R.string.settings_background_scale_fit)
-                        }
-                        "${stringResource(R.string.settings_background_selected)} • $mode"
-                    }
-                    Text(subtitle)
-                },
-                trailingContent = {
-                    if (backgroundUri != null) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            IconButton(
-                                onClick = {
-                                    val next = !backgroundFillScreen
-                                    prefs.edit {
-                                        putBoolean("background_fill_screen", next)
-                                    }
-                                    backgroundFillScreen = next
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Filled.Flip,
-                                    contentDescription = stringResource(R.string.settings_background_scale_photo)
-                                )
-                            }
-                            IconButton(
-                                onClick = {
-                                    val uriString = backgroundUri
-                                    if (uriString != null) {
-                                        deleteOwnedBackgroundFile(context, uriString)
-                                    }
-                                    prefs.edit {
-                                        remove("background_uri")
-                                        remove("background_is_video")
-                                    }
-                                    backgroundUri = null
-                                    backgroundIsVideo = false
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Filled.Delete,
-                                    contentDescription = stringResource(R.string.settings_background_clear)
-                                )
-                            }
-                        }
-                    }
-                },
-                modifier = Modifier.clickable {
-                    backgroundPickerLauncher.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
-                    )
-                }
-            )
-
-            if (backgroundUri != null) {
-                var backgroundDimPercent by rememberSaveable {
-                    mutableStateOf(prefs.getInt("background_dim", 0))
-                }
-
-                ListItem(
-                    headlineContent = {
-                        Text(
-                            text = stringResource(R.string.settings_background_dim),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    },
-                    supportingContent = {
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text("$backgroundDimPercent%")
-                            Slider(
-                                value = backgroundDimPercent / 100f,
-                                onValueChange = { v ->
-                                    val next = (v * 100).roundToInt().coerceIn(0, 100)
-                                    backgroundDimPercent = next
-                                    prefs.edit {
-                                        putInt("background_dim", next)
-                                    }
-                                }
-                            )
-                        }
-                    }
-                )
+            var backgroundDimPercent by rememberSaveable {
+                mutableStateOf(prefs.getInt("background_dim", 0))
             }
 
             var cardTransparencyPercent by rememberSaveable {
@@ -391,46 +270,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     }
                 )
             }
-            ListItem(
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.settings_ui_card_transparency),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                supportingContent = {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("$cardTransparencyPercent%")
-                        Slider(
-                            value = cardTransparencyPercent / 100f,
-                            onValueChange = { v ->
-                                val next = (v * 100).roundToInt().coerceIn(0, 100)
-                                cardTransparencyPercent = next
-                                prefs.edit {
-                                    putInt("ui_card_transparency", next)
-                                }
-                            }
-                        )
-                    }
-                }
-            )
 
             var useBanner by rememberSaveable {
                 mutableStateOf(
                     prefs.getBoolean("use_banner", true)
                 )
-            }
-            if (ksuVersion != null) {
-                SwitchItem(
-                    icon = Icons.Filled.ViewCarousel,
-                    title = stringResource(id = R.string.settings_banner),
-                    summary = stringResource(id = R.string.settings_banner_summary),
-                    checked = useBanner
-                ) {
-                    prefs.edit { putBoolean("use_banner", it) }
-                    useBanner = it
-                }
             }
 
             var enableBottomBar by rememberSaveable {
@@ -438,31 +282,257 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     prefs.getBoolean("enable_bottom_bar", false)
                 )
             }
-            SwitchItem(
-                icon = Icons.Filled.ViewStream,
-                title = stringResource(id = R.string.settings_enable_bottom_bar),
-                summary = stringResource(id = R.string.settings_enable_bottom_bar_summary),
-                checked = enableBottomBar
-            ) {
-                prefs.edit { putBoolean("enable_bottom_bar", it) }
-                enableBottomBar = it
-            }
 
             var enableAmoled by rememberSaveable {
                 mutableStateOf(
                     prefs.getBoolean("enable_amoled", false)
                 )
             }
-            if (isSystemInDarkTheme()) {
-                val activity = LocalContext.current as? MainActivity
-                SwitchItem(
-                    icon = Icons.Filled.Contrast,
-                    title = stringResource(id = R.string.settings_amoled_mode),
-                    summary = stringResource(id = R.string.settings_amoled_mode_summary),
-                    checked = enableAmoled
-                ) { checked ->
-                    activity?.setAmoledMode(checked)
-                    enableAmoled = checked
+
+            val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
+            val cardElevation = if (cardAlpha < 1f) {
+                CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
+            } else {
+                CardDefaults.elevatedCardElevation()
+            }
+
+            val elevatedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+
+            // Card 1: Interface
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                colors = CardDefaults.elevatedCardColors(containerColor = elevatedContainerColor),
+                elevation = cardElevation,
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val language = stringResource(id = R.string.settings_language)
+                    
+                    // Compute display name based on current app locale (similar to the reference implementation)
+                    val currentLanguageDisplay = remember(currentAppLocale) {
+                        val locale = currentAppLocale
+                        if (locale != null) {
+                            locale.getDisplayName(locale)
+                        } else {
+                            context.getString(R.string.system_default)
+                        }
+                    }
+
+                    ListItem(
+                        leadingContent = { Icon(Icons.Filled.Translate, language) },
+                        headlineContent = { Text(
+                            text = language,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        ) },
+                        supportingContent = { Text(currentLanguageDisplay) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                languageDialog.show()
+                            },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                    )
+
+                    if (ksuVersion != null) {
+                        SwitchItem(
+                            icon = Icons.Filled.ViewCarousel,
+                            title = stringResource(id = R.string.settings_banner),
+                            summary = stringResource(id = R.string.settings_banner_summary),
+                            checked = useBanner,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp)),
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                        ) {
+                            prefs.edit { putBoolean("use_banner", it) }
+                            useBanner = it
+                        }
+                    }
+
+                    SwitchItem(
+                        icon = Icons.Filled.ViewStream,
+                        title = stringResource(id = R.string.settings_enable_bottom_bar),
+                        summary = stringResource(id = R.string.settings_enable_bottom_bar_summary),
+                        checked = enableBottomBar,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp)),
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                    ) {
+                        prefs.edit { putBoolean("enable_bottom_bar", it) }
+                        enableBottomBar = it
+                    }
+                }
+            }
+
+            // Card 2: Theming
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                colors = CardDefaults.elevatedCardColors(containerColor = elevatedContainerColor),
+                elevation = cardElevation,
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    ListItem(
+                        leadingContent = {
+                            Icon(Icons.Filled.Wallpaper, null)
+                        },
+                        headlineContent = {
+                            Text(
+                                text = stringResource(R.string.settings_background),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        },
+                        supportingContent = {
+                            val subtitle = if (backgroundUri == null) {
+                                stringResource(R.string.settings_background_choose_media)
+                            } else {
+                                val mode = if (backgroundFillScreen) {
+                                    stringResource(R.string.settings_background_scale_zoom)
+                                } else {
+                                    stringResource(R.string.settings_background_scale_fit)
+                                }
+                                "${stringResource(R.string.settings_background_selected)} • $mode"
+                            }
+                            Text(subtitle)
+                        },
+                        trailingContent = {
+                            if (backgroundUri != null) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    IconButton(
+                                        onClick = {
+                                            val next = !backgroundFillScreen
+                                            prefs.edit {
+                                                putBoolean("background_fill_screen", next)
+                                            }
+                                            backgroundFillScreen = next
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Flip,
+                                            contentDescription = stringResource(R.string.settings_background_scale_photo)
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = {
+                                            val uriString = backgroundUri
+                                            if (uriString != null) {
+                                                deleteOwnedBackgroundFile(context, uriString)
+                                            }
+                                            prefs.edit {
+                                                remove("background_uri")
+                                                remove("background_is_video")
+                                            }
+                                            backgroundUri = null
+                                            backgroundIsVideo = false
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.Delete,
+                                            contentDescription = stringResource(R.string.settings_background_clear)
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                backgroundPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
+                                )
+                            },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                    )
+
+                    if (backgroundUri != null) {
+                        ListItem(
+                            headlineContent = {
+                                Text(
+                                    text = stringResource(R.string.settings_background_dim),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            },
+                            supportingContent = {
+                                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Text("$backgroundDimPercent%")
+                                    Slider(
+                                        value = backgroundDimPercent / 100f,
+                                        onValueChange = { v ->
+                                            val next = (v * 100).roundToInt().coerceIn(0, 100)
+                                            backgroundDimPercent = next
+                                            prefs.edit {
+                                                putInt("background_dim", next)
+                                            }
+                                        }
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp)),
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                        )
+                    }
+
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                text = stringResource(R.string.settings_ui_card_transparency),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        },
+                        supportingContent = {
+                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text("$cardTransparencyPercent%")
+                                Slider(
+                                    value = cardTransparencyPercent / 100f,
+                                    onValueChange = { v ->
+                                        val next = (v * 100).roundToInt().coerceIn(0, 100)
+                                        cardTransparencyPercent = next
+                                        prefs.edit {
+                                            putInt("ui_card_transparency", next)
+                                        }
+                                    }
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp)),
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                    )
+
+                    if (isSystemInDarkTheme()) {
+                        val activity = LocalContext.current as? MainActivity
+                        SwitchItem(
+                            icon = Icons.Filled.Contrast,
+                            title = stringResource(id = R.string.settings_amoled_mode),
+                            summary = stringResource(id = R.string.settings_amoled_mode_summary),
+                            checked = enableAmoled,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp)),
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                        ) { checked ->
+                            activity?.setAmoledMode(checked)
+                            enableAmoled = checked
+                        }
+                    }
                 }
             }
         }
