@@ -459,6 +459,7 @@ private fun TopBar(
     val moduleViewModel: ModuleViewModel = viewModel()
     
     val kpatchNext = moduleViewModel.moduleList.find { it.id == "KPatch-Next" }
+    val toolkitModule = moduleViewModel.moduleList.find { it.id == "ksu_toolkit" }
     
     val webUILauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -483,15 +484,6 @@ private fun TopBar(
                         isSpinning = true
                         rotationTarget += 360f * 6
                     }
-
-                    if (kpatchNext != null && kpatchNext.hasWebUi) {
-                        webUILauncher.launch(
-                            Intent(context, WebUIActivity::class.java)
-                                .setData("kernelsu://webui/${kpatchNext.id}".toUri())
-                                .putExtra("id", kpatchNext.id)
-                                .putExtra("name", kpatchNext.name)
-                        )
-                    }
                 }
             ) {
                 Icon(
@@ -512,12 +504,24 @@ private fun TopBar(
         },
         actions = {
             if (ksuVersion != null) {
-                // Check for ksu_toolkit module and if it has a WebUI
-                val moduleViewModel: ModuleViewModel = viewModel()
-                val toolkitModule = moduleViewModel.moduleList.find { it.id == "ksu_toolkit" }
-                
+                if (kpatchNext != null && kpatchNext.hasWebUi) {
+                    IconButton(onClick = {
+                        webUILauncher.launch(
+                            Intent(context, WebUIActivity::class.java)
+                                .setData("kernelsu://webui/${kpatchNext.id}".toUri())
+                                .putExtra("id", kpatchNext.id)
+                                .putExtra("name", kpatchNext.name)
+                        )
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_ksu_next),
+                            contentDescription = "KPatch-Next",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
                 if (toolkitModule != null && toolkitModule.hasWebUi) {
-                    val context = LocalContext.current
                     IconButton(onClick = {
                         webUILauncher.launch(
                             Intent(context, WebUIActivity::class.java)
