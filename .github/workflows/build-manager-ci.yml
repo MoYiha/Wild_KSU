@@ -300,11 +300,14 @@ jobs:
           New Wild KSU CI Build Finished
 
           Repository: https://github.com/${REPO}
+
           Workflow: https://github.com/${REPO}/actions/runs/${RUN_ID}
+
           Commit: https://github.com/${REPO}/commit/${COMMIT_SHA}
 
-          Commit message:
+          ```
           ${COMMIT_MESSAGE}
+          ```
           EOF
               )
           # Check for Normal artifacts
