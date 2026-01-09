@@ -85,4 +85,3 @@ lsposed-cxx = { module = "org.lsposed.libcxx:libcxx", version = "28.1.13356709" 
 
 mmrl-ui = { group = "com.github.MMRLApp.MMRL", name = "ui", version.ref = "mmrl" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
-material-color-utilities = { group = "com.google.android.material", name = "material", version.ref = "material-color-utilities" }
