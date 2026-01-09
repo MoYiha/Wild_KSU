@@ -50,8 +50,11 @@ import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.*
 import com.rifsxd.ksunext.ui.util.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
 import com.rifsxd.ksunext.ui.theme.AppTheme
-import com.rifsxd.ksunext.ui.theme.ColorSelector
+import com.rifsxd.ksunext.ui.theme.ColorPickerDialog
 import com.rifsxd.ksunext.ui.theme.KernelSUTheme
 import com.rifsxd.ksunext.ui.theme.PRIMARY
 import java.util.Locale
