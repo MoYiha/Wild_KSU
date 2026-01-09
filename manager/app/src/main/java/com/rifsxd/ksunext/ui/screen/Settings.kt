@@ -533,6 +533,9 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     )
                 }
             }
+            
+            IssueReportCard()
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

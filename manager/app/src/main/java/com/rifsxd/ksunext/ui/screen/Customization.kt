@@ -573,19 +573,36 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
                     if (currentTheme == AppTheme.CUSTOM) {
                         val currentCustomColor = prefs.getInt("theme_custom_color", PRIMARY.toArgb())
+                        var showColorPicker by remember { mutableStateOf(false) }
+
+                        if (showColorPicker) {
+                            ColorPickerDialog(
+                                initialColor = Color(currentCustomColor),
+                                onDismissRequest = { showColorPicker = false },
+                                onColorSelected = { color ->
+                                    prefs.edit { putInt("theme_custom_color", color.toArgb()) }
+                                    showColorPicker = false
+                                }
+                            )
+                        }
 
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
                         ListItem(
                             headlineContent = { Text("Custom Color") },
-                            supportingContent = {
-                                ColorSelector(
-                                    selectedColor = Color(currentCustomColor),
-                                    onColorSelected = { color ->
-                                        prefs.edit { putInt("theme_custom_color", color.toArgb()) }
-                                    }
+                            supportingContent = { Text("Tap to pick a color") },
+                            trailingContent = {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(currentCustomColor))
+                                        .border(1.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
                                 )
                             },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showColorPicker = true },
                             colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                         )
                     }

@@ -181,7 +181,6 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             }
 
             InfoCard(autoExpand = developerOptionsEnabled)
-            IssueReportCard()
             Spacer(Modifier)
         }
     }
@@ -705,6 +704,8 @@ private fun TopBar(
                                 }
                             }
 
+                            var selectedReason by remember { mutableStateOf("") }
+                            
                             ElevatedCard(
                                 modifier = Modifier.fillMaxWidth(0.95f),
                                 colors = CardDefaults.elevatedCardColors(
@@ -714,35 +715,63 @@ private fun TopBar(
                                     defaultElevation = if (cardAlpha < 1f) 0.dp else 6.dp
                                 )
                             ) {
-                                Box {
-                                    Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        RebootDropdownItem(id = R.string.reboot)
+                                Column(modifier = Modifier.padding(24.dp)) {
+                                    Text(
+                                        text = stringResource(R.string.reboot),
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
 
-                                        val pm =
-                                            LocalContext.current.getSystemService(Context.POWER_SERVICE) as PowerManager?
-                                        @Suppress("DEPRECATION")
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm?.isRebootingUserspaceSupported == true) {
-                                            RebootDropdownItem(id = R.string.reboot_userspace, reason = "userspace")
+                                    val options = mutableListOf<Pair<Int, String>>()
+                                    options.add(R.string.reboot to "")
+                                    
+                                    val pm = LocalContext.current.getSystemService(Context.POWER_SERVICE) as PowerManager?
+                                    @Suppress("DEPRECATION")
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm?.isRebootingUserspaceSupported == true) {
+                                        options.add(R.string.reboot_userspace to "userspace")
+                                    }
+                                    options.add(R.string.reboot_recovery to "recovery")
+                                    options.add(R.string.reboot_bootloader to "bootloader")
+                                    options.add(R.string.reboot_download to "download")
+                                    options.add(R.string.reboot_edl to "edl")
+
+                                    options.forEach { (id, reason) ->
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable { selectedReason = reason }
+                                                .padding(vertical = 8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            RadioButton(
+                                                selected = (selectedReason == reason),
+                                                onClick = { selectedReason = reason }
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = stringResource(id),
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
                                         }
-                                        RebootDropdownItem(id = R.string.reboot_recovery, reason = "recovery")
-                                        RebootDropdownItem(id = R.string.reboot_bootloader, reason = "bootloader")
-                                        RebootDropdownItem(id = R.string.reboot_download, reason = "download")
-                                        RebootDropdownItem(id = R.string.reboot_edl, reason = "edl")
+                                    }
 
-                                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                                    Spacer(modifier = Modifier.height(24.dp))
 
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = stringResource(android.R.string.cancel),
-                                                    style = MaterialTheme.typography.titleMedium,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.error
-                                                )
-                                            },
-                                            onClick = { showDropdown = false }
-                                        )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End
+                                    ) {
+                                        TextButton(onClick = { showDropdown = false }) {
+                                            Text(stringResource(android.R.string.cancel))
+                                        }
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Button(onClick = {
+                                            reboot(selectedReason)
+                                            showDropdown = false
+                                        }) {
+                                            Text(stringResource(R.string.confirm))
+                                        }
                                     }
                                 }
                             }

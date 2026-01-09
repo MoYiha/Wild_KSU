@@ -42,10 +42,7 @@ import coil.request.ImageRequest
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.FlashScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.ModuleScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SuperUserScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.*
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ui.screen.FlashIt
@@ -250,8 +247,10 @@ class MainActivity : ComponentActivity() {
                                         val currentDestination = navBackStackEntry?.destination
 
                                         NavigationBar {
-                            BottomBarDestination.values().forEach { destination ->
-                                                val isSelected = currentDestination?.route == destination.direction.route
+                                            BottomBarDestination.values().forEach { destination ->
+                                                val isSelected = currentDestination?.route == destination.direction.route ||
+                                                        (destination == BottomBarDestination.Settings && currentDestination?.route == CustomizationScreenDestination.route)
+
                                                 if (destination.rootRequired && !Natives.isManager) return@forEach
 
                                                 NavigationBarItem(
