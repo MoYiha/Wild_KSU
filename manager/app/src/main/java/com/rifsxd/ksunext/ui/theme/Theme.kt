@@ -92,35 +92,55 @@ fun KernelSUTheme(
             
             val scheme = if (systemDark) {
                 // Generate dark scheme
+                // Use lighter containers for dark mode
+                val primaryContainer = colorToUse.blend(Color.Black, 0.6f) 
+                // Ensure text on primary is readable
+                val onPrimary = if (colorToUse.luminance() > 0.5f) Color.Black else Color.White
+                
                 darkColorScheme(
                     primary = colorToUse,
-                    onPrimary = Color.Black, // Assuming vibrant colors, black text is usually safer
-                    primaryContainer = colorToUse.blend(Color.Black, 0.7f),
-                    onPrimaryContainer = colorToUse.blend(Color.White, 0.2f),
-                    secondary = colorToUse,
-                    onSecondary = Color.Black,
-                    secondaryContainer = colorToUse.blend(Color.Black, 0.7f),
-                    onSecondaryContainer = colorToUse.blend(Color.White, 0.2f),
-                    tertiary = colorToUse,
-                    onTertiary = Color.Black,
-                    tertiaryContainer = colorToUse.blend(Color.Black, 0.7f),
-                    onTertiaryContainer = colorToUse.blend(Color.White, 0.2f),
+                    onPrimary = onPrimary,
+                    primaryContainer = primaryContainer,
+                    onPrimaryContainer = colorToUse.blend(Color.White, 0.1f), // Slightly lighter than primary
+                    
+                    secondary = colorToUse.blend(Color.White, 0.2f), // Slightly lighter secondary
+                    onSecondary = if (colorToUse.blend(Color.White, 0.2f).luminance() > 0.5f) Color.Black else Color.White,
+                    secondaryContainer = primaryContainer,
+                    onSecondaryContainer = colorToUse.blend(Color.White, 0.1f),
+                    
+                    tertiary = colorToUse.blend(Color.Black, 0.2f), // Slightly darker tertiary
+                    onTertiary = Color.White,
+                    tertiaryContainer = primaryContainer,
+                    onTertiaryContainer = colorToUse.blend(Color.White, 0.1f),
+                    
+                    // Tint surfaces slightly
+                    surface = Color(0xFF121212).blend(colorToUse, 0.05f),
+                    surfaceContainer = Color(0xFF1E1E1E).blend(colorToUse, 0.08f),
                 )
             } else {
                 // Generate light scheme
+                val primaryContainer = colorToUse.blend(Color.White, 0.6f)
+                val onPrimary = if (colorToUse.luminance() > 0.5f) Color.Black else Color.White
+
                 lightColorScheme(
                     primary = colorToUse,
-                    onPrimary = Color.White,
-                    primaryContainer = colorToUse.blend(Color.White, 0.7f),
-                    onPrimaryContainer = colorToUse.blend(Color.Black, 0.2f),
+                    onPrimary = onPrimary,
+                    primaryContainer = primaryContainer,
+                    onPrimaryContainer = colorToUse.blend(Color.Black, 0.1f), // Slightly darker than primary
+                    
                     secondary = colorToUse,
-                    onSecondary = Color.White,
-                    secondaryContainer = colorToUse.blend(Color.White, 0.7f),
-                    onSecondaryContainer = colorToUse.blend(Color.Black, 0.2f),
+                    onSecondary = onPrimary,
+                    secondaryContainer = primaryContainer,
+                    onSecondaryContainer = colorToUse.blend(Color.Black, 0.1f),
+                    
                     tertiary = colorToUse,
-                    onTertiary = Color.White,
-                    tertiaryContainer = colorToUse.blend(Color.White, 0.7f),
-                    onTertiaryContainer = colorToUse.blend(Color.Black, 0.2f),
+                    onTertiary = onPrimary,
+                    tertiaryContainer = primaryContainer,
+                    onTertiaryContainer = colorToUse.blend(Color.Black, 0.1f),
+
+                    // Tint surfaces slightly
+                    surface = Color(0xFFFDFDFD).blend(colorToUse, 0.05f),
+                    surfaceContainer = Color(0xFFF0F0F0).blend(colorToUse, 0.08f),
                 )
             }
             scheme to systemDark
