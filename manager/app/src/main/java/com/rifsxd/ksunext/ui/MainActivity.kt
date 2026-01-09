@@ -246,7 +246,9 @@ class MainActivity : ComponentActivity() {
                                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                                         val currentDestination = navBackStackEntry?.destination
 
-                                        NavigationBar {
+                                        NavigationBar(
+                                            containerColor = MaterialTheme.colorScheme.surface,
+                                        ) {
                                             BottomBarDestination.values().forEach { destination ->
                                                 val isSelected = currentDestination?.route == destination.direction.route ||
                                                         (destination == BottomBarDestination.Settings && currentDestination?.route == CustomizationScreenDestination.route)
