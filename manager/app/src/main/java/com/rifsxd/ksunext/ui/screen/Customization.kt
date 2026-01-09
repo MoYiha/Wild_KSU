@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -50,7 +51,9 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.*
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.theme.AppTheme
+import com.rifsxd.ksunext.ui.theme.ColorSelector
 import com.rifsxd.ksunext.ui.theme.KernelSUTheme
+import com.rifsxd.ksunext.ui.theme.PRIMARY
 import java.util.Locale
 import java.io.File
 import java.io.FileOutputStream
@@ -564,6 +567,25 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         },
                         header = Header.Default(title = "Select Theme")
                     )
+
+                    if (currentTheme == AppTheme.CUSTOM) {
+                        val currentCustomColor = prefs.getInt("theme_custom_color", PRIMARY.toArgb())
+
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+                        ListItem(
+                            headlineContent = { Text("Custom Color") },
+                            supportingContent = {
+                                ColorSelector(
+                                    selectedColor = Color(currentCustomColor),
+                                    onColorSelected = { color ->
+                                        prefs.edit { putInt("theme_custom_color", color.toArgb()) }
+                                    }
+                                )
+                            },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                        )
+                    }
                 }
             }
         }

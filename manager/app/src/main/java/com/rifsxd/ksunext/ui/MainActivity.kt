@@ -50,6 +50,7 @@ import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.theme.AppTheme
 import com.rifsxd.ksunext.ui.theme.KernelSUTheme
+import com.rifsxd.ksunext.ui.theme.PRIMARY
 import com.rifsxd.ksunext.ui.util.*
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +58,7 @@ class MainActivity : ComponentActivity() {
     var zipUri by mutableStateOf<ArrayList<Uri>?>(null)
     var navigateLoc by mutableStateOf("")
     var appThemeState = mutableStateOf(AppTheme.AUTO)
+    var appThemeCustomColorState = mutableIntStateOf(0xFF8AADF4.toInt())
     private val handler = Handler(Looper.getMainLooper())
 
     override fun attachBaseContext(newBase: Context?) {
@@ -76,6 +78,7 @@ class MainActivity : ComponentActivity() {
             val prefsInit = getSharedPreferences("settings", MODE_PRIVATE)
             val themeValue = prefsInit.getInt("app_theme", 0)
             appThemeState.value = AppTheme.fromValue(themeValue)
+            appThemeCustomColorState.intValue = prefsInit.getInt("theme_custom_color", PRIMARY.toArgb())
         } catch (_: Exception) {}
 
         val isManager = Natives.isManager
@@ -90,7 +93,10 @@ class MainActivity : ComponentActivity() {
             handleIntent(intent)
 
         setContent {
-            KernelSUTheme(appTheme = appThemeState.value) {
+            KernelSUTheme(
+                appTheme = appThemeState.value,
+                customColor = Color(appThemeCustomColorState.intValue)
+            ) {
                 val navController = rememberNavController()
                 val snackBarHostState = remember { SnackbarHostState() }
                 val navigator = navController.rememberDestinationsNavigator()
@@ -135,6 +141,9 @@ class MainActivity : ComponentActivity() {
                             if (key == "app_theme") {
                                 val themeValue = prefs.getInt("app_theme", 0)
                                 appThemeState.value = AppTheme.fromValue(themeValue)
+                            }
+                            if (key == "theme_custom_color") {
+                                appThemeCustomColorState.intValue = prefs.getInt("theme_custom_color", PRIMARY.toArgb())
                             }
                             if (key == "background_uri" || key == "background_fill_screen") {
                                 backgroundSettings = BackgroundSettings(

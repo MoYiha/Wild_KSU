@@ -1,6 +1,7 @@
 package com.rifsxd.ksunext.ui.theme
 
 import android.os.Build
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -42,11 +43,13 @@ fun Color.blend(other: Color, ratio: Float): Color {
 @Composable
 fun KernelSUTheme(
     appTheme: AppTheme = AppTheme.AUTO,
+    customColor: Color? = null,
     content: @Composable () -> Unit
 ) {
     val systemDark = isSystemInDarkTheme()
     val dynamicColor = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
 
     val (colorScheme, darkTheme) = when (appTheme) {
         AppTheme.AUTO -> {
@@ -85,11 +88,20 @@ fun KernelSUTheme(
             amoledScheme to true
         }
         AppTheme.CUSTOM -> {
-            // Placeholder for custom theme, fallback to Auto behavior for now
-            val scheme = if (dynamicColor) {
-                if (systemDark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            val colorToUse = customColor ?: Color(prefs.getInt("theme_custom_color", PRIMARY.toArgb()))
+            
+            val scheme = if (systemDark) {
+                darkColorScheme(
+                    primary = colorToUse,
+                    secondary = colorToUse,
+                    tertiary = colorToUse
+                )
             } else {
-                if (systemDark) DarkColorScheme else LightColorScheme
+                lightColorScheme(
+                    primary = colorToUse,
+                    secondary = colorToUse,
+                    tertiary = colorToUse
+                )
             }
             scheme to systemDark
         }
