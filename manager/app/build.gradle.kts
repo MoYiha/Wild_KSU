@@ -143,4 +143,5 @@ dependencies {
     implementation(libs.lsposed.cxx)
 
     implementation(libs.mmrl.ui)
+    implementation(libs.material.color.utilities)
 }

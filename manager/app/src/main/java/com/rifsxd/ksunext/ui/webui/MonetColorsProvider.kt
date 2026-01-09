@@ -12,7 +12,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 
+import com.google.android.material.color.utilities.Scheme
 import com.rifsxd.ksunext.ui.theme.AMOLED_BLACK
+
 
 /**
  * @author rifsxd
@@ -25,7 +27,61 @@ object MonetColorsProvider {
         val isDark = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
         val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val appThemeVal = prefs.getInt("app_theme", 0)
         val amoledMode = prefs.getBoolean("enable_amoled", false)
+
+        if (appThemeVal == 6) { // AppTheme.CUSTOM
+            val customColor = prefs.getInt("theme_custom_color", 0xFF8AADF4.toInt())
+            val scheme = if (isDark) Scheme.dark(customColor) else Scheme.light(customColor)
+            val monetColors = mapOf(
+                "primary" to Color(scheme.primary).toArgb().toHex(),
+                "onPrimary" to Color(scheme.onPrimary).toArgb().toHex(),
+                "primaryContainer" to Color(scheme.primaryContainer).toArgb().toHex(),
+                "onPrimaryContainer" to Color(scheme.onPrimaryContainer).toArgb().toHex(),
+                "inversePrimary" to Color(scheme.inversePrimary).toArgb().toHex(),
+                "secondary" to Color(scheme.secondary).toArgb().toHex(),
+                "onSecondary" to Color(scheme.onSecondary).toArgb().toHex(),
+                "secondaryContainer" to Color(scheme.secondaryContainer).toArgb().toHex(),
+                "onSecondaryContainer" to Color(scheme.onSecondaryContainer).toArgb().toHex(),
+                "tertiary" to Color(scheme.tertiary).toArgb().toHex(),
+                "onTertiary" to Color(scheme.onTertiary).toArgb().toHex(),
+                "tertiaryContainer" to Color(scheme.tertiaryContainer).toArgb().toHex(),
+                "onTertiaryContainer" to Color(scheme.onTertiaryContainer).toArgb().toHex(),
+                "background" to Color(scheme.background).toArgb().toHex(),
+                "onBackground" to Color(scheme.onBackground).toArgb().toHex(),
+                "surface" to Color(scheme.surface).toArgb().toHex(),
+                "tonalSurface" to Color(scheme.surface).toArgb().toHex(),
+                "onSurface" to Color(scheme.onSurface).toArgb().toHex(),
+                "surfaceVariant" to Color(scheme.surfaceVariant).toArgb().toHex(),
+                "onSurfaceVariant" to Color(scheme.onSurfaceVariant).toArgb().toHex(),
+                "surfaceTint" to Color(scheme.primary).toArgb().toHex(),
+                "inverseSurface" to Color(scheme.inverseSurface).toArgb().toHex(),
+                "inverseOnSurface" to Color(scheme.inverseOnSurface).toArgb().toHex(),
+                "error" to Color(scheme.error).toArgb().toHex(),
+                "onError" to Color(scheme.onError).toArgb().toHex(),
+                "errorContainer" to Color(scheme.errorContainer).toArgb().toHex(),
+                "onErrorContainer" to Color(scheme.onErrorContainer).toArgb().toHex(),
+                "outline" to Color(scheme.outline).toArgb().toHex(),
+                "outlineVariant" to Color(scheme.outlineVariant).toArgb().toHex(),
+                "scrim" to Color(scheme.scrim).toArgb().toHex(),
+                "surfaceBright" to Color(scheme.neutralPalette.tone(if (isDark) 24 else 98)).toArgb().toHex(),
+                "surfaceDim" to Color(scheme.neutralPalette.tone(if (isDark) 6 else 87)).toArgb().toHex(),
+                "surfaceContainer" to Color(scheme.neutralPalette.tone(if (isDark) 12 else 94)).toArgb().toHex(),
+                "surfaceContainerHigh" to Color(scheme.neutralPalette.tone(if (isDark) 17 else 92)).toArgb().toHex(),
+                "surfaceContainerHighest" to Color(scheme.neutralPalette.tone(if (isDark) 22 else 90)).toArgb().toHex(),
+                "surfaceContainerLow" to Color(scheme.neutralPalette.tone(if (isDark) 10 else 96)).toArgb().toHex(),
+                "surfaceContainerLowest" to Color(scheme.neutralPalette.tone(if (isDark) 4 else 100)).toArgb().toHex(),
+                "filledTonalButtonContentColor" to Color(scheme.onSecondaryContainer).toArgb().toHex(),
+                "filledTonalButtonContainerColor" to Color(scheme.secondaryContainer).toArgb().toHex(),
+                "filledTonalButtonDisabledContentColor" to Color(scheme.onSurfaceVariant).toArgb().toHex(),
+                "filledTonalButtonDisabledContainerColor" to Color(scheme.surfaceVariant).toArgb().toHex(),
+                "filledCardContentColor" to Color(scheme.onPrimaryContainer).toArgb().toHex(),
+                "filledCardContainerColor" to Color(scheme.primaryContainer).toArgb().toHex(),
+                "filledCardDisabledContentColor" to Color(scheme.onSurfaceVariant).toArgb().toHex(),
+                "filledCardDisabledContainerColor" to Color(scheme.surfaceVariant).toArgb().toHex()
+            )
+            return monetColors.toCssVars()
+        }
 
         val colorScheme = if (isDark) {
             dynamicDarkColorScheme(context)

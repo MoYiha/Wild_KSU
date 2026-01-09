@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.runtime.remember
+import com.google.android.material.color.utilities.Scheme
+
 
 private val DarkColorScheme = darkColorScheme(
     primary = PRIMARY,
@@ -90,61 +92,52 @@ fun KernelSUTheme(
         }
         AppTheme.CUSTOM -> {
             val colorToUse = customColor ?: Color(prefs.getInt("theme_custom_color", PRIMARY.toArgb()))
-            
-            val scheme = if (systemDark) {
-                // Generate dark scheme
-                // Use lighter containers for dark mode
-                val primaryContainer = colorToUse.blend(Color.Black, 0.6f) 
-                // Ensure text on primary is readable
-                val onPrimary = if (colorToUse.luminance() > 0.5f) Color.Black else Color.White
-                
-                darkColorScheme(
-                    primary = colorToUse,
-                    onPrimary = onPrimary,
-                    primaryContainer = primaryContainer,
-                    onPrimaryContainer = colorToUse.blend(Color.White, 0.1f), // Slightly lighter than primary
-                    
-                    secondary = colorToUse.blend(Color.White, 0.2f), // Slightly lighter secondary
-                    onSecondary = if (colorToUse.blend(Color.White, 0.2f).luminance() > 0.5f) Color.Black else Color.White,
-                    secondaryContainer = primaryContainer,
-                    onSecondaryContainer = colorToUse.blend(Color.White, 0.1f),
-                    
-                    tertiary = colorToUse.blend(Color.Black, 0.2f), // Slightly darker tertiary
-                    onTertiary = Color.White,
-                    tertiaryContainer = primaryContainer,
-                    onTertiaryContainer = colorToUse.blend(Color.White, 0.1f),
-                    
-                    // Tint surfaces slightly
-                    surface = Color(0xFF121212).blend(colorToUse, 0.05f),
-                    surfaceContainer = Color(0xFF1E1E1E).blend(colorToUse, 0.08f),
-                )
-            } else {
-                // Generate light scheme
-                val primaryContainer = colorToUse.blend(Color.White, 0.6f)
-                val onPrimary = if (colorToUse.luminance() > 0.5f) Color.Black else Color.White
+            val argb = colorToUse.toArgb()
 
-                lightColorScheme(
-                    primary = colorToUse,
-                    onPrimary = onPrimary,
-                    primaryContainer = primaryContainer,
-                    onPrimaryContainer = colorToUse.blend(Color.Black, 0.1f), // Slightly darker than primary
-                    
-                    secondary = colorToUse,
-                    onSecondary = onPrimary,
-                    secondaryContainer = primaryContainer,
-                    onSecondaryContainer = colorToUse.blend(Color.Black, 0.1f),
-                    
-                    tertiary = colorToUse,
-                    onTertiary = onPrimary,
-                    tertiaryContainer = primaryContainer,
-                    onTertiaryContainer = colorToUse.blend(Color.Black, 0.1f),
+            val scheme = if (systemDark) Scheme.dark(argb) else Scheme.light(argb)
 
-                    // Tint surfaces slightly
-                    surface = Color(0xFFFDFDFD).blend(colorToUse, 0.05f),
-                    surfaceContainer = Color(0xFFF0F0F0).blend(colorToUse, 0.08f),
-                )
-            }
-            scheme to systemDark
+            val m3Scheme = ColorScheme(
+                primary = Color(scheme.primary),
+                onPrimary = Color(scheme.onPrimary),
+                primaryContainer = Color(scheme.primaryContainer),
+                onPrimaryContainer = Color(scheme.onPrimaryContainer),
+                inversePrimary = Color(scheme.inversePrimary),
+                secondary = Color(scheme.secondary),
+                onSecondary = Color(scheme.onSecondary),
+                secondaryContainer = Color(scheme.secondaryContainer),
+                onSecondaryContainer = Color(scheme.onSecondaryContainer),
+                tertiary = Color(scheme.tertiary),
+                onTertiary = Color(scheme.onTertiary),
+                tertiaryContainer = Color(scheme.tertiaryContainer),
+                onTertiaryContainer = Color(scheme.onTertiaryContainer),
+                background = Color(scheme.background),
+                onBackground = Color(scheme.onBackground),
+                surface = Color(scheme.surface),
+                onSurface = Color(scheme.onSurface),
+                surfaceVariant = Color(scheme.surfaceVariant),
+                onSurfaceVariant = Color(scheme.onSurfaceVariant),
+                surfaceTint = Color(scheme.primary),
+                inverseSurface = Color(scheme.inverseSurface),
+                inverseOnSurface = Color(scheme.inverseOnSurface),
+                error = Color(scheme.error),
+                onError = Color(scheme.onError),
+                errorContainer = Color(scheme.errorContainer),
+                onErrorContainer = Color(scheme.onErrorContainer),
+                outline = Color(scheme.outline),
+                outlineVariant = Color(scheme.outlineVariant),
+                scrim = Color(scheme.scrim),
+
+                // Surface Container Roles (derived from Neutral Palette)
+                surfaceBright = Color(scheme.neutralPalette.tone(if (systemDark) 24 else 98)),
+                surfaceDim = Color(scheme.neutralPalette.tone(if (systemDark) 6 else 87)),
+                surfaceContainer = Color(scheme.neutralPalette.tone(if (systemDark) 12 else 94)),
+                surfaceContainerHigh = Color(scheme.neutralPalette.tone(if (systemDark) 17 else 92)),
+                surfaceContainerHighest = Color(scheme.neutralPalette.tone(if (systemDark) 22 else 90)),
+                surfaceContainerLow = Color(scheme.neutralPalette.tone(if (systemDark) 10 else 96)),
+                surfaceContainerLowest = Color(scheme.neutralPalette.tone(if (systemDark) 4 else 100))
+            )
+
+            m3Scheme to systemDark
         }
     }
 
