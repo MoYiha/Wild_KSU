@@ -14,12 +14,12 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.util.LocalUiOverlaySettings
 
 @Composable
-fun IssueReportCard() {
+fun IssueReportCard(modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
     val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
-    Card() {
+    Card(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

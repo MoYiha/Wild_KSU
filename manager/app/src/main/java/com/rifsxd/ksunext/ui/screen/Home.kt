@@ -1237,53 +1237,7 @@ fun EXperimentalCard() {
     }
 }
 
-@Composable
-fun IssueReportCard() {
-    val uriHandler = LocalUriHandler.current
-    val githubIssueUrl = stringResource(R.string.issue_report_github_link)
-    val telegramUrl = stringResource(R.string.issue_report_telegram_link)
-    val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
-    Card() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.issue_report_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.issue_report_body),
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.issue_report_body_2),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                IconButton(onClick = { uriHandler.openUri(githubIssueUrl) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_github),
-                        contentDescription = stringResource(R.string.issue_report_github),
-                    )
-                }
-                IconButton(onClick = { uriHandler.openUri(telegramUrl) }) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_telegram),
-                        contentDescription = stringResource(R.string.issue_report_telegram),
-                    )
-                }
-            }
-        }
-    }
-}
+
 
 fun getManagerVersion(context: Context): Pair<String, Long> {
     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)!!
