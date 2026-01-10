@@ -95,6 +95,7 @@ fun KernelSUTheme(
             val argb = colorToUse.toArgb()
 
             val scheme = if (systemDark) Scheme.dark(argb) else Scheme.light(argb)
+            val corePalette = CorePalette.of(argb)
 
             val m3Scheme = ColorScheme(
                 primary = Color(scheme.primary),
@@ -128,13 +129,13 @@ fun KernelSUTheme(
                 scrim = Color(scheme.scrim),
 
                 // Surface Container Roles (derived from Neutral Palette)
-                surfaceBright = Color(scheme.neutralPalette.tone(if (systemDark) 24 else 98)),
-                surfaceDim = Color(scheme.neutralPalette.tone(if (systemDark) 6 else 87)),
-                surfaceContainer = Color(scheme.neutralPalette.tone(if (systemDark) 12 else 94)),
-                surfaceContainerHigh = Color(scheme.neutralPalette.tone(if (systemDark) 17 else 92)),
-                surfaceContainerHighest = Color(scheme.neutralPalette.tone(if (systemDark) 22 else 90)),
-                surfaceContainerLow = Color(scheme.neutralPalette.tone(if (systemDark) 10 else 96)),
-                surfaceContainerLowest = Color(scheme.neutralPalette.tone(if (systemDark) 4 else 100))
+                surfaceBright = Color(corePalette.n1.tone(if (systemDark) 24 else 98)),
+                surfaceDim = Color(corePalette.n1.tone(if (systemDark) 6 else 87)),
+                surfaceContainer = Color(corePalette.n1.tone(if (systemDark) 12 else 94)),
+                surfaceContainerHigh = Color(corePalette.n1.tone(if (systemDark) 17 else 92)),
+                surfaceContainerHighest = Color(corePalette.n1.tone(if (systemDark) 22 else 90)),
+                surfaceContainerLow = Color(corePalette.n1.tone(if (systemDark) 10 else 96)),
+                surfaceContainerLowest = Color(corePalette.n1.tone(if (systemDark) 4 else 100))
             )
 
             m3Scheme to systemDark
