@@ -13,7 +13,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 
 import com.google.android.material.color.utilities.Scheme
-import com.google.android.material.color.utilities.CorePalette
+import com.google.android.material.color.utilities.Hct
+import com.google.android.material.color.utilities.TonalPalette
 import com.rifsxd.ksunext.ui.theme.AMOLED_BLACK
 
 
@@ -34,7 +35,8 @@ object MonetColorsProvider {
         if (appThemeVal == 6) { // AppTheme.CUSTOM
             val customColor = prefs.getInt("theme_custom_color", 0xFF8AADF4.toInt())
             val scheme = if (isDark) Scheme.dark(customColor) else Scheme.light(customColor)
-            val corePalette = CorePalette.of(customColor)
+            val hct = Hct.fromInt(customColor)
+            val neutralPalette = TonalPalette.fromHueAndChroma(hct.hue, 4.0)
             val monetColors = mapOf(
                 "primary" to Color(scheme.primary).toArgb().toHex(),
                 "onPrimary" to Color(scheme.onPrimary).toArgb().toHex(),
@@ -66,13 +68,13 @@ object MonetColorsProvider {
                 "outline" to Color(scheme.outline).toArgb().toHex(),
                 "outlineVariant" to Color(scheme.outlineVariant).toArgb().toHex(),
                 "scrim" to Color(scheme.scrim).toArgb().toHex(),
-                "surfaceBright" to Color(corePalette.n1.tone(if (isDark) 24 else 98)).toArgb().toHex(),
-                "surfaceDim" to Color(corePalette.n1.tone(if (isDark) 6 else 87)).toArgb().toHex(),
-                "surfaceContainer" to Color(corePalette.n1.tone(if (isDark) 12 else 94)).toArgb().toHex(),
-                "surfaceContainerHigh" to Color(corePalette.n1.tone(if (isDark) 17 else 92)).toArgb().toHex(),
-                "surfaceContainerHighest" to Color(corePalette.n1.tone(if (isDark) 22 else 90)).toArgb().toHex(),
-                "surfaceContainerLow" to Color(corePalette.n1.tone(if (isDark) 10 else 96)).toArgb().toHex(),
-                "surfaceContainerLowest" to Color(corePalette.n1.tone(if (isDark) 4 else 100)).toArgb().toHex(),
+                "surfaceBright" to Color(neutralPalette.tone(if (isDark) 24 else 98)).toArgb().toHex(),
+                "surfaceDim" to Color(neutralPalette.tone(if (isDark) 6 else 87)).toArgb().toHex(),
+                "surfaceContainer" to Color(neutralPalette.tone(if (isDark) 12 else 94)).toArgb().toHex(),
+                "surfaceContainerHigh" to Color(neutralPalette.tone(if (isDark) 17 else 92)).toArgb().toHex(),
+                "surfaceContainerHighest" to Color(neutralPalette.tone(if (isDark) 22 else 90)).toArgb().toHex(),
+                "surfaceContainerLow" to Color(neutralPalette.tone(if (isDark) 10 else 96)).toArgb().toHex(),
+                "surfaceContainerLowest" to Color(neutralPalette.tone(if (isDark) 4 else 100)).toArgb().toHex(),
                 "filledTonalButtonContentColor" to Color(scheme.onSecondaryContainer).toArgb().toHex(),
                 "filledTonalButtonContainerColor" to Color(scheme.secondaryContainer).toArgb().toHex(),
                 "filledTonalButtonDisabledContentColor" to Color(scheme.onSurfaceVariant).toArgb().toHex(),

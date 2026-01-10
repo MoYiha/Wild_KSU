@@ -19,6 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.runtime.remember
 import com.google.android.material.color.utilities.Scheme
+import com.google.android.material.color.utilities.Hct
+import com.google.android.material.color.utilities.TonalPalette
 
 
 private val DarkColorScheme = darkColorScheme(
@@ -129,13 +131,13 @@ fun KernelSUTheme(
                 scrim = Color(scheme.scrim),
 
                 // Surface Container Roles (derived from Neutral Palette)
-                surfaceBright = Color(corePalette.n1.tone(if (systemDark) 24 else 98)),
-                surfaceDim = Color(corePalette.n1.tone(if (systemDark) 6 else 87)),
-                surfaceContainer = Color(corePalette.n1.tone(if (systemDark) 12 else 94)),
-                surfaceContainerHigh = Color(corePalette.n1.tone(if (systemDark) 17 else 92)),
-                surfaceContainerHighest = Color(corePalette.n1.tone(if (systemDark) 22 else 90)),
-                surfaceContainerLow = Color(corePalette.n1.tone(if (systemDark) 10 else 96)),
-                surfaceContainerLowest = Color(corePalette.n1.tone(if (systemDark) 4 else 100))
+                surfaceBright = Color(neutralPalette.tone(if (systemDark) 24 else 98)),
+                surfaceDim = Color(neutralPalette.tone(if (systemDark) 6 else 87)),
+                surfaceContainer = Color(neutralPalette.tone(if (systemDark) 12 else 94)),
+                surfaceContainerHigh = Color(neutralPalette.tone(if (systemDark) 17 else 92)),
+                surfaceContainerHighest = Color(neutralPalette.tone(if (systemDark) 22 else 90)),
+                surfaceContainerLow = Color(neutralPalette.tone(if (systemDark) 10 else 96)),
+                surfaceContainerLowest = Color(neutralPalette.tone(if (systemDark) 4 else 100))
             )
 
             m3Scheme to systemDark
