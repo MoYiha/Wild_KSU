@@ -260,12 +260,12 @@ class MainActivity : ComponentActivity() {
                                                     onClick = {
                                                         if (isSelected) return@NavigationBarItem
                                                         navigator.navigate(destination.direction) {
-                                                            launchSingleTop = true
-                                                            restoreState = true
-                                                            popUpTo(NavGraphs.root) {
-                                                                saveState = true
-                                                            }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                        popUpTo(HomeScreenDestination) {
+                                                            saveState = true
                                                         }
+                                                    }
                                                     },
                                                     icon = {
                                                         Icon(

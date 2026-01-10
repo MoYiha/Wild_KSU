@@ -19,13 +19,7 @@ fun IssueReportCard() {
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
     val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
-    val cardElevation = if (cardAlpha < 1f) {
-        CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
-    } else {
-        CardDefaults.elevatedCardElevation()
-    }
-
-    ElevatedCard(elevation = cardElevation) {
+    Card() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

@@ -299,21 +299,14 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             }
 
             val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
-            val cardElevation = if (cardAlpha < 1f) {
-                CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
-            } else {
-                CardDefaults.elevatedCardElevation()
-            }
-
             val elevatedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
 
             // Card 1: Interface
-            ElevatedCard(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
-                colors = CardDefaults.elevatedCardColors(containerColor = elevatedContainerColor),
-                elevation = cardElevation,
+                colors = CardDefaults.cardColors(containerColor = elevatedContainerColor),
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
@@ -381,12 +374,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             }
 
             // Card 2: Theming
-            ElevatedCard(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
-                colors = CardDefaults.elevatedCardColors(containerColor = elevatedContainerColor),
-                elevation = cardElevation,
+                colors = CardDefaults.cardColors(containerColor = elevatedContainerColor),
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),

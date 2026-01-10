@@ -135,22 +135,15 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             }
 
             val cardAlpha = LocalUiOverlaySettings.current.cardAlpha
-            val cardElevation = if (cardAlpha < 1f) {
-                CardDefaults.elevatedCardElevation(defaultElevation = 0.dp)
-            } else {
-                CardDefaults.elevatedCardElevation()
-            }
-
             val elevatedContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
 
             if (ksuVersion != null) {
 
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
-                    colors = CardDefaults.elevatedCardColors(containerColor = elevatedContainerColor),
-                    elevation = cardElevation,
+                    colors = CardDefaults.cardColors(containerColor = elevatedContainerColor),
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -242,12 +235,11 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     }
                 }
 
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp),
-                    colors = CardDefaults.elevatedCardColors(containerColor = elevatedContainerColor),
-                    elevation = cardElevation,
+                    colors = CardDefaults.cardColors(containerColor = elevatedContainerColor),
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -333,12 +325,11 @@ fun SettingScreen(navigator: DestinationsNavigator) {
 
             val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-            ElevatedCard(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
-                colors = CardDefaults.elevatedCardColors(containerColor = elevatedContainerColor),
-                elevation = cardElevation,
+                colors = CardDefaults.cardColors(containerColor = elevatedContainerColor),
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
