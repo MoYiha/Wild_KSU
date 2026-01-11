@@ -102,7 +102,7 @@ fun DeveloperScreen(navigator: DestinationsNavigator) {
                         loadingDialog.withLoading {
                             withContext(Dispatchers.IO) {
                                 runCatching {
-                                    val url = "https://nightly.link/WildKernels/Wild_KSU/workflows/build-manager-ci/wild/manager.zip"
+                                    val url = "https://nightly.link/WildKernels/Wild_KSU/workflows/build-manager-ci/wild-dev/manager.zip"
                                     val request = okhttp3.Request.Builder().url(url).build()
                                     
                                     ksuApp.okhttpClient.newCall(request).execute().use { response ->
