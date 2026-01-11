@@ -295,53 +295,33 @@ class MainActivity : ComponentActivity() {
                                     defaultTransitions = object : NavHostAnimatedDestinationStyle() {
                                         override val enterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
                                             {
-                                                slideInHorizontally(
-                                                    initialOffsetX = { it },
-                                                    animationSpec = tween(
-                                                        durationMillis = 300,
-                                                        easing = FastOutSlowInEasing
-                                                    )
-                                                ) + fadeIn(
-                                                    animationSpec = tween(300, easing = LinearOutSlowInEasing)
+                                                fadeIn(animationSpec = tween(300)) + scaleIn(
+                                                    initialScale = 0.95f,
+                                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
                                                 )
                                             }
 
                                         override val exitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
                                             {
-                                                slideOutHorizontally(
-                                                    targetOffsetX = { -it / 3 },
-                                                    animationSpec = tween(
-                                                        durationMillis = 300,
-                                                        easing = FastOutSlowInEasing
-                                                    )
-                                                ) + fadeOut(
-                                                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                                                fadeOut(animationSpec = tween(300)) + scaleOut(
+                                                    targetScale = 0.95f,
+                                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
                                                 )
                                             }
 
                                         override val popEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition =
                                             {
-                                                slideInHorizontally(
-                                                    initialOffsetX = { -it / 3 },
-                                                    animationSpec = tween(
-                                                        durationMillis = 280,
-                                                        easing = FastOutSlowInEasing
-                                                    )
-                                                ) + fadeIn(
-                                                    animationSpec = tween(280, easing = LinearOutSlowInEasing)
+                                                fadeIn(animationSpec = tween(300)) + scaleIn(
+                                                    initialScale = 0.95f,
+                                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
                                                 )
                                             }
 
                                         override val popExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition =
                                             {
-                                                slideOutHorizontally(
-                                                    targetOffsetX = { it / 3 },
-                                                    animationSpec = tween(
-                                                        durationMillis = 280,
-                                                        easing = FastOutSlowInEasing
-                                                    )
-                                                ) + fadeOut(
-                                                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                                                fadeOut(animationSpec = tween(300)) + scaleOut(
+                                                    targetScale = 0.95f,
+                                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
                                                 )
                                             }
                                     }
