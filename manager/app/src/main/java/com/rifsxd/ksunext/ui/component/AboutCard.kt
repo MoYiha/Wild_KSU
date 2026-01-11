@@ -29,7 +29,7 @@ import com.rifsxd.ksunext.R
 fun AboutCard() {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge
+        shape = RoundedCornerShape(8.dp)
     ) {
         Row(
             modifier = Modifier
