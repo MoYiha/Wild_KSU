@@ -24,7 +24,7 @@ on:
 
 jobs:
   prepare-tag:
-    if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/wild' || github.ref == 'refs/heads/wild-dev') }}
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/wild' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -37,11 +37,7 @@ jobs:
       - name: Create Tag
         id: create_tag
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/wild-dev" ]]; then
-             BASE_VERSION="v4.2.0-dev"
-          else
-             BASE_VERSION="v4.2.0"
-          fi
+          BASE_VERSION="v4.2.0"
           TAGS=$(git tag -l "${BASE_VERSION}-r*")
           if [ -z "$TAGS" ]; then
             NEW_TAG="${BASE_VERSION}-r1"
@@ -215,8 +211,6 @@ jobs:
         with:
           tag_name: ${{ needs.prepare-tag.outputs.tag_name }}
           body: ${{ github.event.head_commit.message }}
-          prerelease: ${{ github.ref == 'refs/heads/wild-dev' }}
-          make_latest: ${{ github.ref == 'refs/heads/wild' }}
           files: |
             manager/*.apk
             manager-spoofed/*.apk
