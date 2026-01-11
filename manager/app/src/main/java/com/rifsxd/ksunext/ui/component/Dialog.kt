@@ -385,7 +385,7 @@ private fun LoadingDialog() {
         properties = DialogProperties(dismissOnClickOutside = false, dismissOnBackPress = false)
     ) {
         Surface(
-            modifier = Modifier.size(100.dp), shape = MaterialTheme.shapes.medium
+            modifier = Modifier.size(100.dp), shape = RoundedCornerShape(8.dp)
         ) {
             Box(
                 contentAlignment = Alignment.Center,
